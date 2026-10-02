@@ -3,298 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gà Gaming - Temp Mail</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background-color: #0b0f19;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 15px;
-        }
-        .container {
-            width: 100%;
-            max-width: 420px;
-            background: #131b2e;
-            border: 1px solid #1e293b;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            font-size: 20px;
-            color: #fbbf24;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-        .header p {
-            font-size: 13px;
-            color: #94a3b8;
-        }
-        .label {
-            font-size: 13px;
-            color: #cbd5e1;
-            margin-bottom: 8px;
-            display: block;
-        }
-        .email-box-wrapper {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        .email-input {
-            flex: 1;
-            background: #0b0f19;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            color: #4ade80;
-            font-size: 14px;
-            padding: 12px;
-            outline: none;
-            text-align: center;
-            font-weight: 600;
-        }
-        .btn-copy {
-            background: #fbbf24;
-            color: #000;
-            border: none;
-            border-radius: 10px;
-            padding: 0 16px;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-        .btn-copy:active {
-            opacity: 0.8;
-        }
-        .btn-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-        .btn {
-            flex: 1;
-            border: none;
-            border-radius: 10px;
-            padding: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            color: #fff;
-            transition: opacity 0.2s;
-        }
-        .btn:active {
-            opacity: 0.8;
-        }
-        .btn-change {
-            background: #3b82f6;
-        }
-        .btn-check {
-            background: #10b981;
-        }
-        .inbox-section {
-            margin-top: 10px;
-        }
-        .inbox-title {
-            font-size: 13px;
-            color: #94a3b8;
-            margin-bottom: 8px;
-        }
-        .inbox-box {
-            background: #0b0f19;
-            border: 1px solid #1e293b;
-            border-radius: 10px;
-            min-height: 140px;
-            max-height: 220px;
-            overflow-y: auto;
-            padding: 12px;
-            font-size: 13px;
-            color: #64748b;
-            text-align: center;
-        }
-        .email-item {
-            background: #1e293b;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            text-align: left;
-            color: #f8fafc;
-            cursor: pointer;
-        }
-        .email-item .sender {
-            font-weight: bold;
-            color: #fbbf24;
-            font-size: 12px;
-        }
-        .email-item .subject {
-            font-size: 13px;
-            margin-top: 2px;
-        }
-    </style>
+    <title>Gà Gaming - Hệ Thống Shop Game Thông Minh & File ID</title>
+    <!-- Sử dụng Tailwind CSS để thiết kế giao diện cực đẹp -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Thư viện hiệu ứng icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen selection:bg-yellow-500 selection:text-slate-950">
+    
+    <!-- Header thông minh -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-400 text-xl font-bold">🐔</div>
+                <div>
+                    <span class="font-black text-lg text-white tracking-wide block">GÀ GAMING CORP</span>
+                    <span class="text-[10px] text-emerald-400 font-mono tracking-wider flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> HỆ THỐNG TỰ ĐỘNG 24/7</span>
+                </div>
+            </div>
+            <button onclick="toggleAdminPanel()" id="adminBtnText" class="bg-slate-900 hover:bg-slate-800 text-yellow-400 border border-slate-800 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-lg">
+                <i class="fa-solid fa-shield-halved"></i> Quản Trị Công Ty
+            </button>
+        </div>
+    </header>
 
-    <div class="container">
-        <div class="header">
-            <h1>🐔 GÀ GAMING - TEMP MAIL</h1>
-            <p>Hệ thống tạo email tạm thời nhận mã OTP tự động</p>
+    <!-- Main Shop View -->
+    <main id="shopView" class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+        <!-- Banner -->
+        <div class="relative overflow-hidden bg-gradient-to-r from-yellow-600/20 via-orange-600/20 to-red-600/20 border border-yellow-500/30 rounded-3xl p-8 md:p-12 text-center shadow-2xl">
+            <div class="absolute -right-10 -bottom-10 text-9xl opacity-10 select-none">🍎</div>
+            <h1 class="text-3xl md:text-5xl font-black text-white mb-3 tracking-tight">SHOP BLOX FRUIT TỰ ĐỘNG & FILE ID</h1>
+            <p class="text-slate-400 max-w-xl mx-auto text-sm md:text-base">Giao dịch thông minh 100%, tự động trừ kho, cấp mã File ID định danh doanh nghiệp chuẩn xác ngay sau 1 giây.</p>
         </div>
 
-        <label class="label">Email ảo của bạn:</label>
-        <div class="email-box-wrapper">
-            <input type="text" id="emailDisplay" class="email-input" readonly value="Đang tạo email...">
-            <button class="btn-copy" onclick="copyEmail()">Sao chép</button>
+        <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold text-white border-l-4 border-yellow-500 pl-3 flex items-center gap-2">
+                <span>DANH MỤC TÀI KHOẢN TỰ ĐỘNG</span>
+            </h2>
+        </div>
+        
+        <!-- Danh sách sản phẩm -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="productList">
+            <!-- Render bằng JavaScript bên dưới -->
+        </div>
+    </main>
+
+    <!-- Admin Panel View (Ẩn mặc định) -->
+    <div id="adminView" class="max-w-6xl mx-auto px-4 py-8 hidden space-y-6">
+        <div class="flex items-center justify-between bg-slate-900 p-4 rounded-2xl border border-slate-800">
+            <h1 class="text-xl font-bold text-yellow-400 flex items-center gap-2">
+                <i class="fa-solid fa-gauge-high"></i> Bảng Điều Khiển Doanh Nghiệp Thông Minh
+            </h1>
+            <button onclick="toggleAdminPanel()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Về Trang Shop
+            </button>
         </div>
 
-        <div class="btn-row">
-            <button class="btn btn-change" onclick="getNewEmail()">🔄 Đổi Email Khác</button>
-            <button class="btn btn-check" onclick="checkInbox()">📬 Kiểm Tra Hộp Thư</button>
+        <!-- Thống kê tài chính / cổ tiền -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl shadow-xl">
+                <p class="text-xs text-slate-400 font-medium">Tổng Tài Chính / Cổ Tiền</p>
+                <h3 id="statTreasury" class="text-2xl font-black text-cyan-400 mt-2">0đ</h3>
+            </div>
+            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl shadow-xl">
+                <p class="text-xs text-slate-400 font-medium">Doanh Thu Bán Hàng</p>
+                <h3 id="statRevenue" class="text-2xl font-black text-emerald-400 mt-2">0đ</h3>
+            </div>
+            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl shadow-xl">
+                <p class="text-xs text-slate-400 font-medium">Tổng Đơn File ID</p>
+                <h3 id="statOrders" class="text-2xl font-black text-yellow-400 mt-2">0</h3>
+            </div>
+            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl shadow-xl">
+                <p class="text-xs text-slate-400 font-medium">Acc Tồn Kho</p>
+                <h3 id="statStock" class="text-2xl font-black text-blue-400 mt-2">0</h3>
+            </div>
         </div>
 
-        <div class="inbox-section">
-            <div class="inbox-title" id="inboxStatus">Hộp thư đến (Đang chờ thư...):</div>
-            <div class="inbox-box" id="inboxContent">
-                Chưa có tin nhắn nào đến...
+        <!-- Bảng quản lý File ID chi tiết -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
+            <h3 class="font-bold text-white text-sm flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice"></i> Sổ Giao Dịch & File ID Định Danh Công Ty:
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-yellow-500 bg-slate-950/40">
+                            <th class="p-3">Mã File ID</th>
+                            <th class="p-3">Thời gian</th>
+                            <th class="p-3">Khách hàng</th>
+                            <th class="p-3">Sản phẩm</th>
+                            <th class="p-3">Tài khoản xuất kho</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminLogsTable">
+                        <tr><td colspan="5" class="p-4 text-center text-slate-500">Chưa có giao dịch nào.</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
+    <!-- Modal Thông Báo Giao Dịch Thành Công Thông Minh -->
+    <div id="successModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 rounded-2xl flex items-center justify-center text-3xl mx-auto">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h3 class="text-xl font-black text-white">Giao Dịch Thành Công!</h3>
+                <p class="text-xs text-slate-400">Hệ thống đã tự động xuất kho và lập File ID bảo hành.</p>
+            </div>
+
+            <div class="space-y-3 bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
+                <div>
+                    <span class="text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">Mã File ID Định Danh:</span>
+                    <div class="flex items-center justify-between mt-1 bg-slate-900 p-2 rounded-xl border border-slate-800">
+                        <span id="modalFileId" class="font-mono text-sm text-cyan-300 font-bold"></span>
+                        <button onclick="copyText('modalFileId')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded-lg transition">Copy</button>
+                    </div>
+                </div>
+                <div>
+                    <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">Tài khoản & Mật khẩu Game:</span>
+                    <div class="flex items-center justify-between mt-1 bg-slate-900 p-2 rounded-xl border border-slate-800">
+                        <span id="modalAccount" class="font-mono text-xs text-emerald-300 font-bold"></span>
+                        <button onclick="copyText('modalAccount')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded-lg transition">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="closeModal()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold py-3 rounded-xl text-sm transition shadow-lg">
+                Đã hiểu & Lưu thông tin
+            </button>
+        </div>
+    </div>
+
+    <!-- Script Xử Lý Thông Minh -->
     <script>
-        let currentEmail = "";
-        let currentLogin = "";
-        let currentDomain = "";
-
-        // Danh sách domain dự phòng từ 1secmail
-        const domains = ["1secmail.com", "1secmail.org", "1secmail.net", "wwjmp.com", "esiix.com"];
-
-        function getRandomDomain() {
-            return domains[Math.floor(Math.random() * domains.length)];
+        // Khởi tạo dữ liệu mẫu thông minh vào LocalStorage nếu chưa có
+        if (!localStorage.getItem('stockAccounts')) {
+            const initialStock = [
+                { id: 1, type: "Random Trái Ác Quỷ Víp", desc: "Tỷ lệ trúng Leopard/Dough cực cao.", icon: "🍎", account: "bloxfruit_ga1@gmail.com | pass123", price: 20000, sold: false },
+                { id: 2, type: "Random Trái Ác Quỷ Víp", desc: "Tỷ lệ trúng Leopard/Dough cực cao.", icon: "🍎", account: "bloxfruit_ga2@gmail.com | pass456", price: 20000, sold: false },
+                { id: 3, type: "Acc Max Level + Godhuman", desc: "Full skill, sẵn sàng chiến đấu.", icon: "⚔️", account: "godhuman_pro1@gmail.com | pass789", price: 50000, sold: false },
+                { id: 4, type: "Acc Cực VIP Tộc V4", desc: "Full gear, max trang bị khủng.", icon: "🔥", account: "tocv4_vip99@gmail.com | pass999", price: 100000, sold: false }
+            ];
+            localStorage.setItem('stockAccounts', JSON.stringify(initialStock));
         }
 
-        async function getNewEmail() {
-            const emailDisplay = document.getElementById("emailDisplay");
-            const inboxContent = document.getElementById("inboxContent");
-            const inboxStatus = document.getElementById("inboxStatus");
-            
-            emailDisplay.value = "Đang kết nối...";
-            inboxContent.innerHTML = "Chưa có tin nhắn nào đến...";
-            inboxStatus.innerText = "Hộp thư đến (Đang chờ thư...):";
-
-            try {
-                // Tạo tên ngẫu nhiên 10 ký tự
-                const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-                let username = "";
-                for (let i = 0; i < 10; i++) {
-                    username += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-                currentDomain = getRandomDomain();
-                currentLogin = username;
-                currentEmail = `${username}@${currentDomain}`;
-
-                // Test gọi API để xác thực kết nối
-                let response = await fetch(`https://www.1secmail.com/api/v1/?action=getMessages&login=${currentLogin}&domain=${currentDomain}`);
-                if (!response.ok) throw new Error("Network response was not ok");
-                
-                emailDisplay.value = currentEmail;
-            } catch (error) {
-                console.error(error);
-                // Fallback tạo email bằng domain khác hoặc báo lỗi rõ ràng
-                emailDisplay.value = "Lỗi kết nối tạo email (Thử lại)";
-            }
+        if (!localStorage.getItem('transactionLogs')) {
+            localStorage.setItem('transactionLogs', JSON.stringify([]));
         }
 
-        function copyEmail() {
-            const emailDisplay = document.getElementById("emailDisplay");
-            if (!currentEmail || emailDisplay.value.includes("Lỗi")) {
-                alert("Chưa có email hợp lệ để sao chép!");
-                return;
-            }
-            navigator.clipboard.writeText(currentEmail).then(() => {
-                alert("Đã sao chép: " + currentEmail);
-            }).catch(err => {
-                // Fallback cho trình duyệt cũ
-                emailDisplay.select();
-                document.execCommand("copy");
-                alert("Đã sao chép: " + currentEmail);
+        if (!localStorage.getItem('revenue')) {
+            localStorage.setItem('revenue', '0');
+        }
+
+        const baseCapital = 500000; // Vốn / Cổ tiền ban đầu của công ty
+
+        // Render danh sách sản phẩm ra giao diện
+        function renderProducts() {
+            let stock = JSON.parse(localStorage.getItem('stockAccounts'));
+            let productListEl = document.getElementById('productList');
+            productListEl.innerHTML = "";
+
+            // Gom nhóm sản phẩm theo tên loại
+            let types = [...new Set(stock.map(item => item.type))];
+
+            types.forEach(typeName => {
+                let availableItems = stock.filter(acc => acc.type === typeName && !acc.sold);
+                let sampleItem = stock.find(acc => acc.type === typeName);
+                let isOutOfStock = availableItems.length === 0;
+
+                productListEl.innerHTML += `
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between transition hover:border-slate-700">
+                        <div>
+                            <div class="bg-slate-800/50 h-36 flex items-center justify-center text-5xl border-b border-slate-800">${sampleItem.icon}</div>
+                            <div class="p-5 space-y-2">
+                                <h3 class="font-bold text-lg text-white">${typeName}</h3>
+                                <p class="text-slate-400 text-xs">${sampleItem.desc}</p>
+                                <div class="flex items-center gap-2 pt-1">
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${isOutOfStock ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}">
+                                        ${isOutOfStock ? 'Hết hàng' : 'Còn lại: ' + availableItems.length}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-5 pt-0 flex items-center justify-between">
+                            <span class="text-yellow-400 font-black text-lg">${sampleItem.price.toLocaleString()} đ</span>
+                            <button onclick="buyProduct('${typeName}', ${sampleItem.price})" 
+                                class="${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-yellow-500 hover:bg-yellow-400 text-slate-950 shadow-lg shadow-yellow-500/20'} font-bold px-4 py-2.5 rounded-xl text-sm transition">
+                                ${isOutOfStock ? 'Hết Hàng' : 'Mua Ngay'}
+                            </button>
+                        </div>
+                    </div>
+                `;
             });
         }
 
-        async function checkInbox() {
-            if (!currentLogin || !currentDomain) {
-                alert("Vui lòng tạo email trước!");
-                getNewEmail();
+        // Xử lý thông minh khi khách bấm mua
+        function buyProduct(productType, price) {
+            let stock = JSON.parse(localStorage.getItem('stockAccounts'));
+            let availableAcc = stock.find(acc => acc.type === productType && !acc.sold);
+
+            if (!availableAcc) {
+                alert("❌ Sản phẩm này trong kho công ty đã tạm hết!");
                 return;
             }
 
-            const inboxContent = document.getElementById("inboxContent");
-            const inboxStatus = document.getElementById("inboxStatus");
-            inboxStatus.innerText = "Hộp thư đến (Đang kiểm tra...):";
+            let username = prompt("Nhập tên nhân vật hoặc tài khoản của bạn để nhận hàng:");
+            if (!username) return;
 
-            try {
-                let response = await fetch(`https://www.1secmail.com/api/v1/?action=getMessages&login=${currentLogin}&domain=${currentDomain}`);
-                let messages = await response.json();
+            // Đánh dấu tài khoản đã bán
+            availableAcc.sold = true;
+            localStorage.setItem('stockAccounts', JSON.stringify(stock));
 
-                if (messages && messages.length > 0) {
-                    inboxContent.innerHTML = "";
-                    inboxStatus.innerText = `Hộp thư đến (${messages.length} thư mới):`;
-                    
-                    messages.forEach(msg => {
-                        let div = document.createElement("div");
-                        div.className = "email-item";
-                        div.innerHTML = `<div class="sender">Từ: ${msg.from}</div><div class="subject">Tiêu đề: ${msg.subject}</div>`;
-                        div.onclick = () => readMessage(msg.id);
-                        inboxContent.appendChild(div);
-                    });
-                } else {
-                    inboxStatus.innerText = "Hộp thư đến (Không có thư mới):";
-                    inboxContent.innerHTML = "Chưa có tin nhắn nào đến...";
-                }
-            } catch (error) {
-                console.error(error);
-                inboxStatus.innerText = "Hộp thư đến (Lỗi kết nối):";
-                inboxContent.innerHTML = "Không thể kết nối đến máy chủ thư!";
+            // Sinh mã File ID định danh doanh nghiệp độc quyền
+            let fileId = `GA-CORP-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+
+            // Cộng doanh thu tài chính
+            let currentRev = parseInt(localStorage.getItem('revenue')) + price;
+            localStorage.setItem('revenue', currentRev);
+
+            // Lưu lịch sử giao dịch
+            let logs = JSON.parse(localStorage.getItem('transactionLogs'));
+            logs.push({
+                fileId: fileId,
+                time: new Date().toLocaleString(),
+                buyer: username,
+                product: productType,
+                accountInfo: availableAcc.account
+            });
+            localStorage.setItem('transactionLogs', JSON.stringify(logs));
+
+            // Hiển thị Modal thông báo thông minh
+            document.getElementById('modalFileId').innerText = fileId;
+            document.getElementById('modalAccount').innerText = availableAcc.account;
+            document.getElementById('successModal').classList.remove('hidden');
+
+            // Cập nhật lại giao diện shop
+            renderProducts();
+        }
+
+        function closeModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+        // Tính năng copy thông minh
+        function copyText(elementId) {
+            let text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text);
+            alert("📋 Đã sao chép vào bộ nhớ tạm!");
+        }
+
+        // Chuyển đổi qua lại giữa Shop và Bảng Admin
+        function toggleAdminPanel() {
+            let shop = document.getElementById('shopView');
+            let admin = document.getElementById('adminView');
+
+            if (admin.classList.contains('hidden')) {
+                shop.classList.add('hidden');
+                admin.classList.remove('hidden');
+                loadAdminData();
+            } else {
+                admin.classList.add('hidden');
+                shop.classList.remove('hidden');
             }
         }
 
-        async function readMessage(id) {
-            try {
-                let response = await fetch(`https://www.1secmail.com/api/v1/?action=readMessage&login=${currentLogin}&domain=${currentDomain}&id=${id}`);
-                let data = await response.json();
-                
-                const inboxContent = document.getElementById("inboxContent");
-                inboxContent.innerHTML = `
-                    <div style="text-align: left; padding: 5px;">
-                        <button onclick="checkInbox()" style="background:#3b82f6; color:#fff; border:none; padding:5px 10px; border-radius:5px; margin-bottom:8px; cursor:pointer;">⬅ Quay lại</button>
-                        <p><b>Từ:</b> ${data.from}</p>
-                        <p><b>Tiêu đề:</b> ${data.subject}</p>
-                        <hr style="border-color:#334155; margin:6px 0;">
-                        <div>${data.body || data.textBody}</div>
-                    </div>
-                `;
-            } catch (error) {
-                alert("Không thể đọc nội dung tin nhắn!");
+        // Load dữ liệu thông kê cho Admin Công ty
+        function loadAdminData() {
+            let stock = JSON.parse(localStorage.getItem('stockAccounts'));
+            let logs = JSON.parse(localStorage.getItem('transactionLogs'));
+            let revenue = parseInt(localStorage.getItem('revenue'));
+            let stockCount = stock.filter(acc => !acc.sold).length;
+
+            document.getElementById('statTreasury').innerText = (baseCapital + revenue).toLocaleString() + 'đ';
+            document.getElementById('statRevenue').innerText = revenue.toLocaleString() + 'đ';
+            document.getElementById('statOrders').innerText = logs.length;
+            document.getElementById('statStock').innerText = stockCount;
+
+            let table = document.getElementById('adminLogsTable');
+            if (logs.length === 0) {
+                table.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Chưa có File ID nào được tạo.</td></tr>`;
+            } else {
+                table.innerHTML = "";
+                logs.slice().reverse().forEach(log => {
+                    table.innerHTML += `
+                        <tr class="border-b border-slate-800/50 hover:bg-slate-900/50">
+                            <td class="p-3 font-mono text-cyan-400 font-bold">${log.fileId}</td>
+                            <td class="p-3 text-slate-400">${log.time}</td>
+                            <td class="p-3 font-bold text-white">${log.buyer}</td>
+                            <td class="p-3 text-yellow-400">${log.product}</td>
+                            <td class="p-3 font-mono text-emerald-400">${log.accountInfo}</td>
+                        </tr>`;
+                });
             }
         }
 
-        // Tự động tạo email khi load trang
-        window.onload = getNewEmail;
+        // Khởi chạy khi mở trang
+        renderProducts();
     </script>
 </body>
 </html>
