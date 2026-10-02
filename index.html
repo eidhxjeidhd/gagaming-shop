@@ -188,8 +188,8 @@
     </div>
 
     <script>
-        // Database
-        let db = JSON.parse(localStorage.getItem('gagaming_db_v2')) || {
+        // Database Initialization with Storage Event sync
+        let db = JSON.parse(localStorage.getItem('gagaming_db_v3')) || {
             users: [
                 { username: 'admin', password: '123456', balance: 5000000, isAdmin: true }
             ],
@@ -198,24 +198,47 @@
                 { id: 2, name: 'Acc Liên Quân Full Tướng + 30 Skin', price: 250000, img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500', credentials: { user: 'lienquan_vip_hn', pass: 'hoangMaster88' }, sold: false }
             ],
             purchased: [],
-            topupRequests: [] // { id, username, type, amount, code, status: 'pending' }
+            topupRequests: []
         };
 
-        let currentUser = JSON.parse(localStorage.getItem('gagaming_current_user_v2')) || null;
+        let currentUser = JSON.parse(localStorage.getItem('gagaming_current_user_v3')) || null;
         let isRegisterMode = false;
 
+        // Auto sync across tabs/sessions
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'gagaming_db_v3') {
+                db = JSON.parse(e.newValue);
+                if (currentUser) {
+                    let u = db.users.find(x => x.username === currentUser.username);
+                    if (u) {
+                        currentUser = u;
+                        localStorage.setItem('gagaming_current_user_v3', JSON.stringify(currentUser));
+                    }
+                }
+                renderNav();
+                if(!document.getElementById('section-shop').classList.contains('hidden')) renderShop();
+                if(!document.getElementById('section-admin').classList.contains('hidden')) renderAdminDashboard();
+            }
+        });
+
         function saveDB() {
-            localStorage.setItem('gagaming_db_v2', JSON.stringify(db));
+            localStorage.setItem('gagaming_db_v3', JSON.stringify(db));
             if(currentUser) {
                 let u = db.users.find(x => x.username === currentUser.username);
                 if(u) {
                     currentUser = u;
-                    localStorage.setItem('gagaming_current_user_v2', JSON.stringify(currentUser));
+                    localStorage.setItem('gagaming_current_user_v3', JSON.stringify(currentUser));
                 }
             }
         }
 
+        function reloadDB() {
+            let latest = JSON.parse(localStorage.getItem('gagaming_db_v3'));
+            if(latest) db = latest;
+        }
+
         function renderNav() {
+            reloadDB();
             const nav = document.getElementById('user-nav');
             const adminTab = document.getElementById('tab-admin');
             
@@ -239,6 +262,7 @@
         }
 
         function renderShop() {
+            reloadDB();
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
             
@@ -272,6 +296,7 @@
         }
 
         function renderHistory() {
+            reloadDB();
             const list = document.getElementById('purchased-list');
             list.innerHTML = '';
 
@@ -306,13 +331,12 @@
         }
 
         function renderAdminDashboard() {
-            // Stats
+            reloadDB();
             const pendingCount = db.topupRequests.filter(r => r.status === 'pending').length;
             document.getElementById('stat-pending-topup').innerText = pendingCount;
             document.getElementById('stat-total-products').innerText = db.products.length;
             document.getElementById('stat-total-sold').innerText = db.purchased.length;
 
-            // Topup requests list
             const topupList = document.getElementById('admin-topup-requests');
             topupList.innerHTML = '';
             const pendingRequests = db.topupRequests.filter(r => r.status === 'pending');
@@ -337,7 +361,6 @@
                 });
             }
 
-            // Products list
             const prodList = document.getElementById('admin-product-list');
             prodList.innerHTML = '';
             db.products.forEach(p => {
@@ -353,13 +376,13 @@
             });
         }
 
-        // Topup User Action
         function handleTopupSubmit(e) {
             e.preventDefault();
             if(!currentUser) {
                 openAuthModal();
                 return;
             }
+            reloadDB();
             const type = document.getElementById('topup-type').value;
             const amount = Number(document.getElementById('topup-amount').value);
             const code = document.getElementById('topup-code').value.trim();
@@ -379,6 +402,7 @@
         }
 
         function approveTopup(requestId) {
+            reloadDB();
             let req = db.topupRequests.find(r => r.id === requestId);
             if(!req) return;
 
@@ -393,6 +417,7 @@
         }
 
         function rejectTopup(requestId) {
+            reloadDB();
             let req = db.topupRequests.find(r => r.id === requestId);
             if(req) {
                 req.status = 'rejected';
@@ -402,12 +427,12 @@
             }
         }
 
-        // Buy Product
         function buyProduct(id) {
             if(!currentUser) {
                 openAuthModal();
                 return;
             }
+            reloadDB();
             const product = db.products.find(p => p.id === id);
             if(!product || product.sold) return;
 
@@ -439,9 +464,9 @@
             }
         }
 
-        // Admin Create Product
         function handleCreateProduct(e) {
             e.preventDefault();
+            reloadDB();
             const name = document.getElementById('p-name').value;
             const price = Number(document.getElementById('p-price').value);
             const img = document.getElementById('p-img').value;
@@ -463,6 +488,7 @@
         }
 
         function deleteProduct(id) {
+            reloadDB();
             if(confirm('Xóa sản phẩm này khỏi hệ thống?')) {
                 db.products = db.products.filter(p => p.id !== id);
                 saveDB();
@@ -471,7 +497,6 @@
             }
         }
 
-        // Navigation
         function switchTab(tab) {
             document.getElementById('section-shop').classList.add('hidden');
             document.getElementById('section-history').classList.add('hidden');
@@ -502,7 +527,6 @@
             }
         }
 
-        // Auth & Modals
         function openAuthModal() {
             isRegisterMode = false;
             updateAuthUI();
@@ -516,11 +540,12 @@
         function updateAuthUI() {
             document.getElementById('auth-title').innerText = isRegisterMode ? 'Đăng Ký Tài Khoản' : 'Đăng Nhập Hệ Thống';
             document.getElementById('auth-switch-text').innerText = isRegisterMode ? 'Đã có tài khoản?' : 'Chưa có tài khoản?';
-            document.getElementById('auth-switch-btn').innerText = isRegisterMode ? 'Đăng nhập' : 'Đăng ký ngay';
+            document.getElementById('auth-switch-btn').innerText = isRegisterMode ? 'Đăng ký ngay' : 'Đăng nhập';
         }
 
         function handleAuth(e) {
             e.preventDefault();
+            reloadDB();
             const u = document.getElementById('auth-user').value.trim();
             const p = document.getElementById('auth-pass').value.trim();
 
@@ -533,7 +558,7 @@
                 db.users.push(newUser);
                 saveDB();
                 currentUser = newUser;
-                localStorage.setItem('gagaming_current_user_v2', JSON.stringify(currentUser));
+                localStorage.setItem('gagaming_current_user_v3', JSON.stringify(currentUser));
                 alert('Đăng ký thành công!');
             } else {
                 let found = db.users.find(x => x.username === u && x.password === p);
@@ -542,7 +567,7 @@
                     return;
                 }
                 currentUser = found;
-                localStorage.setItem('gagaming_current_user_v2', JSON.stringify(currentUser));
+                localStorage.setItem('gagaming_current_user_v3', JSON.stringify(currentUser));
                 alert('Đăng nhập thành công!');
             }
             closeAuthModal();
@@ -552,7 +577,7 @@
 
         function logout() {
             currentUser = null;
-            localStorage.removeItem('gagaming_current_user_v2');
+            localStorage.removeItem('gagaming_current_user_v3');
             renderNav();
             switchTab('shop');
             alert('Đã đăng xuất.');
@@ -561,10 +586,11 @@
         function checkAdminAccess() {
             if(!currentUser || !currentUser.isAdmin) {
                 let pass = prompt("Nhập mật khẩu Admin quản trị:");
+                reloadDB();
                 let adminUser = db.users.find(u => u.isAdmin && u.password === pass);
                 if(adminUser) {
                     currentUser = adminUser;
-                    localStorage.setItem('gagaming_current_user_v2', JSON.stringify(currentUser));
+                    localStorage.setItem('gagaming_current_user_v3', JSON.stringify(currentUser));
                     renderNav();
                     switchTab('admin');
                 } else {
