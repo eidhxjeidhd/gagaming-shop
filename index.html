@@ -3,252 +3,590 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gà Gaming Shop - Secure Edition</title>
-    <style>
-        :root { --primary: #007bff; --success: #28a745; --danger: #dc3545; --dark: #222; --bg: #f4f4f4; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: var(--bg); padding: 12px; color: #333; }
-        .box { background: #fff; border: 1px solid #ddd; padding: 16px; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .btn { background: var(--primary); color: white; border: none; padding: 11px; cursor: pointer; border-radius: 6px; font-size: 14px; font-weight: bold; width: 100%; margin-top: 8px; }
-        .btn:active { opacity: 0.8; }
-        .btn-green { background: var(--success); }
-        .btn-danger { background: var(--danger); }
-        input { width: 100%; padding: 11px; margin: 6px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; }
-        .nav { display: flex; justify-content: space-between; align-items: center; background: var(--dark); color: white; padding: 14px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
-        .admin-panel { background: #fff9db; border: 1px solid #ffe066; }
-        .wallet-box { background: #e8f5e9; border: 1px solid #c8e6c9; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 14px; }
-        .msg { padding: 10px; margin-bottom: 12px; border-radius: 6px; font-weight: bold; font-size: 13px; text-align: center; display: none; }
-        .card-game { border: 1px solid #e2e8f0; background: #fff; padding: 14px; margin-bottom: 10px; border-radius: 6px; }
-        .price { color: var(--danger); font-weight: bold; font-size: 15px; margin: 4px 0 8px 0; display: block; }
-        hr { border: 0; border-top: 1px dashed #ddd; margin: 14px 0; }
-    </style>
+    <title>Gà Gaming Shop - Hệ Thống Mua Bán Acc Tự Động</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen pb-12">
 
-    <!-- THANH ĐIỀU HƯỚNG -->
-    <div class="nav">
-        <div>🎮 <b>GÀ GAMING SHOP</b></div>
-        <div id="userStatus">Chưa đăng nhập</div>
-    </div>
-
-    <!-- THÔNG BÁO -->
-    <div id="statusMsg" class="msg"></div>
-
-    <!-- KHU VỰC TÀI KHOẢN -->
-    <div class="box" id="authSection">
-        <h3 style="margin-bottom:10px;">🔑 HỆ THỐNG TÀI KHOẢN</h3>
-        <div>
-            <p style="font-size: 13px; font-weight: bold; color: #555;">Đăng Nhập</p>
-            <input type="text" id="loginUser" placeholder="Tên tài khoản">
-            <input type="password" id="loginPass" placeholder="Mật khẩu">
-            <button type="button" class="btn" id="btnLogin">ĐĂNG NHẬP NGAY</button>
+    <!-- Header -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="switchTab('shop')">
+                <i class="fa-solid fa-gamepad text-yellow-400 text-2xl"></i>
+                <span class="font-bold text-xl tracking-wider text-yellow-400">GÀ GAMING SHOP</span>
+            </div>
+            <div id="user-nav" class="flex items-center space-x-3">
+                <!-- Dynamic Nav -->
+            </div>
         </div>
-        <hr>
-        <div>
-            <p style="font-size: 13px; font-weight: bold; color: #555;">Đăng Ký Tài Khoản Mới</p>
-            <input type="text" id="regUser" placeholder="Tên tài khoản muốn tạo">
-            <input type="password" id="regPass" placeholder="Mật khẩu">
-            <button type="button" class="btn btn-green" id="btnReg">TẠO TÀI KHOẢN</button>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 mt-6">
+        <!-- Banner -->
+        <div class="bg-gradient-to-r from-yellow-600 to-amber-700 rounded-2xl p-6 mb-8 shadow-lg flex flex-col md:flex-row justify-between items-center">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-white mb-2">Shop Acc Game Uy Tín Số 1</h1>
+                <p class="text-yellow-100 text-sm md:text-base">Hệ thống nạp thẻ tự động, duyệt tiền nhanh chóng, bảo mật tuyệt đối 100%!</p>
+            </div>
+            <div class="mt-4 md:mt-0 flex space-x-3">
+                <button onclick="openTopupModal()" class="bg-slate-900 hover:bg-slate-800 text-yellow-400 font-bold px-5 py-2.5 rounded-xl border border-yellow-500/30 transition shadow">
+                    <i class="fa-solid fa-wallet mr-2"></i> Nạp Tiền / Thẻ Cào
+                </button>
+            </div>
         </div>
-        <p style="font-size: 11px; color: #770; margin-top: 12px; background: #fff9db; padding: 8px; border-radius: 4px;">
-            💡 Admin: <b>admin</b> | Mật khẩu: <b>123456</b> (Có sẵn 1.000.000 VNĐ để test mua hàng)
-        </p>
-    </div>
 
-    <!-- KHU VỰC THÔNG TIN SỐ DƯ (HIỆN KHI ĐÃ ĐĂNG NHẬP) -->
-    <div class="box" id="userDashboard" style="display: none;">
-        <div class="wallet-box">
-            👤 Tài khoản: <b id="lblUser"></b> | 💰 Số dư: <b id="lblBalance" style="color: green;">0 VNĐ</b>
+        <!-- Navigation Tabs -->
+        <div class="flex space-x-2 border-b border-slate-800 pb-3 mb-6 overflow-x-auto">
+            <button onclick="switchTab('shop')" id="tab-shop" class="px-5 py-2 rounded-xl font-semibold bg-yellow-500 text-slate-950 transition"><i class="fa-solid fa-store mr-2"></i> Trang Chủ</button>
+            <button onclick="switchTab('history')" id="tab-history" class="px-5 py-2 rounded-xl font-semibold bg-slate-900 text-slate-400 hover:text-white transition"><i class="fa-solid fa-history mr-2"></i> Lịch Sử Mua</button>
+            <button onclick="checkAdminAccess()" id="tab-admin" class="px-5 py-2 rounded-xl font-semibold bg-slate-900 text-slate-400 hover:text-white transition hidden"><i class="fa-solid fa-shield-halved mr-2"></i> Quản Trị Admin</button>
         </div>
-        <button type="button" class="btn btn-green" id="btnSimulateTopup">+ NẠP THỬ 100.000 VNĐ (TEST)</button>
-        <button type="button" class="btn btn-danger" id="btnLogout" style="margin-top: 6px;">ĐĂNG XUẤT</button>
-    </div>
 
-    <!-- BẢNG QUẢN TRỊ ADMIN -->
-    <div class="box admin-panel" id="adminPanel" style="display: none;">
-        <h3 style="color: #b7791f; margin-bottom: 6px;">⚙️ BẢNG QUẢN TRỊ ADMIN</h3>
-        <input type="text" id="accTitle" placeholder="Tên Acc (Ví dụ: Acc Blox Fruits VIP Max)">
-        <input type="text" id="accDesc" placeholder="Mô tả chi tiết">
-        <input type="number" id="accPrice" placeholder="Giá tiền (VNĐ - Nhập số, VD: 50000)">
-        <input type="text" id="accInfo" placeholder="Thông tin bàn giao: Tài khoản | Mật khẩu">
-        <button type="button" class="btn btn-green" id="btnAddAcc">+ ĐĂNG BÁN NICK LÊN SHOP</button>
-    </div>
+        <!-- Section: Shop -->
+        <div id="section-shop" class="space-y-6">
+            <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-fire text-red-500 mr-2"></i> Danh Sách Tài Khoản Game</h2>
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <!-- Products -->
+            </div>
+        </div>
 
-    <!-- DANH SÁCH ACC GAME -->
-    <div class="box">
-        <h3 style="margin-bottom: 8px;">🔥 DANH SÁCH ACC GAME ĐANG BÁN</h3>
-        <div id="productList">
-            <div class="card-game">
-                <h4 style="font-size: 15px;">Acc Blox Fruits Max Level #01</h4>
-                <p style="font-size: 13px; color: #666;">Mô tả: Max Level, Mochi Awaken, CDCK</p>
-                <span class="price" data-price="80000">80.000 VNĐ</span>
-                <button type="button" class="btn btn-buy" data-title="Blox Fruits #01" data-price="80000" data-info="ohyflrs333 | 080439123">MUA NGAY</button>
+        <!-- Section: History -->
+        <div id="section-history" class="space-y-6 hidden">
+            <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-box-archive text-yellow-400 mr-2"></i> Tài Khoản Đã Mua Của Bạn</h2>
+            <div id="purchased-list" class="space-y-4">
+                <!-- History -->
+            </div>
+        </div>
+
+        <!-- Section: Admin Dashboard -->
+        <div id="section-admin" class="space-y-6 hidden">
+            <!-- Thống kê nhanh -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                    <p class="text-slate-400 text-sm">Yêu cầu nạp chờ duyệt</p>
+                    <h3 id="stat-pending-topup" class="text-2xl font-bold text-yellow-400 mt-1">0</h3>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                    <p class="text-slate-400 text-sm">Tổng tài khoản trong shop</p>
+                    <h3 id="stat-total-products" class="text-2xl font-bold text-white mt-1">0</h3>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                    <p class="text-slate-400 text-sm">Tổng đơn đã bán</p>
+                    <h3 id="stat-total-sold" class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
+                </div>
+            </div>
+
+            <!-- TAB 1: Duyệt nạp tiền / thẻ cào -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                <h2 class="text-xl font-bold text-yellow-400 mb-4"><i class="fa-solid fa-money-check-dollar mr-2"></i> Duyệt Yêu Cầu Nạp Tiền / Thẻ Cào Của Khách</h2>
+                <div id="admin-topup-requests" class="space-y-3">
+                    <!-- Pending Topups -->
+                </div>
+            </div>
+
+            <!-- TAB 2: Đăng bán nick mới -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                <h2 class="text-xl font-bold text-yellow-400 mb-4"><i class="fa-solid fa-plus-circle mr-2"></i> Đăng Bán Tài Khoản Game Mới</h2>
+                <form id="add-product-form" onsubmit="handleCreateProduct(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-slate-400 mb-1">Tên / Mô tả tài khoản</label>
+                        <input type="text" id="p-name" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-yellow-500">
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm text-slate-400 mb-1">Giá tiền (VNĐ)</label>
+                            <input type="number" id="p-price" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-yellow-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-slate-400 mb-1">Link ảnh minh họa</label>
+                            <input type="text" id="p-img" value="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-yellow-500">
+                        </div>
+                    </div>
+                    <div class="border-t border-slate-800 pt-4 mt-2">
+                        <h3 class="text-sm font-semibold text-red-400 mb-2"><i class="fa-solid fa-lock mr-1"></i> Thông Tin Bàn Giao (Giấu kín, khách mua xong mới thấy)</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-slate-400 mb-1">Tài khoản Game</label>
+                                <input type="text" id="p-username" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-slate-400 mb-1">Mật khẩu Game</label>
+                                <input type="text" id="p-password" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-red-500">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold px-6 py-3 rounded-xl transition shadow">Đăng Bán Ngay</button>
+                </form>
+            </div>
+
+            <!-- TAB 3: Quản lý kho sản phẩm -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                <h2 class="text-xl font-bold text-white mb-4">Quản Lý Kho Hàng</h2>
+                <div id="admin-product-list" class="space-y-3">
+                    <!-- Products management -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Auth -->
+    <div id="auth-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 id="auth-title" class="text-xl font-bold mb-4 text-yellow-400">Đăng Nhập</h3>
+            <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Tên tài khoản</label>
+                    <input type="text" id="auth-user" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-yellow-500">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Mật khẩu</label>
+                    <input type="password" id="auth-pass" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-yellow-500">
+                </div>
+                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold py-3 rounded-xl transition">Xác Nhận</button>
+            </form>
+            <div class="mt-4 text-center text-sm text-slate-400">
+                <span id="auth-switch-text">Chưa có tài khoản?</span> 
+                <button onclick="toggleAuthMode()" id="auth-switch-btn" class="text-yellow-400 font-semibold ml-1 hover:underline">Đăng ký ngay</button>
             </div>
         </div>
     </div>
 
+    <!-- Modal Topup / Thẻ Cào -->
+    <div id="topup-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 relative">
+            <button onclick="closeTopupModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-xl font-bold mb-4 text-yellow-400"><i class="fa-solid fa-credit-card mr-2"></i> Nạp Tiền / Gửi Thẻ Cào</h3>
+            <form onsubmit="handleTopupSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Loại thẻ / Hình thức</label>
+                    <select id="topup-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-yellow-500 text-white">
+                        <option value="Momo / Chuyển Khoản">Chuyển Khoản MOMO / Ngân Hàng</option>
+                        <option value="Viettel">Thẻ Cào Viettel</option>
+                        <option value="Vinaphone">Thẻ Cào Vinaphone</option>
+                        <option value="Mobifone">Thẻ Cào Mobifone</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Mệnh giá</label>
+                    <select id="topup-amount" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-yellow-500 text-white">
+                        <option value="50000">50,000 đ</option>
+                        <option value="100000">100,000 đ</option>
+                        <option value="200000">200,000 đ</option>
+                        <option value="500000">500,000 đ</option>
+                        <option value="1000000">1,000,000 đ</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Mã thẻ hoặc Số Seri / Nội dung chuyển khoản</label>
+                    <input type="text" id="topup-code" required placeholder="Nhập mã thẻ hoặc mã giao dịch..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-yellow-500">
+                </div>
+                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold py-3 rounded-xl transition shadow">Gửi Yêu Cầu Nạp Tiền</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        (function() {
-            // Khởi tạo dữ liệu người dùng (Lưu tài khoản, mật khẩu và số dư)
-            if (!localStorage.getItem('shop_db_users')) {
-                var defaultUsers = { 
-                    "admin": { pass: "123456", balance: 1000000 } 
-                };
-                localStorage.setItem('shop_db_users', JSON.stringify(defaultUsers));
-            }
+        // Database
+        let db = JSON.parse(localStorage.getItem('gagaming_db_v2')) || {
+            users: [
+                { username: 'admin', password: '123456', balance: 5000000, isAdmin: true }
+            ],
+            products: [
+                { id: 1, name: 'Acc Blox Fruits Max Level + T-Rex', price: 150000, img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500', credentials: { user: 'bloxfruits_pro_99', pass: 'gaGaming2026@' }, sold: false },
+                { id: 2, name: 'Acc Liên Quân Full Tướng + 30 Skin', price: 250000, img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500', credentials: { user: 'lienquan_vip_hn', pass: 'hoangMaster88' }, sold: false }
+            ],
+            purchased: [],
+            topupRequests: [] // { id, username, type, amount, code, status: 'pending' }
+        };
 
-            var currentUser = localStorage.getItem('shop_current_user') || null;
+        let currentUser = JSON.parse(localStorage.getItem('gagaming_current_user_v2')) || null;
+        let isRegisterMode = false;
 
-            function showMsg(text, isSuccess) {
-                var msg = document.getElementById('statusMsg');
-                msg.style.display = 'block';
-                msg.style.background = isSuccess ? '#d4edda' : '#f8d7da';
-                msg.style.color = isSuccess ? '#155724' : '#721c24';
-                msg.innerHTML = text;
-                setTimeout(function() { msg.style.display = 'none'; }, 4000);
-            }
-
-            function updateUI() {
-                var users = JSON.parse(localStorage.getItem('shop_db_users'));
-                if (currentUser && users[currentUser]) {
-                    document.getElementById('authSection').style.display = 'none';
-                    document.getElementById('userDashboard').style.display = 'block';
-                    document.getElementById('lblUser').innerText = currentUser;
-                    document.getElementById('lblBalance').innerText = Number(users[currentUser].balance).toLocaleString() + ' VNĐ';
-
-                    if (currentUser === 'admin') {
-                        document.getElementById('adminPanel').style.display = 'block';
-                    } else {
-                        document.getElementById('adminPanel').style.display = 'none';
-                    }
-                } else {
-                    document.getElementById('authSection').style.display = 'block';
-                    document.getElementById('userDashboard').style.display = 'none';
-                    document.getElementById('adminPanel').style.display = 'none';
-                }
-            }
-
-            if (currentUser) { updateUI(); }
-
-            // Đăng ký
-            document.getElementById('btnReg').onclick = function() {
-                var u = document.getElementById('regUser').value.trim();
-                var p = document.getElementById('regPass').value.trim();
-                if (!u || !p) { showMsg("❌ Vui lòng nhập đủ tài khoản và mật khẩu!", false); return; }
-
-                var users = JSON.parse(localStorage.getItem('shop_db_users'));
-                if (users[u]) { showMsg("❌ Tài khoản đã tồn tại!", false); return; }
-
-                users[u] = { pass: p, balance: 0 }; // Tài khoản mới mặc định 0 VNĐ
-                localStorage.setItem('shop_db_users', JSON.stringify(users));
-                showMsg("✅ Tạo tài khoản thành công! Số dư hiện tại: 0 VNĐ", true);
-                
-                document.getElementById('loginUser').value = u;
-                document.getElementById('loginPass').value = p;
-                document.getElementById('regUser').value = "";
-                document.getElementById('regPass').value = "";
-            };
-
-            // Đăng nhập
-            document.getElementById('btnLogin').onclick = function() {
-                var u = document.getElementById('loginUser').value.trim();
-                var p = document.getElementById('loginPass').value.trim();
-                if (!u || !p) { showMsg("❌ Vui lòng điền đầy đủ thông tin!", false); return; }
-
-                var users = JSON.parse(localStorage.getItem('shop_db_users'));
-                if (users[u] && users[u].pass === p) {
+        function saveDB() {
+            localStorage.setItem('gagaming_db_v2', JSON.stringify(db));
+            if(currentUser) {
+                let u = db.users.find(x => x.username === currentUser.username);
+                if(u) {
                     currentUser = u;
-                    localStorage.setItem('shop_current_user', u);
-                    showMsg("🎉 Đăng nhập thành công!", true);
-                    updateUI();
-                } else {
-                    showMsg("❌ Sai tài khoản hoặc mật khẩu!", false);
+                    localStorage.setItem('gagaming_current_user_v2', JSON.stringify(currentUser));
                 }
-            };
+            }
+        }
 
-            // Đăng xuất
-            document.getElementById('btnLogout').onclick = function() {
-                currentUser = null;
-                localStorage.removeItem('shop_current_user');
-                updateUI();
-            };
+        function renderNav() {
+            const nav = document.getElementById('user-nav');
+            const adminTab = document.getElementById('tab-admin');
+            
+            if(currentUser) {
+                if(currentUser.isAdmin) adminTab.classList.remove('hidden');
+                else adminTab.classList.add('hidden');
 
-            // Giả lập nút nạp tiền (cho khách test)
-            document.getElementById('btnSimulateTopup').onclick = function() {
-                var users = JSON.parse(localStorage.getItem('shop_db_users'));
-                if (currentUser && users[currentUser]) {
-                    users[currentUser].balance += 100000;
-                    localStorage.setItem('shop_db_users', JSON.stringify(users));
-                    updateUI();
-                    alert("✅ Nạp thành công 100.000 VNĐ vào tài khoản!");
-                }
-            };
+                nav.innerHTML = `
+                    <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 text-sm">
+                        <span class="text-slate-400">Ví:</span> <span class="text-yellow-400 font-bold">${currentUser.balance.toLocaleString()}đ</span>
+                    </div>
+                    <span class="font-semibold text-white hidden sm:inline">${currentUser.username}</span>
+                    <button onclick="logout()" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-1.5 rounded-xl text-sm transition"><i class="fa-solid fa-right-from-bracket"></i></button>
+                `;
+            } else {
+                adminTab.classList.add('hidden');
+                nav.innerHTML = `
+                    <button onclick="openAuthModal()" class="bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition">Đăng Nhập</button>
+                `;
+            }
+        }
 
-            // Admin thêm nick
-            document.getElementById('btnAddAcc').onclick = function() {
-                var title = document.getElementById('accTitle').value.trim();
-                var desc = document.getElementById('accDesc').value.trim();
-                var price = parseInt(document.getElementById('accPrice').value.trim());
-                var info = document.getElementById('accInfo').value.trim();
+        function renderShop() {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            
+            const availableProducts = db.products.filter(p => !p.sold);
+            if(availableProducts.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-12">Hiện chưa có tài khoản nào được bày bán.</p>`;
+                return;
+            }
 
-                if (!title || isNaN(price) || !info) {
-                    alert("❌ Vui lòng nhập đúng thông tin và giá tiền bằng số!");
-                    return;
-                }
+            availableProducts.forEach(p => {
+                grid.innerHTML += `
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow hover:border-yellow-500/50 transition flex flex-col justify-between">
+                        <div>
+                            <img src="${p.img}" class="w-full h-40 object-cover" alt="game">
+                            <div class="p-4">
+                                <h3 class="font-bold text-white mb-1 line-clamp-2">${p.name}</h3>
+                                <div class="text-yellow-400 font-extrabold text-lg mb-3">${p.price.toLocaleString()} VNĐ</div>
+                                <div class="text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg inline-block mb-3">
+                                    <i class="fa-solid fa-shield-check mr-1"></i> Tự động 100%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 pt-0">
+                            <button onclick="buyProduct(${p.id})" class="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold py-2.5 rounded-xl transition shadow flex items-center justify-center">
+                                <i class="fa-solid fa-cart-shopping mr-2"></i> Mua Ngay
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
 
-                var list = document.getElementById('productList');
-                var card = document.createElement('div');
-                card.className = 'card-game';
-                card.innerHTML = '<h4 style="font-size: 15px;">' + title + '</h4>' +
-                                 '<p style="font-size: 13px; color: #666;">Mô tả: ' + desc + '</p>' +
-                                 '<span class="price" data-price="' + price + '">' + price.toLocaleString() + ' VNĐ</span>' +
-                                 '<button type="button" class="btn btn-buy" data-title="' + title + '" data-price="' + price + '" data-info="' + info + '">MUA NGAY</button>';
-                
-                list.insertBefore(card, list.firstChild);
-                alert("✅ Đăng bán nick thành công!");
+        function renderHistory() {
+            const list = document.getElementById('purchased-list');
+            list.innerHTML = '';
 
-                document.getElementById('accTitle').value = "";
-                document.getElementById('accDesc').value = "";
-                document.getElementById('accPrice').value = "";
-                document.getElementById('accInfo').value = "";
-                bindBuyEvents();
-            };
+            if(!currentUser) {
+                list.innerHTML = `<p class="text-center text-slate-500 py-12">Vui lòng đăng nhập để xem lịch sử!</p>`;
+                return;
+            }
 
-            // HỆ THỐNG MUA HÀNG (KIỂM TRA SỐ DƯ NGHIÊM NGẶT)
-            function bindBuyEvents() {
-                var buyButtons = document.querySelectorAll('.btn-buy');
-                buyButtons.forEach(function(btn) {
-                    btn.onclick = function() {
-                        var activeUser = localStorage.getItem('shop_current_user');
-                        if (!activeUser) {
-                            alert("⚠️ Bạn cần ĐĂNG NHẬP để mua hàng!");
-                            return;
-                        }
+            const myHistory = db.purchased.filter(x => x.buyer === currentUser.username);
+            if(myHistory.length === 0) {
+                list.innerHTML = `<p class="text-center text-slate-500 py-12">Bạn chưa mua tài khoản nào.</p>`;
+                return;
+            }
 
-                        var users = JSON.parse(localStorage.getItem('shop_db_users'));
-                        var price = parseInt(this.getAttribute('data-price'));
-                        var title = this.getAttribute('data-title');
-                        var info = this.getAttribute('data-info');
-                        var userBalance = users[activeUser].balance;
+            myHistory.forEach(item => {
+                list.innerHTML += `
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h3 class="font-bold text-white text-lg">${item.name}</h3>
+                            <p class="text-xs text-slate-400 mb-2">Thời gian mua: ${item.time}</p>
+                            <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-1">
+                                <p class="text-sm text-slate-300">Tài khoản: <span class="text-yellow-400 font-mono font-bold select-all">${item.credentials.user}</span></p>
+                                <p class="text-sm text-slate-300">Mật khẩu: <span class="text-yellow-400 font-mono font-bold select-all">${item.credentials.pass}</span></p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1 rounded-xl text-sm border border-emerald-500/20">Giao dịch thành công</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
 
-                        // KIỂM TRA XEM ĐỦ TIỀN KHÔNG
-                        if (userBalance < price) {
-                            alert("❌ SỐ DƯ KHÔNG ĐỦ!\n\n- Giá nick: " + price.toLocaleString() + " VNĐ\n- Số dư của bạn: " + userBalance.toLocaleString() + " VNĐ\n\nVui lòng nạp thêm tiền vào tài khoản để mua!");
-                            return;
-                        }
+        function renderAdminDashboard() {
+            // Stats
+            const pendingCount = db.topupRequests.filter(r => r.status === 'pending').length;
+            document.getElementById('stat-pending-topup').innerText = pendingCount;
+            document.getElementById('stat-total-products').innerText = db.products.length;
+            document.getElementById('stat-total-sold').innerText = db.purchased.length;
 
-                        // TRỪ TIỀN VÀ LƯU LẠI
-                        users[activeUser].balance -= price;
-                        localStorage.setItem('shop_db_users', JSON.stringify(users));
-                        updateUI();
-
-                        alert("🎉 MUA NICK [" + title + "] THÀNH CÔNG!\n\n💰 Đã trừ: " + price.toLocaleString() + " VNĐ\n🔐 Thông tin tài khoản:\n" + info + "\n\n(Vui lòng lưu lại thông tin ngay!)");
-                    };
+            // Topup requests list
+            const topupList = document.getElementById('admin-topup-requests');
+            topupList.innerHTML = '';
+            const pendingRequests = db.topupRequests.filter(r => r.status === 'pending');
+            
+            if(pendingRequests.length === 0) {
+                topupList.innerHTML = `<p class="text-slate-500 text-sm">Không có yêu cầu nạp tiền nào đang chờ duyệt.</p>`;
+            } else {
+                pendingRequests.forEach(req => {
+                    topupList.innerHTML += `
+                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <div>
+                                <p class="font-bold text-white">Khách: <span class="text-yellow-400">${req.username}</span></p>
+                                <p class="text-sm text-slate-300">Hình thức: ${req.type} - Số tiền: <span class="text-emerald-400 font-bold">+${req.amount.toLocaleString()}đ</span></p>
+                                <p class="text-xs text-slate-400 font-mono">Mã/Seri: ${req.code}</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="approveTopup(${req.id})" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition"><i class="fa-solid fa-check mr-1"></i> Duyệt cộng tiền</button>
+                                <button onclick="rejectTopup(${req.id})" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 font-bold px-3 py-2 rounded-xl text-sm transition"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        </div>
+                    `;
                 });
             }
 
-            bindBuyEvents();
-        })();
+            // Products list
+            const prodList = document.getElementById('admin-product-list');
+            prodList.innerHTML = '';
+            db.products.forEach(p => {
+                prodList.innerHTML += `
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-white">${p.name}</span> - <span class="text-yellow-400">${p.price.toLocaleString()}đ</span>
+                            <span class="text-xs ml-2 px-2 py-0.5 rounded ${p.sold ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}">${p.sold ? 'Đã bán' : 'Đang bán'}</span>
+                        </div>
+                        <button onclick="deleteProduct(${p.id})" class="text-red-400 hover:text-red-300 text-sm"><i class="fa-solid fa-trash"></i> Xóa</button>
+                    </div>
+                `;
+            });
+        }
+
+        // Topup User Action
+        function handleTopupSubmit(e) {
+            e.preventDefault();
+            if(!currentUser) {
+                openAuthModal();
+                return;
+            }
+            const type = document.getElementById('topup-type').value;
+            const amount = Number(document.getElementById('topup-amount').value);
+            const code = document.getElementById('topup-code').value.trim();
+
+            db.topupRequests.push({
+                id: Date.now(),
+                username: currentUser.username,
+                type,
+                amount,
+                code,
+                status: 'pending'
+            });
+
+            saveDB();
+            closeTopupModal();
+            alert('Đã gửi yêu cầu nạp tiền! Vui lòng chờ Admin kiểm tra và duyệt tài khoản.');
+        }
+
+        function approveTopup(requestId) {
+            let req = db.topupRequests.find(r => r.id === requestId);
+            if(!req) return;
+
+            let targetUser = db.users.find(u => u.username === req.username);
+            if(targetUser) {
+                targetUser.balance += req.amount;
+                req.status = 'approved';
+                saveDB();
+                renderAdminDashboard();
+                alert(`Đã duyệt thành công +${req.amount.toLocaleString()}đ cho tài khoản ${req.username}!`);
+            }
+        }
+
+        function rejectTopup(requestId) {
+            let req = db.topupRequests.find(r => r.id === requestId);
+            if(req) {
+                req.status = 'rejected';
+                saveDB();
+                renderAdminDashboard();
+                alert('Đã từ chối yêu cầu nạp tiền.');
+            }
+        }
+
+        // Buy Product
+        function buyProduct(id) {
+            if(!currentUser) {
+                openAuthModal();
+                return;
+            }
+            const product = db.products.find(p => p.id === id);
+            if(!product || product.sold) return;
+
+            if(currentUser.balance < product.price) {
+                alert('Số dư ví không đủ! Vui lòng bấm Nạp Tiền / Thẻ Cào để nạp thêm.');
+                openTopupModal();
+                return;
+            }
+
+            if(confirm(`Xác nhận mua "${product.name}" với giá ${product.price.toLocaleString()}đ?`)) {
+                let u = db.users.find(x => x.username === currentUser.username);
+                u.balance -= product.price;
+                product.sold = true;
+
+                db.purchased.push({
+                    id: Date.now(),
+                    buyer: currentUser.username,
+                    name: product.name,
+                    price: product.price,
+                    credentials: product.credentials,
+                    time: new Date().toLocaleString()
+                });
+
+                saveDB();
+                renderNav();
+                renderShop();
+                alert('Thanh toán thành công! Thông tin tài khoản đã nằm trong mục "Lịch sử mua".');
+                switchTab('history');
+            }
+        }
+
+        // Admin Create Product
+        function handleCreateProduct(e) {
+            e.preventDefault();
+            const name = document.getElementById('p-name').value;
+            const price = Number(document.getElementById('p-price').value);
+            const img = document.getElementById('p-img').value;
+            const user = document.getElementById('p-username').value;
+            const pass = document.getElementById('p-password').value;
+
+            db.products.push({
+                id: Date.now(),
+                name, price, img,
+                credentials: { user, pass },
+                sold: false
+            });
+
+            saveDB();
+            document.getElementById('add-product-form').reset();
+            renderShop();
+            renderAdminDashboard();
+            alert('Đăng bán tài khoản thành công!');
+        }
+
+        function deleteProduct(id) {
+            if(confirm('Xóa sản phẩm này khỏi hệ thống?')) {
+                db.products = db.products.filter(p => p.id !== id);
+                saveDB();
+                renderShop();
+                renderAdminDashboard();
+            }
+        }
+
+        // Navigation
+        function switchTab(tab) {
+            document.getElementById('section-shop').classList.add('hidden');
+            document.getElementById('section-history').classList.add('hidden');
+            document.getElementById('section-admin').classList.add('hidden');
+
+            document.getElementById('tab-shop').className = "px-5 py-2 rounded-xl font-semibold bg-slate-900 text-slate-400 hover:text-white transition";
+            document.getElementById('tab-history').className = "px-5 py-2 rounded-xl font-semibold bg-slate-900 text-slate-400 hover:text-white transition";
+            const adminTab = document.getElementById('tab-admin');
+            if(adminTab) adminTab.className = "px-5 py-2 rounded-xl font-semibold bg-slate-900 text-slate-400 hover:text-white transition";
+
+            if(tab === 'shop') {
+                document.getElementById('section-shop').classList.remove('hidden');
+                document.getElementById('tab-shop').className = "px-5 py-2 rounded-xl font-semibold bg-yellow-500 text-slate-950 transition";
+                renderShop();
+            } else if(tab === 'history') {
+                document.getElementById('section-history').classList.remove('hidden');
+                document.getElementById('tab-history').className = "px-5 py-2 rounded-xl font-semibold bg-yellow-500 text-slate-950 transition";
+                renderHistory();
+            } else if(tab === 'admin') {
+                if(!currentUser || !currentUser.isAdmin) {
+                    alert('Bạn không có quyền truy cập!');
+                    switchTab('shop');
+                    return;
+                }
+                document.getElementById('section-admin').classList.remove('hidden');
+                adminTab.className = "px-5 py-2 rounded-xl font-semibold bg-yellow-500 text-slate-950 transition";
+                renderAdminDashboard();
+            }
+        }
+
+        // Auth & Modals
+        function openAuthModal() {
+            isRegisterMode = false;
+            updateAuthUI();
+            document.getElementById('auth-modal').classList.remove('hidden');
+        }
+        function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            updateAuthUI();
+        }
+        function updateAuthUI() {
+            document.getElementById('auth-title').innerText = isRegisterMode ? 'Đăng Ký Tài Khoản' : 'Đăng Nhập Hệ Thống';
+            document.getElementById('auth-switch-text').innerText = isRegisterMode ? 'Đã có tài khoản?' : 'Chưa có tài khoản?';
+            document.getElementById('auth-switch-btn').innerText = isRegisterMode ? 'Đăng nhập' : 'Đăng ký ngay';
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const u = document.getElementById('auth-user').value.trim();
+            const p = document.getElementById('auth-pass').value.trim();
+
+            if(isRegisterMode) {
+                if(db.users.find(x => x.username === u)) {
+                    alert('Tên tài khoản đã tồn tại!');
+                    return;
+                }
+                let newUser = { username: u, password: p, balance: 0, isAdmin: false };
+                db.users.push(newUser);
+                saveDB();
+                currentUser = newUser;
+                localStorage.setItem('gagaming_current_user_v2', JSON.stringify(currentUser));
+                alert('Đăng ký thành công!');
+            } else {
+                let found = db.users.find(x => x.username === u && x.password === p);
+                if(!found) {
+                    alert('Sai tên đăng nhập hoặc mật khẩu!');
+                    return;
+                }
+                currentUser = found;
+                localStorage.setItem('gagaming_current_user_v2', JSON.stringify(currentUser));
+                alert('Đăng nhập thành công!');
+            }
+            closeAuthModal();
+            renderNav();
+            switchTab('shop');
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('gagaming_current_user_v2');
+            renderNav();
+            switchTab('shop');
+            alert('Đã đăng xuất.');
+        }
+
+        function checkAdminAccess() {
+            if(!currentUser || !currentUser.isAdmin) {
+                let pass = prompt("Nhập mật khẩu Admin quản trị:");
+                let adminUser = db.users.find(u => u.isAdmin && u.password === pass);
+                if(adminUser) {
+                    currentUser = adminUser;
+                    localStorage.setItem('gagaming_current_user_v2', JSON.stringify(currentUser));
+                    renderNav();
+                    switchTab('admin');
+                } else {
+                    alert('Mật khẩu quản trị sai!');
+                }
+            } else {
+                switchTab('admin');
+            }
+        }
+
+        function openTopupModal() {
+            if(!currentUser) {
+                openAuthModal();
+                return;
+            }
+            document.getElementById('topup-modal').classList.remove('hidden');
+        }
+        function closeTopupModal() { document.getElementById('topup-modal').classList.add('hidden'); }
+
+        // Init
+        renderNav();
+        renderShop();
     </script>
 </body>
 </html>
