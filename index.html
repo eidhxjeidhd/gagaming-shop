@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gà Gaming Shop - Secure Edition</title>
+    <style>
+        :root { --primary: #007bff; --success: #28a745; --danger: #dc3545; --dark: #222; --bg: #f4f4f4; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: var(--bg); padding: 12px; color: #333; }
+        .box { background: #fff; border: 1px solid #ddd; padding: 16px; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .btn { background: var(--primary); color: white; border: none; padding: 11px; cursor: pointer; border-radius: 6px; font-size: 14px; font-weight: bold; width: 100%; margin-top: 8px; }
+        .btn:active { opacity: 0.8; }
+        .btn-green { background: var(--success); }
+        .btn-danger { background: var(--danger); }
+        input { width: 100%; padding: 11px; margin: 6px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; }
+        .nav { display: flex; justify-content: space-between; align-items: center; background: var(--dark); color: white; padding: 14px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
+        .admin-panel { background: #fff9db; border: 1px solid #ffe066; }
+        .wallet-box { background: #e8f5e9; border: 1px solid #c8e6c9; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 14px; }
+        .msg { padding: 10px; margin-bottom: 12px; border-radius: 6px; font-weight: bold; font-size: 13px; text-align: center; display: none; }
+        .card-game { border: 1px solid #e2e8f0; background: #fff; padding: 14px; margin-bottom: 10px; border-radius: 6px; }
+        .price { color: var(--danger); font-weight: bold; font-size: 15px; margin: 4px 0 8px 0; display: block; }
+        hr { border: 0; border-top: 1px dashed #ddd; margin: 14px 0; }
+    </style>
+</head>
+<body>
+
+    <!-- THANH ĐIỀU HƯỚNG -->
+    <div class="nav">
+        <div>🎮 <b>GÀ GAMING SHOP</b></div>
+        <div id="userStatus">Chưa đăng nhập</div>
+    </div>
+
+    <!-- THÔNG BÁO -->
+    <div id="statusMsg" class="msg"></div>
+
+    <!-- KHU VỰC TÀI KHOẢN -->
+    <div class="box" id="authSection">
+        <h3 style="margin-bottom:10px;">🔑 HỆ THỐNG TÀI KHOẢN</h3>
+        <div>
+            <p style="font-size: 13px; font-weight: bold; color: #555;">Đăng Nhập</p>
+            <input type="text" id="loginUser" placeholder="Tên tài khoản">
+            <input type="password" id="loginPass" placeholder="Mật khẩu">
+            <button type="button" class="btn" id="btnLogin">ĐĂNG NHẬP NGAY</button>
+        </div>
+        <hr>
+        <div>
+            <p style="font-size: 13px; font-weight: bold; color: #555;">Đăng Ký Tài Khoản Mới</p>
+            <input type="text" id="regUser" placeholder="Tên tài khoản muốn tạo">
+            <input type="password" id="regPass" placeholder="Mật khẩu">
+            <button type="button" class="btn btn-green" id="btnReg">TẠO TÀI KHOẢN</button>
+        </div>
+        <p style="font-size: 11px; color: #770; margin-top: 12px; background: #fff9db; padding: 8px; border-radius: 4px;">
+            💡 Admin: <b>admin</b> | Mật khẩu: <b>123456</b> (Có sẵn 1.000.000 VNĐ để test mua hàng)
+        </p>
+    </div>
+
+    <!-- KHU VỰC THÔNG TIN SỐ DƯ (HIỆN KHI ĐÃ ĐĂNG NHẬP) -->
+    <div class="box" id="userDashboard" style="display: none;">
+        <div class="wallet-box">
+            👤 Tài khoản: <b id="lblUser"></b> | 💰 Số dư: <b id="lblBalance" style="color: green;">0 VNĐ</b>
+        </div>
+        <button type="button" class="btn btn-green" id="btnSimulateTopup">+ NẠP THỬ 100.000 VNĐ (TEST)</button>
+        <button type="button" class="btn btn-danger" id="btnLogout" style="margin-top: 6px;">ĐĂNG XUẤT</button>
+    </div>
+
+    <!-- BẢNG QUẢN TRỊ ADMIN -->
+    <div class="box admin-panel" id="adminPanel" style="display: none;">
+        <h3 style="color: #b7791f; margin-bottom: 6px;">⚙️ BẢNG QUẢN TRỊ ADMIN</h3>
+        <input type="text" id="accTitle" placeholder="Tên Acc (Ví dụ: Acc Blox Fruits VIP Max)">
+        <input type="text" id="accDesc" placeholder="Mô tả chi tiết">
+        <input type="number" id="accPrice" placeholder="Giá tiền (VNĐ - Nhập số, VD: 50000)">
+        <input type="text" id="accInfo" placeholder="Thông tin bàn giao: Tài khoản | Mật khẩu">
+        <button type="button" class="btn btn-green" id="btnAddAcc">+ ĐĂNG BÁN NICK LÊN SHOP</button>
+    </div>
+
+    <!-- DANH SÁCH ACC GAME -->
+    <div class="box">
+        <h3 style="margin-bottom: 8px;">🔥 DANH SÁCH ACC GAME ĐANG BÁN</h3>
+        <div id="productList">
+            <div class="card-game">
+                <h4 style="font-size: 15px;">Acc Blox Fruits Max Level #01</h4>
+                <p style="font-size: 13px; color: #666;">Mô tả: Max Level, Mochi Awaken, CDCK</p>
+                <span class="price" data-price="80000">80.000 VNĐ</span>
+                <button type="button" class="btn btn-buy" data-title="Blox Fruits #01" data-price="80000" data-info="ohyflrs333 | 080439123">MUA NGAY</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Khởi tạo dữ liệu người dùng (Lưu tài khoản, mật khẩu và số dư)
+            if (!localStorage.getItem('shop_db_users')) {
+                var defaultUsers = { 
+                    "admin": { pass: "123456", balance: 1000000 } 
+                };
+                localStorage.setItem('shop_db_users', JSON.stringify(defaultUsers));
+            }
+
+            var currentUser = localStorage.getItem('shop_current_user') || null;
+
+            function showMsg(text, isSuccess) {
+                var msg = document.getElementById('statusMsg');
+                msg.style.display = 'block';
+                msg.style.background = isSuccess ? '#d4edda' : '#f8d7da';
+                msg.style.color = isSuccess ? '#155724' : '#721c24';
+                msg.innerHTML = text;
+                setTimeout(function() { msg.style.display = 'none'; }, 4000);
+            }
+
+            function updateUI() {
+                var users = JSON.parse(localStorage.getItem('shop_db_users'));
+                if (currentUser && users[currentUser]) {
+                    document.getElementById('authSection').style.display = 'none';
+                    document.getElementById('userDashboard').style.display = 'block';
+                    document.getElementById('lblUser').innerText = currentUser;
+                    document.getElementById('lblBalance').innerText = Number(users[currentUser].balance).toLocaleString() + ' VNĐ';
+
+                    if (currentUser === 'admin') {
+                        document.getElementById('adminPanel').style.display = 'block';
+                    } else {
+                        document.getElementById('adminPanel').style.display = 'none';
+                    }
+                } else {
+                    document.getElementById('authSection').style.display = 'block';
+                    document.getElementById('userDashboard').style.display = 'none';
+                    document.getElementById('adminPanel').style.display = 'none';
+                }
+            }
+
+            if (currentUser) { updateUI(); }
+
+            // Đăng ký
+            document.getElementById('btnReg').onclick = function() {
+                var u = document.getElementById('regUser').value.trim();
+                var p = document.getElementById('regPass').value.trim();
+                if (!u || !p) { showMsg("❌ Vui lòng nhập đủ tài khoản và mật khẩu!", false); return; }
+
+                var users = JSON.parse(localStorage.getItem('shop_db_users'));
+                if (users[u]) { showMsg("❌ Tài khoản đã tồn tại!", false); return; }
+
+                users[u] = { pass: p, balance: 0 }; // Tài khoản mới mặc định 0 VNĐ
+                localStorage.setItem('shop_db_users', JSON.stringify(users));
+                showMsg("✅ Tạo tài khoản thành công! Số dư hiện tại: 0 VNĐ", true);
+                
+                document.getElementById('loginUser').value = u;
+                document.getElementById('loginPass').value = p;
+                document.getElementById('regUser').value = "";
+                document.getElementById('regPass').value = "";
+            };
+
+            // Đăng nhập
+            document.getElementById('btnLogin').onclick = function() {
+                var u = document.getElementById('loginUser').value.trim();
+                var p = document.getElementById('loginPass').value.trim();
+                if (!u || !p) { showMsg("❌ Vui lòng điền đầy đủ thông tin!", false); return; }
+
+                var users = JSON.parse(localStorage.getItem('shop_db_users'));
+                if (users[u] && users[u].pass === p) {
+                    currentUser = u;
+                    localStorage.setItem('shop_current_user', u);
+                    showMsg("🎉 Đăng nhập thành công!", true);
+                    updateUI();
+                } else {
+                    showMsg("❌ Sai tài khoản hoặc mật khẩu!", false);
+                }
+            };
+
+            // Đăng xuất
+            document.getElementById('btnLogout').onclick = function() {
+                currentUser = null;
+                localStorage.removeItem('shop_current_user');
+                updateUI();
+            };
+
+            // Giả lập nút nạp tiền (cho khách test)
+            document.getElementById('btnSimulateTopup').onclick = function() {
+                var users = JSON.parse(localStorage.getItem('shop_db_users'));
+                if (currentUser && users[currentUser]) {
+                    users[currentUser].balance += 100000;
+                    localStorage.setItem('shop_db_users', JSON.stringify(users));
+                    updateUI();
+                    alert("✅ Nạp thành công 100.000 VNĐ vào tài khoản!");
+                }
+            };
+
+            // Admin thêm nick
+            document.getElementById('btnAddAcc').onclick = function() {
+                var title = document.getElementById('accTitle').value.trim();
+                var desc = document.getElementById('accDesc').value.trim();
+                var price = parseInt(document.getElementById('accPrice').value.trim());
+                var info = document.getElementById('accInfo').value.trim();
+
+                if (!title || isNaN(price) || !info) {
+                    alert("❌ Vui lòng nhập đúng thông tin và giá tiền bằng số!");
+                    return;
+                }
+
+                var list = document.getElementById('productList');
+                var card = document.createElement('div');
+                card.className = 'card-game';
+                card.innerHTML = '<h4 style="font-size: 15px;">' + title + '</h4>' +
+                                 '<p style="font-size: 13px; color: #666;">Mô tả: ' + desc + '</p>' +
+                                 '<span class="price" data-price="' + price + '">' + price.toLocaleString() + ' VNĐ</span>' +
+                                 '<button type="button" class="btn btn-buy" data-title="' + title + '" data-price="' + price + '" data-info="' + info + '">MUA NGAY</button>';
+                
+                list.insertBefore(card, list.firstChild);
+                alert("✅ Đăng bán nick thành công!");
+
+                document.getElementById('accTitle').value = "";
+                document.getElementById('accDesc').value = "";
+                document.getElementById('accPrice').value = "";
+                document.getElementById('accInfo').value = "";
+                bindBuyEvents();
+            };
+
+            // HỆ THỐNG MUA HÀNG (KIỂM TRA SỐ DƯ NGHIÊM NGẶT)
+            function bindBuyEvents() {
+                var buyButtons = document.querySelectorAll('.btn-buy');
+                buyButtons.forEach(function(btn) {
+                    btn.onclick = function() {
+                        var activeUser = localStorage.getItem('shop_current_user');
+                        if (!activeUser) {
+                            alert("⚠️ Bạn cần ĐĂNG NHẬP để mua hàng!");
+                            return;
+                        }
+
+                        var users = JSON.parse(localStorage.getItem('shop_db_users'));
+                        var price = parseInt(this.getAttribute('data-price'));
+                        var title = this.getAttribute('data-title');
+                        var info = this.getAttribute('data-info');
+                        var userBalance = users[activeUser].balance;
+
+                        // KIỂM TRA XEM ĐỦ TIỀN KHÔNG
+                        if (userBalance < price) {
+                            alert("❌ SỐ DƯ KHÔNG ĐỦ!\n\n- Giá nick: " + price.toLocaleString() + " VNĐ\n- Số dư của bạn: " + userBalance.toLocaleString() + " VNĐ\n\nVui lòng nạp thêm tiền vào tài khoản để mua!");
+                            return;
+                        }
+
+                        // TRỪ TIỀN VÀ LƯU LẠI
+                        users[activeUser].balance -= price;
+                        localStorage.setItem('shop_db_users', JSON.stringify(users));
+                        updateUI();
+
+                        alert("🎉 MUA NICK [" + title + "] THÀNH CÔNG!\n\n💰 Đã trừ: " + price.toLocaleString() + " VNĐ\n🔐 Thông tin tài khoản:\n" + info + "\n\n(Vui lòng lưu lại thông tin ngay!)");
+                    };
+                });
+            }
+
+            bindBuyEvents();
+        })();
+    </script>
+</body>
+</html>
