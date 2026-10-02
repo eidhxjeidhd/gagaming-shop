@@ -1,0 +1,1 @@
+# gagaming-shop
