@@ -27,11 +27,11 @@
         <div class="bg-gradient-to-r from-yellow-600 to-amber-700 rounded-2xl p-6 mb-8 shadow-lg flex flex-col md:flex-row justify-between items-center">
             <div>
                 <h1 class="text-2xl md:text-3xl font-extrabold text-white mb-2">Shop Acc Game Uy Tín Số 1</h1>
-                <p class="text-yellow-100 text-sm md:text-base">Hệ thống nạp thẻ tự động, duyệt tiền nhanh chóng, bảo mật tuyệt đối 100%!</p>
+                <p class="text-yellow-100 text-sm md:text-base">Giao dịch tự động 24/7, mua acc nhận thông tin ngay lập tức!</p>
             </div>
             <div class="mt-4 md:mt-0 flex space-x-3">
                 <button onclick="openTopupModal()" class="bg-slate-900 hover:bg-slate-800 text-yellow-400 font-bold px-5 py-2.5 rounded-xl border border-yellow-500/30 transition shadow">
-                    <i class="fa-solid fa-wallet mr-2"></i> Nạp Tiền / Thẻ Cào
+                    <i class="fa-solid fa-wallet mr-2"></i> Nạp Tiền Vào Ví
                 </button>
             </div>
         </div>
@@ -64,8 +64,8 @@
             <!-- Thống kê nhanh -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-                    <p class="text-slate-400 text-sm">Yêu cầu nạp chờ duyệt</p>
-                    <h3 id="stat-pending-topup" class="text-2xl font-bold text-yellow-400 mt-1">0</h3>
+                    <p class="text-slate-400 text-sm">Tổng thành viên đăng ký</p>
+                    <h3 id="stat-total-users" class="text-2xl font-bold text-yellow-400 mt-1">0</h3>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
                     <p class="text-slate-400 text-sm">Tổng tài khoản trong shop</p>
@@ -77,11 +77,12 @@
                 </div>
             </div>
 
-            <!-- TAB 1: Duyệt nạp tiền / thẻ cào -->
+            <!-- TAB 1: Quản lý thành viên & Cộng tiền ví -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                <h2 class="text-xl font-bold text-yellow-400 mb-4"><i class="fa-solid fa-money-check-dollar mr-2"></i> Duyệt Yêu Cầu Nạp Tiền / Thẻ Cào Của Khách</h2>
-                <div id="admin-topup-requests" class="space-y-3">
-                    <!-- Pending Topups -->
+                <h2 class="text-xl font-bold text-yellow-400 mb-2"><i class="fa-solid fa-users-gear mr-2"></i> Quản Lý Thành Viên & Cộng Số Dư Ví</h2>
+                <p class="text-xs text-slate-400 mb-4">Khi khách chuyển khoản, bạn chỉ cần gõ số tiền muốn cộng và bấm nút để nạp tiền thẳng vào tài khoản của khách.</p>
+                <div id="admin-user-list" class="space-y-3">
+                    <!-- User list -->
                 </div>
             </div>
 
@@ -153,43 +154,39 @@
         </div>
     </div>
 
-    <!-- Modal Topup / Thẻ Cào -->
+    <!-- Modal Topup Info (Chuyển khoản / Momo) -->
     <div id="topup-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 relative">
             <button onclick="closeTopupModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h3 class="text-xl font-bold mb-4 text-yellow-400"><i class="fa-solid fa-credit-card mr-2"></i> Nạp Tiền / Gửi Thẻ Cào</h3>
-            <form onsubmit="handleTopupSubmit(event)" class="space-y-4">
-                <div>
-                    <label class="block text-sm text-slate-400 mb-1">Loại thẻ / Hình thức</label>
-                    <select id="topup-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-yellow-500 text-white">
-                        <option value="Momo / Chuyển Khoản">Chuyển Khoản MOMO / Ngân Hàng</option>
-                        <option value="Viettel">Thẻ Cào Viettel</option>
-                        <option value="Vinaphone">Thẻ Cào Vinaphone</option>
-                        <option value="Mobifone">Thẻ Cào Mobifone</option>
-                    </select>
+            <h3 class="text-xl font-bold mb-3 text-yellow-400"><i class="fa-solid fa-qrcode mr-2"></i> Hướng Dẫn Nạp Tiền Vào Ví</h3>
+            <p class="text-sm text-slate-300 mb-4">Quý khách vui lòng chuyển khoản qua thông tin bên dưới để được cộng tiền tự động vào tài khoản:</p>
+            
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3 mb-4 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Ngân hàng / Ví:</span>
+                    <span class="font-bold text-white">MOMO / MB Bank</span>
                 </div>
-                <div>
-                    <label class="block text-sm text-slate-400 mb-1">Mệnh giá</label>
-                    <select id="topup-amount" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-yellow-500 text-white">
-                        <option value="50000">50,000 đ</option>
-                        <option value="100000">100,000 đ</option>
-                        <option value="200000">200,000 đ</option>
-                        <option value="500000">500,000 đ</option>
-                        <option value="1000000">1,000,000 đ</option>
-                    </select>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Số tài khoản / SĐT:</span>
+                    <span class="font-bold text-yellow-400 select-all">0987654321</span>
                 </div>
-                <div>
-                    <label class="block text-sm text-slate-400 mb-1">Mã thẻ hoặc Số Seri / Nội dung chuyển khoản</label>
-                    <input type="text" id="topup-code" required placeholder="Nhập mã thẻ hoặc mã giao dịch..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-yellow-500">
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Chủ tài khoản:</span>
+                    <span class="font-bold text-white">GA GAMING SHOP</span>
                 </div>
-                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold py-3 rounded-xl transition shadow">Gửi Yêu Cầu Nạp Tiền</button>
-            </form>
+                <div class="flex justify-between border-t border-slate-800 pt-2">
+                    <span class="text-slate-400">Nội dung chuyển khoản:</span>
+                    <span id="transfer-syntax" class="font-bold text-emerald-400 select-all">naptien [TênTaiKhoản]</span>
+                </div>
+            </div>
+
+            <p class="text-xs text-slate-400 text-center">Sau khi chuyển khoản thành công, tiền sẽ được Admin cộng vào tài khoản của bạn trong vòng 1-2 phút.</p>
         </div>
     </div>
 
     <script>
-        // Database Initialization with Storage Event sync
-        let db = JSON.parse(localStorage.getItem('gagaming_db_v3')) || {
+        // Database Initialization
+        let db = JSON.parse(localStorage.getItem('gagaming_db_v4')) || {
             users: [
                 { username: 'admin', password: '123456', balance: 5000000, isAdmin: true }
             ],
@@ -197,22 +194,21 @@
                 { id: 1, name: 'Acc Blox Fruits Max Level + T-Rex', price: 150000, img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500', credentials: { user: 'bloxfruits_pro_99', pass: 'gaGaming2026@' }, sold: false },
                 { id: 2, name: 'Acc Liên Quân Full Tướng + 30 Skin', price: 250000, img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500', credentials: { user: 'lienquan_vip_hn', pass: 'hoangMaster88' }, sold: false }
             ],
-            purchased: [],
-            topupRequests: []
+            purchased: []
         };
 
-        let currentUser = JSON.parse(localStorage.getItem('gagaming_current_user_v3')) || null;
+        let currentUser = JSON.parse(localStorage.getItem('gagaming_current_user_v4')) || null;
         let isRegisterMode = false;
 
         // Auto sync across tabs/sessions
         window.addEventListener('storage', function(e) {
-            if (e.key === 'gagaming_db_v3') {
+            if (e.key === 'gagaming_db_v4') {
                 db = JSON.parse(e.newValue);
                 if (currentUser) {
                     let u = db.users.find(x => x.username === currentUser.username);
                     if (u) {
                         currentUser = u;
-                        localStorage.setItem('gagaming_current_user_v3', JSON.stringify(currentUser));
+                        localStorage.setItem('gagaming_current_user_v4', JSON.stringify(currentUser));
                     }
                 }
                 renderNav();
@@ -222,18 +218,18 @@
         });
 
         function saveDB() {
-            localStorage.setItem('gagaming_db_v3', JSON.stringify(db));
+            localStorage.setItem('gagaming_db_v4', JSON.stringify(db));
             if(currentUser) {
                 let u = db.users.find(x => x.username === currentUser.username);
                 if(u) {
                     currentUser = u;
-                    localStorage.setItem('gagaming_current_user_v3', JSON.stringify(currentUser));
+                    localStorage.setItem('gagaming_current_user_v4', JSON.stringify(currentUser));
                 }
             }
         }
 
         function reloadDB() {
-            let latest = JSON.parse(localStorage.getItem('gagaming_db_v3'));
+            let latest = JSON.parse(localStorage.getItem('gagaming_db_v4'));
             if(latest) db = latest;
         }
 
@@ -281,7 +277,7 @@
                                 <h3 class="font-bold text-white mb-1 line-clamp-2">${p.name}</h3>
                                 <div class="text-yellow-400 font-extrabold text-lg mb-3">${p.price.toLocaleString()} VNĐ</div>
                                 <div class="text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg inline-block mb-3">
-                                    <i class="fa-solid fa-shield-check mr-1"></i> Tự động 100%
+                                    <i class="fa-solid fa-shield-check mr-1"></i> Giao dịch tức thì
                                 </div>
                             </div>
                         </div>
@@ -323,7 +319,7 @@
                             </div>
                         </div>
                         <div class="text-right">
-                            <span class="text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1 rounded-xl text-sm border border-emerald-500/20">Giao dịch thành công</span>
+                            <span class="text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1 rounded-xl text-sm border border-emerald-500/20">Thành công</span>
                         </div>
                     </div>
                 `;
@@ -332,35 +328,30 @@
 
         function renderAdminDashboard() {
             reloadDB();
-            const pendingCount = db.topupRequests.filter(r => r.status === 'pending').length;
-            document.getElementById('stat-pending-topup').innerText = pendingCount;
+            document.getElementById('stat-total-users').innerText = db.users.length;
             document.getElementById('stat-total-products').innerText = db.products.length;
             document.getElementById('stat-total-sold').innerText = db.purchased.length;
 
-            const topupList = document.getElementById('admin-topup-requests');
-            topupList.innerHTML = '';
-            const pendingRequests = db.topupRequests.filter(r => r.status === 'pending');
-            
-            if(pendingRequests.length === 0) {
-                topupList.innerHTML = `<p class="text-slate-500 text-sm">Không có yêu cầu nạp tiền nào đang chờ duyệt.</p>`;
-            } else {
-                pendingRequests.forEach(req => {
-                    topupList.innerHTML += `
-                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                            <div>
-                                <p class="font-bold text-white">Khách: <span class="text-yellow-400">${req.username}</span></p>
-                                <p class="text-sm text-slate-300">Hình thức: ${req.type} - Số tiền: <span class="text-emerald-400 font-bold">+${req.amount.toLocaleString()}đ</span></p>
-                                <p class="text-xs text-slate-400 font-mono">Mã/Seri: ${req.code}</p>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button onclick="approveTopup(${req.id})" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition"><i class="fa-solid fa-check mr-1"></i> Duyệt cộng tiền</button>
-                                <button onclick="rejectTopup(${req.id})" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 font-bold px-3 py-2 rounded-xl text-sm transition"><i class="fa-solid fa-xmark"></i></button>
-                            </div>
+            // Render danh sách thành viên để Admin cộng tiền ví
+            const userList = document.getElementById('admin-user-list');
+            userList.innerHTML = '';
+            db.users.forEach(u => {
+                userList.innerHTML += `
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div>
+                            <span class="font-bold text-white">${u.username}</span> 
+                            ${u.isAdmin ? '<span class="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-0.5 rounded ml-2">Admin</span>' : ''}
+                            <div class="text-sm text-slate-400 mt-0.5">Số dư ví: <span class="text-yellow-400 font-bold">${u.balance.toLocaleString()}đ</span></div>
                         </div>
-                    `;
-                });
-            }
+                        <div class="flex items-center space-x-2 w-full sm:w-auto">
+                            <input type="number" id="topup-amount-${u.username}" placeholder="Số tiền cộng..." class="bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-sm text-white w-36 focus:outline-none focus:border-yellow-500">
+                            <button onclick="adminAddBalance('${u.username}')" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-sm transition whitespace-nowrap"><i class="fa-solid fa-plus mr-1"></i> Cộng tiền</button>
+                        </div>
+                    </div>
+                `;
+            });
 
+            // Render kho sản phẩm
             const prodList = document.getElementById('admin-product-list');
             prodList.innerHTML = '';
             db.products.forEach(p => {
@@ -376,54 +367,22 @@
             });
         }
 
-        function handleTopupSubmit(e) {
-            e.preventDefault();
-            if(!currentUser) {
-                openAuthModal();
+        function adminAddBalance(username) {
+            reloadDB();
+            let amountInput = document.getElementById(`topup-amount-${username}`);
+            let amount = Number(amountInput.value);
+            if(!amount || amount <= 0) {
+                alert('Vui lòng nhập số tiền hợp lệ!');
                 return;
             }
-            reloadDB();
-            const type = document.getElementById('topup-type').value;
-            const amount = Number(document.getElementById('topup-amount').value);
-            const code = document.getElementById('topup-code').value.trim();
 
-            db.topupRequests.push({
-                id: Date.now(),
-                username: currentUser.username,
-                type,
-                amount,
-                code,
-                status: 'pending'
-            });
-
-            saveDB();
-            closeTopupModal();
-            alert('Đã gửi yêu cầu nạp tiền! Vui lòng chờ Admin kiểm tra và duyệt tài khoản.');
-        }
-
-        function approveTopup(requestId) {
-            reloadDB();
-            let req = db.topupRequests.find(r => r.id === requestId);
-            if(!req) return;
-
-            let targetUser = db.users.find(u => u.username === req.username);
-            if(targetUser) {
-                targetUser.balance += req.amount;
-                req.status = 'approved';
+            let user = db.users.find(u => u.username === username);
+            if(user) {
+                user.balance += amount;
                 saveDB();
                 renderAdminDashboard();
-                alert(`Đã duyệt thành công +${req.amount.toLocaleString()}đ cho tài khoản ${req.username}!`);
-            }
-        }
-
-        function rejectTopup(requestId) {
-            reloadDB();
-            let req = db.topupRequests.find(r => r.id === requestId);
-            if(req) {
-                req.status = 'rejected';
-                saveDB();
-                renderAdminDashboard();
-                alert('Đã từ chối yêu cầu nạp tiền.');
+                amountInput.value = '';
+                alert(`Đã cộng thành công +${amount.toLocaleString()}đ cho tài khoản ${username}!`);
             }
         }
 
@@ -437,7 +396,7 @@
             if(!product || product.sold) return;
 
             if(currentUser.balance < product.price) {
-                alert('Số dư ví không đủ! Vui lòng bấm Nạp Tiền / Thẻ Cào để nạp thêm.');
+                alert('Số dư ví không đủ! Vui lòng bấm "Nạp Tiền Vào Ví" để xem thông tin chuyển khoản nạp tiền.');
                 openTopupModal();
                 return;
             }
@@ -558,7 +517,7 @@
                 db.users.push(newUser);
                 saveDB();
                 currentUser = newUser;
-                localStorage.setItem('gagaming_current_user_v3', JSON.stringify(currentUser));
+                localStorage.setItem('gagaming_current_user_v4', JSON.stringify(currentUser));
                 alert('Đăng ký thành công!');
             } else {
                 let found = db.users.find(x => x.username === u && x.password === p);
@@ -567,7 +526,7 @@
                     return;
                 }
                 currentUser = found;
-                localStorage.setItem('gagaming_current_user_v3', JSON.stringify(currentUser));
+                localStorage.setItem('gagaming_current_user_v4', JSON.stringify(currentUser));
                 alert('Đăng nhập thành công!');
             }
             closeAuthModal();
@@ -577,7 +536,7 @@
 
         function logout() {
             currentUser = null;
-            localStorage.removeItem('gagaming_current_user_v3');
+            localStorage.removeItem('gagaming_current_user_v4');
             renderNav();
             switchTab('shop');
             alert('Đã đăng xuất.');
@@ -590,7 +549,7 @@
                 let adminUser = db.users.find(u => u.isAdmin && u.password === pass);
                 if(adminUser) {
                     currentUser = adminUser;
-                    localStorage.setItem('gagaming_current_user_v3', JSON.stringify(currentUser));
+                    localStorage.setItem('gagaming_current_user_v4', JSON.stringify(currentUser));
                     renderNav();
                     switchTab('admin');
                 } else {
@@ -602,9 +561,10 @@
         }
 
         function openTopupModal() {
-            if(!currentUser) {
-                openAuthModal();
-                return;
+            if(currentUser) {
+                document.getElementById('transfer-syntax').innerText = `naptien ${currentUser.username}`;
+            } else {
+                document.getElementById('transfer-syntax').innerText = `naptien [TenTaiKhoan của bạn]`;
             }
             document.getElementById('topup-modal').classList.remove('hidden');
         }
