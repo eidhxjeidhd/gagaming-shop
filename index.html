@@ -1,357 +1,175 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gà Gaming Shop - Auto Telegram</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NEON WARRIOR: RIFT HUNT</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050713;color:#fff;font-family:Arial,Helvetica,sans-serif;touch-action:none}
+button{font:inherit;color:#fff}
+#game{position:fixed;inset:0;overflow:hidden;background:
+radial-gradient(circle at 50% 30%,rgba(82,55,170,.2),transparent 35%),
+linear-gradient(#07101e,#050713)}
+canvas{position:absolute;inset:0;width:100%;height:100%}
+.hud{position:absolute;z-index:5;top:10px;left:10px;right:10px;display:flex;gap:8px;align-items:flex-start;pointer-events:none}
+.panel{background:rgba(10,12,30,.82);border:2px solid #7d5cff;border-radius:18px;box-shadow:0 0 18px rgba(125,92,255,.25);backdrop-filter:blur(8px)}
+.stats{width:min(390px,62vw);padding:10px 12px}
+.name{font-size:18px;font-weight:900;color:#d9ccff}.level{color:#79eaff;font-size:13px;margin:2px 0 7px}
+.bar{height:12px;border-radius:20px;background:#191c2c;overflow:hidden;border:1px solid #353a55;margin:4px 0}
+.fill{height:100%;width:100%;transition:.2s}.hp{background:linear-gradient(90deg,#ff315f,#ff8b9e)}.mana{background:linear-gradient(90deg,#24c8ff,#7c70ff)}.xp{background:linear-gradient(90deg,#8f5cff,#ff3fa8)}
+.res{margin-left:auto;display:flex;gap:7px}.resbox{min-width:92px;padding:10px 12px;text-align:center;font-weight:900;font-size:17px}.resbox small{display:block;color:#a9abc0;font-size:10px;letter-spacing:1px}
+#quest{position:absolute;z-index:6;top:112px;left:10px;max-width:310px;padding:11px 14px;display:none}
+#quest b{color:#ffd34d}.questline{font-size:12px;color:#c6c7d6;margin-top:4px}
+.menuBtn{position:absolute;right:10px;top:10px;z-index:8;width:56px;height:56px;border-radius:18px;border:2px solid #ffd447;background:#16132b;font-size:25px}
+.bossbar{position:absolute;z-index:4;top:18%;left:50%;transform:translateX(-50%);width:min(650px,84vw);display:none;text-align:center}
+.bossname{font-weight:1000;letter-spacing:2px;color:#ff65a6;margin-bottom:7px}.bossfill{height:15px;border:2px solid #ff3e88;border-radius:20px;background:#1b1227;overflow:hidden}.bossfill>i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ff287e,#a536ff)}
+#toast{position:absolute;z-index:20;left:50%;top:45%;transform:translate(-50%,-50%) scale(.8);opacity:0;padding:14px 24px;border-radius:18px;background:rgba(255,183,0,.92);color:#201700;font-weight:1000;font-size:21px;transition:.25s;pointer-events:none;white-space:nowrap}
+#combo{position:absolute;z-index:7;left:50%;top:39%;transform:translateX(-50%);font-size:clamp(42px,11vw,90px);font-weight:1000;color:#ffd52f;text-shadow:0 0 18px #ff8a00;opacity:0;pointer-events:none}
+.controls{position:absolute;z-index:9;left:0;right:0;bottom:12px;height:190px;pointer-events:none}
+.joy{position:absolute;left:24px;bottom:5px;width:142px;height:142px;border:2px solid #765dff;border-radius:50%;background:rgba(34,29,70,.38);pointer-events:auto}
+.knob{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;background:radial-gradient(circle,#a873ff,#6435d8);border:3px solid #d9c9ff;box-shadow:0 0 22px #7d55ff}
+.skills{position:absolute;right:16px;bottom:10px;display:grid;grid-template-columns:repeat(3,72px);gap:10px;pointer-events:auto}
+.skill{height:72px;border-radius:20px;border:2px solid #8c6dff;background:linear-gradient(145deg,#17142f,#090b18);box-shadow:0 0 16px rgba(121,83,255,.22);font-size:29px;position:relative}
+.skill:active{transform:scale(.93)}.skill.lock{opacity:.42}.cd{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.55);border-radius:18px;font-weight:900;font-size:18px}
+.bottom{position:absolute;z-index:8;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:7px;pointer-events:auto}
+.nav{height:48px;padding:0 15px;border-radius:15px;border:2px solid #795cff;background:#121128;font-weight:900}
+.modal{position:absolute;z-index:30;inset:0;background:rgba(1,3,10,.75);display:none;align-items:center;justify-content:center;padding:18px}
+.card{width:min(560px,95vw);max-height:85vh;overflow:auto;padding:18px;border-radius:24px;background:linear-gradient(145deg,#15112d,#080b18);border:2px solid #8664ff;box-shadow:0 0 40px rgba(104,70,255,.35)}
+.card h2{margin:0 0 12px;color:#ffd64d}.row{display:flex;gap:8px;flex-wrap:wrap}.item{flex:1;min-width:130px;padding:12px;border:1px solid #40376d;border-radius:15px;background:#101127}.item b{display:block;margin-bottom:5px}.action{margin-top:8px;width:100%;padding:10px;border:0;border-radius:12px;background:#6945e8;font-weight:900}.close{float:right;background:#28213e;border:1px solid #765cff;border-radius:10px;padding:5px 10px}
+#damageLayer{position:absolute;z-index:12;inset:0;pointer-events:none}.dmg{position:absolute;font-weight:1000;font-size:22px;text-shadow:0 2px 4px #000;animation:float .7s forwards}@keyframes float{to{transform:translateY(-60px) scale(1.2);opacity:0}}
+#start{position:absolute;z-index:50;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#20135b,#050713 65%);padding:20px}
+.startcard{text-align:center;width:min(620px,94vw)}.logo{font-size:clamp(35px,9vw,76px);font-weight:1000;line-height:.9;background:linear-gradient(90deg,#65eaff,#b06cff,#ff4e9b);-webkit-background-clip:text;color:transparent}.sub{color:#b9bbd0;margin:18px}.play{padding:16px 34px;border-radius:18px;border:2px solid #ffd448;background:#171329;color:#ffe064;font-size:21px;font-weight:1000}
+@media(max-width:600px){.stats{width:62vw}.resbox{min-width:74px;padding:8px 6px;font-size:14px}.resbox small{font-size:8px}.controls{height:180px}.skills{grid-template-columns:repeat(3,64px)}.skill{height:64px}.joy{width:128px;height:128px}.knob{width:64px;height:64px}.bottom{display:none}}
+</style>
 </head>
-<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center p-4">
+<body>
+<div id="game">
+<canvas id="c"></canvas>
+<div class="hud">
+  <div class="panel stats">
+    <div class="name">⚔️ NEON WARRIOR</div>
+    <div class="level">CẤP <span id="lvl">1</span> • <span id="class">TÂN THỦ</span></div>
+    <div class="bar"><div id="hp" class="fill hp"></div></div>
+    <div class="bar"><div id="mana" class="fill mana"></div></div>
+    <div class="bar"><div id="xp" class="fill xp"></div></div>
+    <div style="font-size:10px;color:#9da0b7">HP <span id="hpTxt"></span> • NĂNG LƯỢNG <span id="manaTxt"></span></div>
+  </div>
+  <div class="res">
+    <div class="panel resbox">🪙 <span id="gold">0</span><small>VÀNG</small></div>
+    <div class="panel resbox">💎 <span id="gem">0</span><small>KIM CƯƠNG</small></div>
+  </div>
+</div>
+<div id="quest" class="panel"><b>📜 NHIỆM VỤ</b><div class="questline" id="questText"></div></div>
+<button class="menuBtn" onclick="openMenu()">☰</button>
+<div id="bossbar" class="bossbar"><div class="bossname">☠ RIFT OVERLORD</div><div class="bossfill"><i id="bossfill"></i></div></div>
+<div id="combo">x1 COMBO!</div><div id="toast"></div><div id="damageLayer"></div>
 
-    <div class="w-full max-w-md bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl space-y-4" id="app">
-        <!-- Header -->
-        <div class="text-center flex justify-between items-center border-b border-slate-800 pb-3">
-            <div>
-                <h1 class="text-lg font-black text-yellow-400">GÀ GAMING SHOP</h1>
-                <p class="text-slate-400 text-[10px]">Bot Telegram: @gane2026_bot</p>
-            </div>
-            <div id="user-box" class="text-right">
-                <button onclick="showAuthModal()" class="bg-yellow-500 text-slate-950 px-3 py-1.5 rounded-xl text-xs font-bold">Đăng Nhập</button>
-            </div>
-        </div>
+<div class="controls">
+  <div id="joy" class="joy"><div class="knob"></div></div>
+  <div class="skills">
+    <button class="skill" onclick="useSkill('dash')">⚡<span class="cd" id="cdDash"></span></button>
+    <button class="skill" onclick="useSkill('nova')">💥<span class="cd" id="cdNova"></span></button>
+    <button class="skill" onclick="useSkill('heal')">❤️<span class="cd" id="cdHeal"></span></button>
+  </div>
+</div>
+<div class="bottom">
+<button class="nav" onclick="openShop()">🛒 SHOP</button>
+<button class="nav" onclick="openInv()">🎒 TÚI ĐỒ</button>
+<button class="nav" onclick="openSkills()">✨ KỸ NĂNG</button>
+</div>
 
-        <!-- Kho sản phẩm -->
-        <div class="space-y-3">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xs font-bold text-cyan-400">Kho Tài Khoản:</h2>
-                <button onclick="openDepositModal()" class="text-[10px] bg-green-500/20 text-green-400 px-2 py-1 rounded-lg font-bold border border-green-500/30">Nạp Tiền Thẻ Cào</button>
-            </div>
-            <div id="product-list" class="space-y-2 max-h-56 overflow-y-auto pr-1">
-                <p class="text-xs text-slate-500 text-center py-4">Đang tải sản phẩm...</p>
-            </div>
-        </div>
+<div id="modal" class="modal"><div class="card"><button class="close" onclick="closeModal()">✕</button><div id="modalBody"></div></div></div>
+<div id="start"><div class="startcard"><div class="logo">RIFT<br>HUNT</div><div class="sub">NEON WARRIOR • MOBILE ACTION RPG<br>Đánh quái • Combo • Boss • Loot • Nâng cấp</div><button class="play" onclick="startGame()">⚔️ BẮT ĐẦU CHIẾN ĐẤU</button></div></div>
+</div>
 
-        <!-- Nút Admin web dự phòng -->
-        <div class="pt-2 border-t border-slate-800 text-center">
-            <button onclick="openAdminLogin()" class="text-[11px] text-slate-400 hover:text-yellow-400 underline">Khu vực quản trị Web (Admin)</button>
-        </div>
-    </div>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W,H,DPR,started=false,last=0,shake=0;
+const player={x:0,y:0,r:22,hp:100,maxHp:100,mana:100,maxMana:100,lvl:1,xp:0,next:100,gold:82,gem:0,damage:16,speed:190,combo:0,comboTime:0,kills:0,weapon:'Kiếm Rift'};
+let enemies=[],particles=[],texts=[],keys={},boss=null,spawnTimer=0,questKills=0;
+const cd={dash:0,nova:0,heal:0};
+const inventory=['⚔️ Kiếm Rift','🧪 Bình hồi phục'];
+const skills={dash:{name:'Lôi Ảnh',cost:20,cd:2.4},nova:{name:'Tinh Vân Bạo Kích',cost:35,cd:3.2},heal:{name:'Hồi Phục',cost:30,cd:5}};
+function resize(){DPR=devicePixelRatio||1;W=innerWidth;H=innerHeight;canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0)}
+addEventListener('resize',resize);resize();
 
-    <!-- Modal Đăng Nhập / Đăng Ký -->
-    <div id="auth-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl w-full max-w-sm space-y-4">
-            <h3 id="auth-title" class="text-sm font-bold text-yellow-400 text-center">Đăng Nhập Tài Khoản</h3>
-            <input type="text" id="auth-user" placeholder="Tên tài khoản" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white">
-            <input type="password" id="auth-pass" placeholder="Mật khẩu" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white">
-            <div class="flex space-x-2">
-                <button onclick="handleAuth()" class="w-full bg-yellow-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs" id="auth-btn">Đăng Nhập</button>
-                <button onclick="toggleAuthMode()" class="w-full bg-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs" id="switch-btn">Chuyển Đăng Ký</button>
-            </div>
-            <button onclick="closeAuthModal()" class="w-full text-slate-500 text-xs text-center pt-2">Đóng</button>
-        </div>
-    </div>
-
-    <!-- Modal Nạp Thẻ -->
-    <div id="deposit-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl w-full max-w-sm space-y-3">
-            <h3 class="text-sm font-bold text-green-400 text-center">Nạp Thẻ Cào (Báo về Telegram)</h3>
-            <select id="card-type" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white">
-                <option value="Viettel">Viettel</option>
-                <option value="Vinaphone">Vinaphone</option>
-                <option value="Mobifone">Mobifone</option>
-            </select>
-            <select id="card-amount" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white">
-                <option value="10000">10.000đ</option>
-                <option value="20000">20.000đ</option>
-                <option value="50000">50.000đ</option>
-                <option value="100000">100.000đ</option>
-                <option value="200000">200.000đ</option>
-                <option value="500000">500.000đ</option>
-            </select>
-            <input type="text" id="card-serial" placeholder="Nhập số Serial thẻ" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white">
-            <input type="text" id="card-code" placeholder="Nhập mã thẻ cào" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white">
-            <button onclick="submitCard()" class="w-full bg-green-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs">Gửi Thẻ Nạp</button>
-            <button onclick="closeDepositModal()" class="w-full text-slate-500 text-xs text-center pt-1">Đóng</button>
-        </div>
-    </div>
-
-    <!-- Modal Quản Trị Web -->
-    <div id="admin-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl w-full max-w-md space-y-4 max-h-[85vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <h3 class="text-sm font-bold text-red-400">Trang Quản Trị Web</h3>
-                <button onclick="closeAdminModal()" class="text-slate-400 text-xs">Đóng</button>
-            </div>
-            <div id="admin-content">
-                <div id="admin-login-box" class="space-y-3">
-                    <p class="text-xs text-slate-400">Mật khẩu Admin (Mặc định: 123456):</p>
-                    <input type="password" id="admin-pass-input" placeholder="Mật khẩu" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white">
-                    <button onclick="checkAdminLogin()" class="w-full bg-red-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs">Truy Cập</button>
-                </div>
-                <div id="admin-dashboard" class="hidden space-y-4">
-                    <div>
-                        <h4 class="text-xs font-bold text-yellow-400 mb-2">Thẻ Cào Chờ Duyệt:</h4>
-                        <div id="admin-deposits-list" class="space-y-2"><p class="text-xs text-slate-500 text-center">Đang tải...</p></div>
-                    </div>
-                    <div class="border-t border-slate-800 pt-3">
-                        <h4 class="text-xs font-bold text-cyan-400 mb-2">Danh Sách Khách Hàng:</h4>
-                        <div id="admin-users-list" class="space-y-2"><p class="text-xs text-slate-500 text-center">Đang tải...</p></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const SUPABASE_URL = 'https://nqozzdvaousgacpjiglw.supabase.co';
-        const SUPABASE_ANON_KEY = 'Sb_publishable_sUYd7prmWNfB2ZUo7gMHEg_BnzBLOAM';
-        
-        // Thông tin Bot Telegram của ông
-        const TELEGRAM_BOT_TOKEN = '8664286603:AAHqLdiV8Ecw_zHurZEifaObLlaVkqZVBss';
-        const TELEGRAM_CHAT_ID = 'DÁN_CHAT_ID_CỦA_ÔNG_VÀO_ĐÂY'; // Thay dãy số Chat ID lấy từ @userinfobot vào đây
-
-        let currentUser = localStorage.getItem('shop_user') ? JSON.parse(localStorage.getItem('shop_user')) : null;
-
-        async function sendTelegramNotification(message) {
-            if (TELEGRAM_CHAT_ID === 'DÁN_CHAT_ID_CỦA_ÔNG_VÀO_ĐÂY') return;
-            try {
-                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'HTML' })
-                });
-            } catch(e) { console.log("Lỗi gửi telegram", e); }
-        }
-
-        function updateUI() {
-            const userBox = document.getElementById('user-box');
-            if (currentUser) {
-                userBox.innerHTML = `
-                    <div class="text-xs">
-                        <span class="text-yellow-400 font-bold">${currentUser.username}</span><br>
-                        <span class="text-green-400">Ví: ${Number(currentUser.balance || 0).toLocaleString()}đ</span> | 
-                        <button onclick="logout()" class="text-red-400 underline text-[10px]">Thoát</button>
-                    </div>
-                `;
-            } else {
-                userBox.innerHTML = `<button onclick="showAuthModal()" class="bg-yellow-500 text-slate-950 px-3 py-1.5 rounded-xl text-xs font-bold">Đăng Nhập</button>`;
-            }
-        }
-
-        async function loadProducts() {
-            const listDiv = document.getElementById('product-list');
-            try {
-                let res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*`, {
-                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-                });
-                let data = await res.json();
-                if (!data || data.length === 0) {
-                    listDiv.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">Chưa có sản phẩm.</p>';
-                    return;
-                }
-                let html = '';
-                data.forEach(item => {
-                    html += `
-                        <div class="flex justify-between items-center bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs">
-                            <div>
-                                <div class="font-bold text-white">${item.name}</div>
-                                <div class="text-[10px] text-slate-400">Giá: ${Number(item.price).toLocaleString()}đ</div>
-                            </div>
-                            <button onclick="buyProduct(${item.id}, '${item.name}', ${item.price}, '${item.account_info}')" class="bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-lg font-bold">Mua</button>
-                        </div>
-                    `;
-                });
-                listDiv.innerHTML = html;
-            } catch (err) {
-                listDiv.innerHTML = '<p class="text-xs text-red-400 text-center">Lỗi tải sản phẩm.</p>';
-            }
-        }
-
-        let isRegisterMode = false;
-        function showAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
-        function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
-        function toggleAuthMode() {
-            isRegisterMode = !isRegisterMode;
-            document.getElementById('auth-title').innerText = isRegisterMode ? "Đăng Ký Tài Khoản" : "Đăng Nhập Tài Khoản";
-            document.getElementById('auth-btn').innerText = isRegisterMode ? "Đăng Ký" : "Đăng Nhập";
-            document.getElementById('switch-btn').innerText = isRegisterMode ? "Chuyển Đăng Nhập" : "Chuyển Đăng Ký";
-        }
-
-        async function handleAuth() {
-            let u = document.getElementById('auth-user').value.trim();
-            let p = document.getElementById('auth-pass').value.trim();
-            if(!u || !p) { alert("Vui lòng điền đủ thông tin!"); return; }
-
-            if(isRegisterMode) {
-                try {
-                    let res = await fetch(`${SUPABASE_URL}/rest/v1/users`, {
-                        method: 'POST',
-                        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-                        body: JSON.stringify({ username: u, password: p, balance: 0 })
-                    });
-                    if(res.ok || res.status === 201) {
-                        alert("Đăng ký thành công! Hãy chuyển sang đăng nhập.");
-                        sendTelegramNotification(`👤 <b>Có khách đăng ký mới!</b>\n- Tài khoản: <code>${u}</code>`);
-                        toggleAuthMode();
-                    } else {
-                        alert("Tên tài khoản đã tồn tại hoặc lỗi kết nối!");
-                    }
-                } catch(e) { alert("Lỗi kết nối mạng!"); }
-            } else {
-                try {
-                    let res = await fetch(`${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(u)}&password=eq.${encodeURIComponent(p)}&select=*`, {
-                        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-                    });
-                    let data = await res.json();
-                    if(data && data.length > 0) {
-                        currentUser = data[0];
-                        localStorage.setItem('shop_user', JSON.stringify(currentUser));
-                        closeAuthModal();
-                        updateUI();
-                        alert("Đăng nhập thành công!");
-                    } else {
-                        alert("Sai tên tài khoản hoặc mật khẩu!");
-                    }
-                } catch(e) { alert("Lỗi kết nối khi đăng nhập!"); }
-            }
-        }
-        function logout() { currentUser = null; localStorage.removeItem('shop_user'); updateUI(); }
-
-        function openDepositModal() {
-            if(!currentUser) { alert("Vui lòng đăng nhập trước khi nạp tiền!"); showAuthModal(); return; }
-            document.getElementById('deposit-modal').classList.remove('hidden');
-        }
-        function closeDepositModal() { document.getElementById('deposit-modal').classList.add('hidden'); }
-
-        async function submitCard() {
-            let type = document.getElementById('card-type').value;
-            let amount = document.getElementById('card-amount').value;
-            let serial = document.getElementById('card-serial').value.trim();
-            let code = document.getElementById('card-code').value.trim();
-
-            if(!serial || !code) { alert("Vui lòng nhập đầy đủ serial và mã thẻ!"); return; }
-
-            let res = await fetch(`${SUPABASE_URL}/rest/v1/deposits`, {
-                method: 'POST',
-                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: currentUser.username, card_type: type, card_amount: amount, serial: serial, code: code, status: 'pending' })
-            });
-
-            if(res.ok) {
-                alert("Gửi thẻ thành công! Bot Telegram sẽ báo cho Admin.");
-                sendTelegramNotification(`🔔 <b>CÓ THẺ NẠP MỚI CẦN DUYỆT!</b>\n- Khách: <b>${currentUser.username}</b>\n- Loại: ${type}\n- Mệnh giá: <b>${Number(amount).toLocaleString()}đ</b>\n- Serial: <code>${serial}</code>\n- Mã thẻ: <code>${code}</code>`);
-                closeDepositModal();
-            } else {
-                alert("Lỗi gửi thẻ, vui lòng thử lại!");
-            }
-        }
-
-        async function buyProduct(id, name, price, info) {
-            if(!currentUser) { alert("Vui lòng đăng nhập để mua hàng!"); showAuthModal(); return; }
-            if(Number(currentUser.balance) < Number(price)) { alert("Số dư ví không đủ! Vui lòng nạp thêm tiền."); return; }
-
-            if(confirm(`Xác nhận mua "${name}" giá ${Number(price).toLocaleString()}đ?`)) {
-                let newBalance = Number(currentUser.balance) - Number(price);
-                let updateRes = await fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${currentUser.id}`, {
-                    method: 'PATCH',
-                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ balance: newBalance })
-                });
-
-                if(updateRes.ok) {
-                    currentUser.balance = newBalance;
-                    localStorage.setItem('shop_user', JSON.stringify(currentUser));
-                    updateUI();
-                    alert(`Mua thành công!\n\nThông tin tài khoản:\n${info}`);
-                } else { alert("Lỗi thanh toán!"); }
-            }
-        }
-
-        function openAdminLogin() { document.getElementById('admin-modal').classList.remove('hidden'); }
-        function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
-
-        async function checkAdminLogin() {
-            let pass = document.getElementById('admin-pass-input').value;
-            if(pass === "123456") {
-                document.getElementById('admin-login-box').classList.add('hidden');
-                document.getElementById('admin-dashboard').classList.remove('hidden');
-                loadAdminData();
-            } else { alert("Sai mật khẩu Admin!"); }
-        }
-
-        async function loadAdminData() {
-            let listDepositsDiv = document.getElementById('admin-deposits-list');
-            let resDep = await fetch(`${SUPABASE_URL}/rest/v1/deposits?status=eq.pending&select=*`, {
-                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-            });
-            let depData = await resDep.json();
-            if(!depData || depData.length === 0) {
-                listDepositsDiv.innerHTML = '<p class="text-xs text-slate-500 text-center">Không có thẻ chờ duyệt.</p>';
-            } else {
-                let htmlDep = '';
-                depData.forEach(item => {
-                    htmlDep += `
-                        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs space-y-1">
-                            <div><b>User:</b> ${item.username} | <b>Loại:</b> ${item.card_type}</div>
-                            <div><b>Mệnh giá:</b> ${Number(item.card_amount).toLocaleString()}đ</div>
-                            <div><b>Serial:</b> ${item.serial} | <b>Mã:</b> ${item.code}</div>
-                            <button onclick="approveCard(${item.id}, '${item.username}', ${item.card_amount})" class="w-full bg-green-500 text-slate-950 font-bold py-1 rounded-lg mt-1">Duyệt & Cộng Tiền</button>
-                        </div>
-                    `;
-                });
-                listDepositsDiv.innerHTML = htmlDep;
-            }
-
-            let listUsersDiv = document.getElementById('admin-users-list');
-            let resUsr = await fetch(`${SUPABASE_URL}/rest/v1/users?select=*`, {
-                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-            });
-            let usrData = await resUsr.json();
-            if(!usrData || usrData.length === 0) {
-                listUsersDiv.innerHTML = '<p class="text-xs text-slate-500 text-center">Chưa có khách đăng ký.</p>';
-            } else {
-                let htmlUsr = `<p class="text-[10px] text-slate-400 mb-1">Tổng số: <b>${usrData.length}</b> khách</p>`;
-                usrData.forEach(u => {
-                    htmlUsr += `
-                        <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 text-xs flex justify-between items-center">
-                            <div><span class="text-yellow-400 font-bold">${u.username}</span> <span class="text-[10px] text-slate-500">(MK: ${u.password})</span></div>
-                            <div class="text-green-400 font-bold">Ví: ${Number(u.balance || 0).toLocaleString()}đ</div>
-                        </div>
-                    `;
-                });
-                listUsersDiv.innerHTML = htmlUsr;
-            }
-        }
-
-        async function approveCard(depositId, username, amount) {
-            await fetch(`${SUPABASE_URL}/rest/v1/deposits?id=eq.${depositId}`, {
-                method: 'PATCH',
-                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: 'approved' })
-            });
-
-            let userRes = await fetch(`${SUPABASE_URL}/rest/v1/users?username=eq.${username}&select=*`, {
-                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-            });
-            let userData = await userRes.json();
-            if(userData && userData.length > 0) {
-                let targetUser = userData[0];
-                let updatedBalance = Number(targetUser.balance) + Number(amount);
-
-                await fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${targetUser.id}`, {
-                    method: 'PATCH',
-                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ balance: updatedBalance })
-                });
-
-                alert(`Đã duyệt cho ${username}, cộng ${Number(amount).toLocaleString()}đ!`);
-                sendTelegramNotification(`✅ <b>ĐÃ DUYỆT THẺ THÀNH CÔNG!</b>\n- Khách: <b>${username}</b>\n- Đã cộng: <b>${Number(amount).toLocaleString()}đ</b> vào ví.`);
-                loadAdminData();
-            }
-        }
-
-        updateUI();
-        loadProducts();
-    </script>
+function startGame(){document.getElementById('start').style.display='none';started=true;player.x=W/2;player.y=H*.55;questKills=0;boss=null;spawnWave();updateUI();requestAnimationFrame(loop)}
+function spawnWave(){for(let i=0;i<5;i++)spawnEnemy();if(player.lvl>=3 && !boss){boss={x:W/2,y:H*.3,r:45,hp:900,maxHp:900,phase:1,hit:0};document.getElementById('bossbar').style.display='block'}updateQuest()}
+function spawnEnemy(){let a=Math.random()*Math.PI*2,d=180+Math.random()*260;enemies.push({x:W/2+Math.cos(a)*d,y:H*.55+Math.sin(a)*d,r:18+Math.random()*5,hp:45+player.lvl*12,maxHp:45+player.lvl*12,spd:45+Math.random()*25,atk:0})}
+function updateQuest(){document.getElementById('quest').style.display='block';document.getElementById('questText').textContent=`Hạ 8 quái vật • Tiến độ: ${Math.min(questKills,8)}/8 • Thưởng: 180 vàng + 5💎`}
+function loop(t){if(!started)return;let dt=Math.min(.033,(t-last)/1000||.016);last=t;update(dt);draw();requestAnimationFrame(loop)}
+function update(dt){
+  for(let k in cd)cd[k]=Math.max(0,cd[k]-dt);
+  player.comboTime-=dt;if(player.comboTime<=0)player.combo=0;
+  player.mana=Math.min(player.maxMana,player.mana+10*dt);
+  let dx=(keys.d?1:0)-(keys.a?1:0),dy=(keys.s?1:0)-(keys.w?1:0);
+  if(dx||dy){let l=Math.hypot(dx,dy);player.x+=dx/l*player.speed*dt;player.y+=dy/l*player.speed*dt}
+  player.x=Math.max(35,Math.min(W-35,player.x));player.y=Math.max(90,Math.min(H-125,player.y));
+  spawnTimer-=dt;if(spawnTimer<=0&&enemies.length<7){spawnEnemy();spawnTimer=1.8}
+  enemies.forEach(e=>{let dx=player.x-e.x,dy=player.y-e.y,d=Math.hypot(dx,dy)||1;e.atk-=dt;if(d>45){e.x+=dx/d*e.spd*dt;e.y+=dy/d*e.spd*dt}else if(e.atk<=0){player.hp-=6;e.atk=1.1;damageText(player.x,player.y-30,'-6','#ff4f67');shake=5}});
+  if(player.hp<=0){player.hp=player.maxHp;player.gold=Math.max(0,player.gold-30);toast('💀 Bị hạ! -30 vàng');player.x=W/2;player.y=H*.55}
+  if(boss)updateBoss(dt);
+  particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;p.vx*=.97;p.vy*=.97});particles=particles.filter(p=>p.life>0);
+  updateUI();
+}
+function updateBoss(dt){
+ let dx=player.x-boss.x,dy=player.y-boss.y,d=Math.hypot(dx,dy)||1;
+ boss.x+=dx/d*45*dt;boss.y+=dy/d*45*dt;boss.hit-=dt;
+ if(d<75&&boss.hit<=0){player.hp-=18;boss.hit=1.2;shake=10;damageText(player.x,player.y-35,'-18','#ff335f')}
+ if(boss.hp<boss.maxHp*.5)boss.phase=2;
+ document.getElementById('bossfill').style.width=(boss.hp/boss.maxHp*100)+'%';
+}
+function attack(){
+ let hit=false;
+ enemies.forEach(e=>{let d=Math.hypot(e.x-player.x,e.y-player.y);if(d<105){hit=true;let dmg=Math.round(player.damage*(1+player.combo*.08));e.hp-=dmg;damageText(e.x,e.y-25,'-'+dmg,'#ffe14d');burst(e.x,e.y,'#a56cff',9);if(e.hp<=0)killEnemy(e)}});
+ if(boss&&Math.hypot(boss.x-player.x,boss.y-player.y)<145){hit=true;let dmg=Math.round(player.damage*(1+player.combo*.1));boss.hp-=dmg;damageText(boss.x,boss.y-55,'-'+dmg,'#ffdf4d');burst(boss.x,boss.y,'#ff4e9b',18);if(boss.hp<=0)killBoss()}
+ if(hit){player.combo=Math.min(20,player.combo+1);player.comboTime=2.2;showCombo()}
+}
+function killEnemy(e){enemies=enemies.filter(x=>x!==e);player.kills++;questKills++;let g=10+Math.floor(Math.random()*18);player.gold+=g;player.xp+=22;burst(e.x,e.y,'#5cffad',20);damageText(e.x,e.y-45,'+'+g+' 🪙','#ffd33d');if(questKills===8){player.gold+=180;player.gem+=5;toast('🏆 Nhiệm vụ hoàn thành! +180 vàng +5💎');questKills=0}levelCheck();updateQuest()}
+function killBoss(){player.gold+=500;player.gem+=25;player.xp+=180;toast('☠ BOSS BỊ TIÊU DIỆT! +500 vàng +25💎');burst(boss.x,boss.y,'#ff3da8',90);boss=null;document.getElementById('bossbar').style.display='none';setTimeout(()=>{if(started)spawnWave()},1500);levelCheck()}
+function levelCheck(){while(player.xp>=player.next){player.xp-=player.next;player.lvl++;player.next=Math.floor(player.next*1.35);player.maxHp+=18;player.maxMana+=10;player.damage+=5;player.hp=player.maxHp;player.mana=player.maxMana;toast('✨ LÊN CẤP '+player.lvl+'!');burst(player.x,player.y,'#70eaff',35)}}
+function useSkill(type){if(!started||cd[type]>0)return;let s=skills[type];if(player.mana<s.cost){toast('⚡ Không đủ năng lượng');return}player.mana-=s.cost;cd[type]=s.cd;
+ if(type==='dash'){let dx=(keys.d?1:keys.a?-1:0),dy=(keys.s?1:keys.w?-1:0);if(!dx&&!dy)dx=1;let l=Math.hypot(dx,dy);player.x=Math.max(35,Math.min(W-35,player.x+dx/l*150));player.y=Math.max(90,Math.min(H-125,player.y+dy/l*150));burst(player.x,player.y,'#55eaff',35);attack()}
+ if(type==='nova'){burst(player.x,player.y,'#ff4caa',55);shake=16;enemies.slice().forEach(e=>{if(Math.hypot(e.x-player.x,e.y-player.y)<190){e.hp-=player.damage*4;damageText(e.x,e.y-20,'-'+player.damage*4,'#ff67c8');if(e.hp<=0)killEnemy(e)}});if(boss&&Math.hypot(boss.x-player.x,boss.y-player.y)<220){boss.hp-=player.damage*7;damageText(boss.x,boss.y-50,'-'+player.damage*7,'#ff67c8');if(boss.hp<=0)killBoss()}}
+ if(type==='heal'){player.hp=Math.min(player.maxHp,player.hp+45);burst(player.x,player.y,'#5cffad',30);toast('❤️ +45 HP')}
+}
+function showCombo(){let el=document.getElementById('combo');el.textContent='x'+Math.max(1,player.combo)+' COMBO!';el.style.opacity='1';el.style.transform='translateX(-50%) scale(1.08)';setTimeout(()=>{el.style.opacity='.25';el.style.transform='translateX(-50%) scale(1)'},250)}
+function damageText(x,y,t,c){let e=document.createElement('div');e.className='dmg';e.textContent=t;e.style.left=x+'px';e.style.top=y+'px';e.style.color=c;document.getElementById('damageLayer').appendChild(e);setTimeout(()=>e.remove(),700)}
+function toast(t){let e=document.getElementById('toast');e.textContent=t;e.style.opacity=1;e.style.transform='translate(-50%,-50%) scale(1)';setTimeout(()=>{e.style.opacity=0;e.style.transform='translate(-50%,-50%) scale(.8)'},1100)}
+function burst(x,y,color,n){for(let i=0;i<n;i++){let a=Math.random()*Math.PI*2,s=40+Math.random()*180;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.35+Math.random()*.55,color,size:2+Math.random()*5})}}
+function draw(){
+ ctx.clearRect(0,0,W,H);
+ let g=ctx.createRadialGradient(W/2,H/2,20,W/2,H/2,Math.max(W,H)*.7);g.addColorStop(0,'#10142e');g.addColorStop(1,'#03050e');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ ctx.save();if(shake>0){ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake*=.88}
+ // arena grid
+ ctx.globalAlpha=.22;ctx.strokeStyle='#4c6aff';ctx.lineWidth=1;
+ for(let x=0;x<W;x+=55){ctx.beginPath();ctx.moveTo(x,70);ctx.lineTo(x,H);ctx.stroke()}
+ for(let y=70;y<H;y+=55){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+ ctx.globalAlpha=1;
+ enemies.forEach(drawEnemy);if(boss)drawBoss();drawPlayer();
+ particles.forEach(p=>{ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill()});ctx.globalAlpha=1;ctx.restore();
+}
+function drawPlayer(){ctx.save();ctx.shadowBlur=25;ctx.shadowColor='#7f5cff';ctx.fillStyle='#7d4cff';ctx.beginPath();ctx.arc(player.x,player.y,player.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#e4d7ff';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(player.x-7,player.y-4,5,0,Math.PI*2);ctx.arc(player.x+7,player.y-4,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#10101d';ctx.beginPath();ctx.arc(player.x-7,player.y-4,2,0,Math.PI*2);ctx.arc(player.x+7,player.y-4,2,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#ffd45a';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(player.x+8,player.y+7);ctx.lineTo(player.x+37,player.y-12);ctx.stroke();ctx.restore()}
+function drawEnemy(e){ctx.save();ctx.shadowBlur=18;ctx.shadowColor='#2dff75';ctx.fillStyle='#24c95b';ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#111';ctx.beginPath();ctx.arc(e.x-5,e.y-2,3,0,Math.PI*2);ctx.arc(e.x+5,e.y-2,3,0,Math.PI*2);ctx.fill();ctx.fillStyle='#171322';ctx.fillRect(e.x-e.r,e.y-e.r-10,e.r*2,4);ctx.fillStyle='#ff365d';ctx.fillRect(e.x-e.r,e.y-e.r-10,e.r*2*(e.hp/e.maxHp),4);ctx.restore()}
+function drawBoss(){ctx.save();ctx.shadowBlur=35;ctx.shadowColor='#ff258e';ctx.fillStyle=boss.phase===2?'#ff3d92':'#9a45ff';ctx.beginPath();ctx.arc(boss.x,boss.y,boss.r,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#ffd44d';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 13px Arial';ctx.textAlign='center';ctx.fillText('OVERLORD',boss.x,boss.y+4);ctx.restore()}
+function updateUI(){document.getElementById('lvl').textContent=player.lvl;document.getElementById('class').textContent=player.lvl>=10?'RIFT MASTER':player.lvl>=5?'NEON HUNTER':'TÂN THỦ';document.getElementById('hp').style.width=Math.max(0,player.hp/player.maxHp*100)+'%';document.getElementById('mana').style.width=player.mana/player.maxMana*100+'%';document.getElementById('xp').style.width=player.xp/player.next*100+'%';document.getElementById('hpTxt').textContent=Math.ceil(player.hp)+'/'+player.maxHp;document.getElementById('manaTxt').textContent=Math.ceil(player.mana)+'/'+player.maxMana;document.getElementById('gold').textContent=player.gold;document.getElementById('gem').textContent=player.gem;for(let k of ['dash','nova','heal'])document.getElementById('cd'+k[0].toUpperCase()+k.slice(1)).textContent=cd[k]>0?cd[k].toFixed(1):''}
+function openMenu(){showModal(`<h2>☰ MENU</h2><div class="row"><div class="item"><b>💾 Lưu tiến trình</b>Tiến trình được lưu trên thiết bị.</div><div class="item"><b>🎮 Điều khiển</b>Joystick hoặc WASD + nút skill.</div></div><button class="action" onclick="saveGame()">💾 LƯU GAME</button><button class="action" onclick="loadGame()">📂 TẢI GAME</button>`)}
+function openShop(){showModal(`<h2>🛒 SHOP</h2><div class="row"><div class="item"><b>🗡️ Kiếm Plasma</b>+12 sát thương<br>Giá: 300🪙<button class="action" onclick="buy(300,()=>{player.damage+=12;inventory.push('🗡️ Kiếm Plasma')})">MUA</button></div><div class="item"><b>❤️ Giáp Rift</b>+50 HP tối đa<br>Giá: 450🪙<button class="action" onclick="buy(450,()=>{player.maxHp+=50;player.hp=player.maxHp})">MUA</button></div><div class="item"><b>💎 Tinh thể</b>+5💎<br>Giá: 800🪙<button class="action" onclick="buy(800,()=>player.gem+=5)">MUA</button></div></div>`)}
+function buy(cost,fn){if(player.gold<cost){toast('Không đủ vàng');return}player.gold-=cost;fn();toast('✅ Mua thành công');closeModal();updateUI()}
+function openInv(){showModal(`<h2>🎒 TÚI ĐỒ</h2><div class="row">${inventory.map(x=>`<div class="item"><b>${x}</b>Đã sở hữu</div>`).join('')}</div>`)}
+function openSkills(){showModal(`<h2>✨ KỸ NĂNG</h2><div class="row">${Object.values(skills).map(s=>`<div class="item"><b>${s.name}</b>Hồi chiêu ${s.cd}s • Năng lượng ${s.cost}</div>`).join('')}</div>`)}
+function showModal(html){document.getElementById('modalBody').innerHTML=html;document.getElementById('modal').style.display='flex'}
+function closeModal(){document.getElementById('modal').style.display='none'}
+function saveGame(){localStorage.riftHuntSave=JSON.stringify({player,inventory});toast('💾 Đã lưu tiến trình');closeModal()}
+function loadGame(){if(!localStorage.riftHuntSave){toast('Chưa có dữ liệu lưu');return}let d=JSON.parse(localStorage.riftHuntSave);Object.assign(player,d.player);inventory.length=0;inventory.push(...d.inventory);closeModal();updateUI();toast('📂 Đã tải tiến trình')}
+addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.code==='Space')attack();if(e.key==='1')useSkill('dash');if(e.key==='2')useSkill('nova');if(e.key==='3')useSkill('heal')});
+addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+canvas.addEventListener('pointerdown',e=>{if(started)attack()});
+let joy=document.getElementById('joy'),knob=joy.querySelector('.knob'),drag=false;
+joy.addEventListener('pointerdown',e=>{drag=true;joy.setPointerCapture(e.pointerId);moveJoy(e)});
+joy.addEventListener('pointermove',e=>{if(drag)moveJoy(e)});joy.addEventListener('pointerup',()=>{drag=false;knob.style.transform='translate(-50%,-50%)';keys.w=keys.a=keys.s=keys.d=false});
+function moveJoy(e){let r=joy.getBoundingClientRect(),x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2,l=Math.hypot(x,y),m=r.width*.34;if(l>m){x=x/l*m;y=y/l*m}knob.style.transform=`translate(calc(-50% + ${x}px),calc(-50% + ${y}px))`;keys.d=x>12;keys.a=x<-12;keys.s=y>12;keys.w=y<-12}
+</script>
 </body>
 </html>
