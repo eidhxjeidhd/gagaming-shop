@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gà Gaming Shop - Tự Động 100%</title>
+    <title>Gà Gaming Shop - Auto Telegram</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center p-4">
@@ -13,14 +13,14 @@
         <div class="text-center flex justify-between items-center border-b border-slate-800 pb-3">
             <div>
                 <h1 class="text-lg font-black text-yellow-400">GÀ GAMING SHOP</h1>
-                <p class="text-slate-400 text-[10px]">Hệ thống Shop Game Tự Động</p>
+                <p class="text-slate-400 text-[10px]">Bot Telegram: @gane2026_bot</p>
             </div>
             <div id="user-box" class="text-right">
                 <button onclick="showAuthModal()" class="bg-yellow-500 text-slate-950 px-3 py-1.5 rounded-xl text-xs font-bold">Đăng Nhập</button>
             </div>
         </div>
 
-        <!-- Nội dung chính: Kho sản phẩm -->
+        <!-- Kho sản phẩm -->
         <div class="space-y-3">
             <div class="flex justify-between items-center">
                 <h2 class="text-xs font-bold text-cyan-400">Kho Tài Khoản:</h2>
@@ -31,9 +31,9 @@
             </div>
         </div>
 
-        <!-- Nút vào trang Admin -->
+        <!-- Nút Admin web dự phòng -->
         <div class="pt-2 border-t border-slate-800 text-center">
-            <button onclick="openAdminLogin()" class="text-[11px] text-slate-400 hover:text-yellow-400 underline">Khu vực quản trị (Admin)</button>
+            <button onclick="openAdminLogin()" class="text-[11px] text-slate-400 hover:text-yellow-400 underline">Khu vực quản trị Web (Admin)</button>
         </div>
     </div>
 
@@ -54,7 +54,7 @@
     <!-- Modal Nạp Thẻ -->
     <div id="deposit-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl w-full max-w-sm space-y-3">
-            <h3 class="text-sm font-bold text-green-400 text-center">Nạp Thẻ Cào Chờ Duyệt</h3>
+            <h3 class="text-sm font-bold text-green-400 text-center">Nạp Thẻ Cào (Báo về Telegram)</h3>
             <select id="card-type" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white">
                 <option value="Viettel">Viettel</option>
                 <option value="Vinaphone">Vinaphone</option>
@@ -75,33 +75,27 @@
         </div>
     </div>
 
-    <!-- Modal Admin Quản Trị -->
+    <!-- Modal Quản Trị Web -->
     <div id="admin-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl w-full max-w-md space-y-4 max-h-[85vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <h3 class="text-sm font-bold text-red-400">Trang Quản Trị Admin</h3>
+                <h3 class="text-sm font-bold text-red-400">Trang Quản Trị Web</h3>
                 <button onclick="closeAdminModal()" class="text-slate-400 text-xs">Đóng</button>
             </div>
             <div id="admin-content">
-                <!-- Form đăng nhập Admin -->
                 <div id="admin-login-box" class="space-y-3">
-                    <p class="text-xs text-slate-400">Nhập mật khẩu quản trị (Mặc định: 123456):</p>
-                    <input type="password" id="admin-pass-input" placeholder="Mật khẩu admin" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white">
+                    <p class="text-xs text-slate-400">Mật khẩu Admin (Mặc định: 123456):</p>
+                    <input type="password" id="admin-pass-input" placeholder="Mật khẩu" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white">
                     <button onclick="checkAdminLogin()" class="w-full bg-red-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs">Truy Cập</button>
                 </div>
-                <!-- Dashboard của Admin: Quản lý Thẻ và Khách hàng -->
                 <div id="admin-dashboard" class="hidden space-y-4">
                     <div>
                         <h4 class="text-xs font-bold text-yellow-400 mb-2">Thẻ Cào Chờ Duyệt:</h4>
-                        <div id="admin-deposits-list" class="space-y-2">
-                            <p class="text-xs text-slate-500 text-center">Đang tải...</p>
-                        </div>
+                        <div id="admin-deposits-list" class="space-y-2"><p class="text-xs text-slate-500 text-center">Đang tải...</p></div>
                     </div>
                     <div class="border-t border-slate-800 pt-3">
-                        <h4 class="text-xs font-bold text-cyan-400 mb-2">Danh Sách Khách Hàng Đã Đăng Ký:</h4>
-                        <div id="admin-users-list" class="space-y-2">
-                            <p class="text-xs text-slate-500 text-center">Đang tải...</p>
-                        </div>
+                        <h4 class="text-xs font-bold text-cyan-400 mb-2">Danh Sách Khách Hàng:</h4>
+                        <div id="admin-users-list" class="space-y-2"><p class="text-xs text-slate-500 text-center">Đang tải...</p></div>
                     </div>
                 </div>
             </div>
@@ -111,8 +105,23 @@
     <script>
         const SUPABASE_URL = 'https://nqozzdvaousgacpjiglw.supabase.co';
         const SUPABASE_ANON_KEY = 'Sb_publishable_sUYd7prmWNfB2ZUo7gMHEg_BnzBLOAM';
+        
+        // Thông tin Bot Telegram của ông
+        const TELEGRAM_BOT_TOKEN = '8664286603:AAHqLdiV8Ecw_zHurZEifaObLlaVkqZVBss';
+        const TELEGRAM_CHAT_ID = 'DÁN_CHAT_ID_CỦA_ÔNG_VÀO_ĐÂY'; // Thay dãy số Chat ID lấy từ @userinfobot vào đây
 
         let currentUser = localStorage.getItem('shop_user') ? JSON.parse(localStorage.getItem('shop_user')) : null;
+
+        async function sendTelegramNotification(message) {
+            if (TELEGRAM_CHAT_ID === 'DÁN_CHAT_ID_CỦA_ÔNG_VÀO_ĐÂY') return;
+            try {
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'HTML' })
+                });
+            } catch(e) { console.log("Lỗi gửi telegram", e); }
+        }
 
         function updateUI() {
             const userBox = document.getElementById('user-box');
@@ -137,7 +146,7 @@
                 });
                 let data = await res.json();
                 if (!data || data.length === 0) {
-                    listDiv.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">Chưa có sản phẩm trong kho.</p>';
+                    listDiv.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">Chưa có sản phẩm.</p>';
                     return;
                 }
                 let html = '';
@@ -154,7 +163,7 @@
                 });
                 listDiv.innerHTML = html;
             } catch (err) {
-                listDiv.innerHTML = '<p class="text-xs text-red-400 text-center">Lỗi tải dữ liệu sản phẩm.</p>';
+                listDiv.innerHTML = '<p class="text-xs text-red-400 text-center">Lỗi tải sản phẩm.</p>';
             }
         }
 
@@ -182,13 +191,12 @@
                     });
                     if(res.ok || res.status === 201) {
                         alert("Đăng ký thành công! Hãy chuyển sang đăng nhập.");
+                        sendTelegramNotification(`👤 <b>Có khách đăng ký mới!</b>\n- Tài khoản: <code>${u}</code>`);
                         toggleAuthMode();
                     } else {
                         alert("Tên tài khoản đã tồn tại hoặc lỗi kết nối!");
                     }
-                } catch(e) {
-                    alert("Lỗi kết nối mạng!");
-                }
+                } catch(e) { alert("Lỗi kết nối mạng!"); }
             } else {
                 try {
                     let res = await fetch(`${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(u)}&password=eq.${encodeURIComponent(p)}&select=*`, {
@@ -204,9 +212,7 @@
                     } else {
                         alert("Sai tên tài khoản hoặc mật khẩu!");
                     }
-                } catch(e) {
-                    alert("Lỗi kết nối khi đăng nhập!");
-                }
+                } catch(e) { alert("Lỗi kết nối khi đăng nhập!"); }
             }
         }
         function logout() { currentUser = null; localStorage.removeItem('shop_user'); updateUI(); }
@@ -232,7 +238,8 @@
             });
 
             if(res.ok) {
-                alert("Gửi thẻ thành công! Vui lòng chờ Admin kiểm tra và duyệt tiền.");
+                alert("Gửi thẻ thành công! Bot Telegram sẽ báo cho Admin.");
+                sendTelegramNotification(`🔔 <b>CÓ THẺ NẠP MỚI CẦN DUYỆT!</b>\n- Khách: <b>${currentUser.username}</b>\n- Loại: ${type}\n- Mệnh giá: <b>${Number(amount).toLocaleString()}đ</b>\n- Serial: <code>${serial}</code>\n- Mã thẻ: <code>${code}</code>`);
                 closeDepositModal();
             } else {
                 alert("Lỗi gửi thẻ, vui lòng thử lại!");
@@ -241,9 +248,9 @@
 
         async function buyProduct(id, name, price, info) {
             if(!currentUser) { alert("Vui lòng đăng nhập để mua hàng!"); showAuthModal(); return; }
-            if(Number(currentUser.balance) < Number(price)) { alert("Số dư trong ví không đủ! Vui lòng nạp thêm tiền."); return; }
+            if(Number(currentUser.balance) < Number(price)) { alert("Số dư ví không đủ! Vui lòng nạp thêm tiền."); return; }
 
-            if(confirm(`Xác nhận mua tài khoản "${name}" với giá ${Number(price).toLocaleString()}đ?`)) {
+            if(confirm(`Xác nhận mua "${name}" giá ${Number(price).toLocaleString()}đ?`)) {
                 let newBalance = Number(currentUser.balance) - Number(price);
                 let updateRes = await fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${currentUser.id}`, {
                     method: 'PATCH',
@@ -255,10 +262,8 @@
                     currentUser.balance = newBalance;
                     localStorage.setItem('shop_user', JSON.stringify(currentUser));
                     updateUI();
-                    alert(`Thanh toán thành công!\n\nThông tin tài khoản của bạn:\n${info}`);
-                } else {
-                    alert("Lỗi thanh toán!");
-                }
+                    alert(`Mua thành công!\n\nThông tin tài khoản:\n${info}`);
+                } else { alert("Lỗi thanh toán!"); }
             }
         }
 
@@ -271,20 +276,17 @@
                 document.getElementById('admin-login-box').classList.add('hidden');
                 document.getElementById('admin-dashboard').classList.remove('hidden');
                 loadAdminData();
-            } else {
-                alert("Sai mật khẩu Admin!");
-            }
+            } else { alert("Sai mật khẩu Admin!"); }
         }
 
         async function loadAdminData() {
-            // Tải danh sách thẻ chờ duyệt
             let listDepositsDiv = document.getElementById('admin-deposits-list');
             let resDep = await fetch(`${SUPABASE_URL}/rest/v1/deposits?status=eq.pending&select=*`, {
                 headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
             });
             let depData = await resDep.json();
             if(!depData || depData.length === 0) {
-                listDepositsDiv.innerHTML = '<p class="text-xs text-slate-500 text-center">Không có thẻ nào đang chờ duyệt.</p>';
+                listDepositsDiv.innerHTML = '<p class="text-xs text-slate-500 text-center">Không có thẻ chờ duyệt.</p>';
             } else {
                 let htmlDep = '';
                 depData.forEach(item => {
@@ -300,23 +302,19 @@
                 listDepositsDiv.innerHTML = htmlDep;
             }
 
-            // Tải danh sách khách hàng đã đăng ký
             let listUsersDiv = document.getElementById('admin-users-list');
             let resUsr = await fetch(`${SUPABASE_URL}/rest/v1/users?select=*`, {
                 headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
             });
             let usrData = await resUsr.json();
             if(!usrData || usrData.length === 0) {
-                listUsersDiv.innerHTML = '<p class="text-xs text-slate-500 text-center">Chưa có khách hàng nào đăng ký.</p>';
+                listUsersDiv.innerHTML = '<p class="text-xs text-slate-500 text-center">Chưa có khách đăng ký.</p>';
             } else {
-                let htmlUsr = `<p class="text-[10px] text-slate-400 mb-1">Tổng số: <b>${usrData.length}</b> khách hàng đã đăng ký</p>`;
+                let htmlUsr = `<p class="text-[10px] text-slate-400 mb-1">Tổng số: <b>${usrData.length}</b> khách</p>`;
                 usrData.forEach(u => {
                     htmlUsr += `
                         <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 text-xs flex justify-between items-center">
-                            <div>
-                                <span class="text-yellow-400 font-bold">${u.username}</span> 
-                                <span class="text-[10px] text-slate-500">(MK: ${u.password})</span>
-                            </div>
+                            <div><span class="text-yellow-400 font-bold">${u.username}</span> <span class="text-[10px] text-slate-500">(MK: ${u.password})</span></div>
                             <div class="text-green-400 font-bold">Ví: ${Number(u.balance || 0).toLocaleString()}đ</div>
                         </div>
                     `;
@@ -346,7 +344,8 @@
                     body: JSON.stringify({ balance: updatedBalance })
                 });
 
-                alert(`Đã duyệt thẻ cho ${username}, cộng ${Number(amount).toLocaleString()}đ thành công!`);
+                alert(`Đã duyệt cho ${username}, cộng ${Number(amount).toLocaleString()}đ!`);
+                sendTelegramNotification(`✅ <b>ĐÃ DUYỆT THẺ THÀNH CÔNG!</b>\n- Khách: <b>${username}</b>\n- Đã cộng: <b>${Number(amount).toLocaleString()}đ</b> vào ví.`);
                 loadAdminData();
             }
         }
