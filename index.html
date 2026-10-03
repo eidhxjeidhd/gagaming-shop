@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gà Gaming Shop</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Nhúng thư viện Supabase bản ổn định qua CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center p-4">
 
@@ -29,22 +27,25 @@
         </button>
     </div>
 
-    <script>
-        // Cấu hình kết nối Supabase chính xác của ông
+    <!-- Sử dụng ES Module trực tiếp chuẩn 100% không sợ lệch phiên bản -->
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
         const SUPABASE_URL = 'https://nqozzdvaousgacpjiglw.supabase.co';
         const SUPABASE_ANON_KEY = 'Sb_publishable_sUYd7prmWNfB2ZUo7gMHEg_BnzBLOAM';
         
-        const { createClient } = window.supabase;
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        async function loadProducts() {
+        window.loadProducts = async function() {
             const listDiv = document.getElementById('product-list');
-            listDiv.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">Đang tải dữ liệu...</p>';
+            listDiv.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">Đang tải dữ liệu từ Supabase...</p>';
 
             try {
                 const { data, error } = await supabase.from('products').select('*');
                 
-                if (error) throw error;
+                if (error) {
+                    throw error;
+                }
 
                 if (!data || data.length === 0) {
                     listDiv.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">Chưa có sản phẩm nào trong kho.</p>';
@@ -72,12 +73,12 @@
                 listDiv.innerHTML = html;
             } catch (err) {
                 console.error(err);
-                listDiv.innerHTML = '<p class="text-xs text-red-400 text-center py-2 bg-red-500/10 p-3 rounded-xl border border-red-500/20">Lỗi kết nối database! Hãy kiểm tra lại bảng products.</p>';
+                listDiv.innerHTML = `<p class="text-xs text-red-400 text-center py-2 bg-red-500/10 p-3 rounded-xl border border-red-500/20">Lỗi: ${err.message || 'Không thể kết nối!'}</p>`;
             }
         }
 
-        // Tự động chạy khi vừa mở web
-        loadProducts();
+        // Tự động chạy hàm ngay khi load trang
+        window.loadProducts();
     </script>
 </body>
 </html>
