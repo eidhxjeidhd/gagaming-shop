@@ -1,175 +1,181 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>NEON WARRIOR: RIFT HUNT</title>
-<style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050713;color:#fff;font-family:Arial,Helvetica,sans-serif;touch-action:none}
-button{font:inherit;color:#fff}
-#game{position:fixed;inset:0;overflow:hidden;background:
-radial-gradient(circle at 50% 30%,rgba(82,55,170,.2),transparent 35%),
-linear-gradient(#07101e,#050713)}
-canvas{position:absolute;inset:0;width:100%;height:100%}
-.hud{position:absolute;z-index:5;top:10px;left:10px;right:10px;display:flex;gap:8px;align-items:flex-start;pointer-events:none}
-.panel{background:rgba(10,12,30,.82);border:2px solid #7d5cff;border-radius:18px;box-shadow:0 0 18px rgba(125,92,255,.25);backdrop-filter:blur(8px)}
-.stats{width:min(390px,62vw);padding:10px 12px}
-.name{font-size:18px;font-weight:900;color:#d9ccff}.level{color:#79eaff;font-size:13px;margin:2px 0 7px}
-.bar{height:12px;border-radius:20px;background:#191c2c;overflow:hidden;border:1px solid #353a55;margin:4px 0}
-.fill{height:100%;width:100%;transition:.2s}.hp{background:linear-gradient(90deg,#ff315f,#ff8b9e)}.mana{background:linear-gradient(90deg,#24c8ff,#7c70ff)}.xp{background:linear-gradient(90deg,#8f5cff,#ff3fa8)}
-.res{margin-left:auto;display:flex;gap:7px}.resbox{min-width:92px;padding:10px 12px;text-align:center;font-weight:900;font-size:17px}.resbox small{display:block;color:#a9abc0;font-size:10px;letter-spacing:1px}
-#quest{position:absolute;z-index:6;top:112px;left:10px;max-width:310px;padding:11px 14px;display:none}
-#quest b{color:#ffd34d}.questline{font-size:12px;color:#c6c7d6;margin-top:4px}
-.menuBtn{position:absolute;right:10px;top:10px;z-index:8;width:56px;height:56px;border-radius:18px;border:2px solid #ffd447;background:#16132b;font-size:25px}
-.bossbar{position:absolute;z-index:4;top:18%;left:50%;transform:translateX(-50%);width:min(650px,84vw);display:none;text-align:center}
-.bossname{font-weight:1000;letter-spacing:2px;color:#ff65a6;margin-bottom:7px}.bossfill{height:15px;border:2px solid #ff3e88;border-radius:20px;background:#1b1227;overflow:hidden}.bossfill>i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ff287e,#a536ff)}
-#toast{position:absolute;z-index:20;left:50%;top:45%;transform:translate(-50%,-50%) scale(.8);opacity:0;padding:14px 24px;border-radius:18px;background:rgba(255,183,0,.92);color:#201700;font-weight:1000;font-size:21px;transition:.25s;pointer-events:none;white-space:nowrap}
-#combo{position:absolute;z-index:7;left:50%;top:39%;transform:translateX(-50%);font-size:clamp(42px,11vw,90px);font-weight:1000;color:#ffd52f;text-shadow:0 0 18px #ff8a00;opacity:0;pointer-events:none}
-.controls{position:absolute;z-index:9;left:0;right:0;bottom:12px;height:190px;pointer-events:none}
-.joy{position:absolute;left:24px;bottom:5px;width:142px;height:142px;border:2px solid #765dff;border-radius:50%;background:rgba(34,29,70,.38);pointer-events:auto}
-.knob{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;background:radial-gradient(circle,#a873ff,#6435d8);border:3px solid #d9c9ff;box-shadow:0 0 22px #7d55ff}
-.skills{position:absolute;right:16px;bottom:10px;display:grid;grid-template-columns:repeat(3,72px);gap:10px;pointer-events:auto}
-.skill{height:72px;border-radius:20px;border:2px solid #8c6dff;background:linear-gradient(145deg,#17142f,#090b18);box-shadow:0 0 16px rgba(121,83,255,.22);font-size:29px;position:relative}
-.skill:active{transform:scale(.93)}.skill.lock{opacity:.42}.cd{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.55);border-radius:18px;font-weight:900;font-size:18px}
-.bottom{position:absolute;z-index:8;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:7px;pointer-events:auto}
-.nav{height:48px;padding:0 15px;border-radius:15px;border:2px solid #795cff;background:#121128;font-weight:900}
-.modal{position:absolute;z-index:30;inset:0;background:rgba(1,3,10,.75);display:none;align-items:center;justify-content:center;padding:18px}
-.card{width:min(560px,95vw);max-height:85vh;overflow:auto;padding:18px;border-radius:24px;background:linear-gradient(145deg,#15112d,#080b18);border:2px solid #8664ff;box-shadow:0 0 40px rgba(104,70,255,.35)}
-.card h2{margin:0 0 12px;color:#ffd64d}.row{display:flex;gap:8px;flex-wrap:wrap}.item{flex:1;min-width:130px;padding:12px;border:1px solid #40376d;border-radius:15px;background:#101127}.item b{display:block;margin-bottom:5px}.action{margin-top:8px;width:100%;padding:10px;border:0;border-radius:12px;background:#6945e8;font-weight:900}.close{float:right;background:#28213e;border:1px solid #765cff;border-radius:10px;padding:5px 10px}
-#damageLayer{position:absolute;z-index:12;inset:0;pointer-events:none}.dmg{position:absolute;font-weight:1000;font-size:22px;text-shadow:0 2px 4px #000;animation:float .7s forwards}@keyframes float{to{transform:translateY(-60px) scale(1.2);opacity:0}}
-#start{position:absolute;z-index:50;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#20135b,#050713 65%);padding:20px}
-.startcard{text-align:center;width:min(620px,94vw)}.logo{font-size:clamp(35px,9vw,76px);font-weight:1000;line-height:.9;background:linear-gradient(90deg,#65eaff,#b06cff,#ff4e9b);-webkit-background-clip:text;color:transparent}.sub{color:#b9bbd0;margin:18px}.play{padding:16px 34px;border-radius:18px;border:2px solid #ffd448;background:#171329;color:#ffe064;font-size:21px;font-weight:1000}
-@media(max-width:600px){.stats{width:62vw}.resbox{min-width:74px;padding:8px 6px;font-size:14px}.resbox small{font-size:8px}.controls{height:180px}.skills{grid-template-columns:repeat(3,64px)}.skill{height:64px}.joy{width:128px;height:128px}.knob{width:64px;height:64px}.bottom{display:none}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gà Gaming - Trang Liên Kết</title>
+    <!-- Thư viện FontAwesome để sử dụng icon mạng xã hội -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        /* Phần thông tin cá nhân / Avatar */
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .profile-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .profile-bio {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 25px;
+        }
+
+        /* Tiêu đề nhóm */
+        .section-title {
+            font-size: 1rem;
+            color: #4a5568;
+            margin: 20px 0 10px 0;
+            text-align: left;
+            font-weight: 600;
+            border-left: 4px solid #667eea;
+            padding-left: 8px;
+        }
+
+        /* Các nút liên kết chung */
+        .link-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 12px 18px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            text-decoration: none;
+            color: #2d3748;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .link-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .link-card i.left-icon {
+            font-size: 1.2rem;
+            width: 25px;
+            text-align: center;
+        }
+
+        .link-card span {
+            flex-grow: 1;
+            text-align: left;
+            margin-left: 10px;
+        }
+
+        /* Màu riêng khi rê chuột hoặc chạm vào mạng xã hội */
+        .link-card.facebook:hover { background: #1877f2; color: white; border-color: #1877f2; }
+        .link-card.instagram:hover { background: #e4405f; color: white; border-color: #e4405f; }
+        .link-card.tiktok:hover { background: #000000; color: white; border-color: #000000; }
+        .link-card.youtube:hover { background: #ff0000; color: white; border-color: #ff0000; }
+        .link-card.file:hover { background: #2b6cb0; color: white; border-color: #2b6cb0; }
+
+        /* Footer */
+        .footer {
+            margin-top: 25px;
+            font-size: 0.8rem;
+            color: #a0aec0;
+        }
+    </style>
 </head>
 <body>
-<div id="game">
-<canvas id="c"></canvas>
-<div class="hud">
-  <div class="panel stats">
-    <div class="name">⚔️ NEON WARRIOR</div>
-    <div class="level">CẤP <span id="lvl">1</span> • <span id="class">TÂN THỦ</span></div>
-    <div class="bar"><div id="hp" class="fill hp"></div></div>
-    <div class="bar"><div id="mana" class="fill mana"></div></div>
-    <div class="bar"><div id="xp" class="fill xp"></div></div>
-    <div style="font-size:10px;color:#9da0b7">HP <span id="hpTxt"></span> • NĂNG LƯỢNG <span id="manaTxt"></span></div>
-  </div>
-  <div class="res">
-    <div class="panel resbox">🪙 <span id="gold">0</span><small>VÀNG</small></div>
-    <div class="panel resbox">💎 <span id="gem">0</span><small>KIM CƯƠNG</small></div>
-  </div>
-</div>
-<div id="quest" class="panel"><b>📜 NHIỆM VỤ</b><div class="questline" id="questText"></div></div>
-<button class="menuBtn" onclick="openMenu()">☰</button>
-<div id="bossbar" class="bossbar"><div class="bossname">☠ RIFT OVERLORD</div><div class="bossfill"><i id="bossfill"></i></div></div>
-<div id="combo">x1 COMBO!</div><div id="toast"></div><div id="damageLayer"></div>
 
-<div class="controls">
-  <div id="joy" class="joy"><div class="knob"></div></div>
-  <div class="skills">
-    <button class="skill" onclick="useSkill('dash')">⚡<span class="cd" id="cdDash"></span></button>
-    <button class="skill" onclick="useSkill('nova')">💥<span class="cd" id="cdNova"></span></button>
-    <button class="skill" onclick="useSkill('heal')">❤️<span class="cd" id="cdHeal"></span></button>
-  </div>
-</div>
-<div class="bottom">
-<button class="nav" onclick="openShop()">🛒 SHOP</button>
-<button class="nav" onclick="openInv()">🎒 TÚI ĐỒ</button>
-<button class="nav" onclick="openSkills()">✨ KỸ NĂNG</button>
-</div>
+    <div class="container">
+        <!-- Ảnh đại diện -->
+        <img src="https://via.placeholder.com/150" alt="Avatar" class="profile-img">
+        <h1 class="profile-name">Gà Gaming</h1>
+        <p class="profile-bio">Chào mừng bạn đến với trang liên kết chính thức của tôi!</p>
 
-<div id="modal" class="modal"><div class="card"><button class="close" onclick="closeModal()">✕</button><div id="modalBody"></div></div></div>
-<div id="start"><div class="startcard"><div class="logo">RIFT<br>HUNT</div><div class="sub">NEON WARRIOR • MOBILE ACTION RPG<br>Đánh quái • Combo • Boss • Loot • Nâng cấp</div><button class="play" onclick="startGame()">⚔️ BẮT ĐẦU CHIẾN ĐẤU</button></div></div>
-</div>
+        <!-- Nhóm Mạng Xã Hội -->
+        <div class="section-title">Mạng xã hội</div>
+        
+        <a href="https://www.tiktok.com/@idollatao" class="link-card tiktok" target="_blank">
+            <i class="fab fa-tiktok left-icon"></i>
+            <span>TikTok: @idollatao</span>
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
 
-<script>
-const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
-let W,H,DPR,started=false,last=0,shake=0;
-const player={x:0,y:0,r:22,hp:100,maxHp:100,mana:100,maxMana:100,lvl:1,xp:0,next:100,gold:82,gem:0,damage:16,speed:190,combo:0,comboTime:0,kills:0,weapon:'Kiếm Rift'};
-let enemies=[],particles=[],texts=[],keys={},boss=null,spawnTimer=0,questKills=0;
-const cd={dash:0,nova:0,heal:0};
-const inventory=['⚔️ Kiếm Rift','🧪 Bình hồi phục'];
-const skills={dash:{name:'Lôi Ảnh',cost:20,cd:2.4},nova:{name:'Tinh Vân Bạo Kích',cost:35,cd:3.2},heal:{name:'Hồi Phục',cost:30,cd:5}};
-function resize(){DPR=devicePixelRatio||1;W=innerWidth;H=innerHeight;canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0)}
-addEventListener('resize',resize);resize();
+        <a href="https://www.youtube.com/@gagaming-u2x" class="link-card youtube" target="_blank">
+            <i class="fab fa-youtube left-icon"></i>
+            <span>YouTube: Gà Gaming</span>
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
 
-function startGame(){document.getElementById('start').style.display='none';started=true;player.x=W/2;player.y=H*.55;questKills=0;boss=null;spawnWave();updateUI();requestAnimationFrame(loop)}
-function spawnWave(){for(let i=0;i<5;i++)spawnEnemy();if(player.lvl>=3 && !boss){boss={x:W/2,y:H*.3,r:45,hp:900,maxHp:900,phase:1,hit:0};document.getElementById('bossbar').style.display='block'}updateQuest()}
-function spawnEnemy(){let a=Math.random()*Math.PI*2,d=180+Math.random()*260;enemies.push({x:W/2+Math.cos(a)*d,y:H*.55+Math.sin(a)*d,r:18+Math.random()*5,hp:45+player.lvl*12,maxHp:45+player.lvl*12,spd:45+Math.random()*25,atk:0})}
-function updateQuest(){document.getElementById('quest').style.display='block';document.getElementById('questText').textContent=`Hạ 8 quái vật • Tiến độ: ${Math.min(questKills,8)}/8 • Thưởng: 180 vàng + 5💎`}
-function loop(t){if(!started)return;let dt=Math.min(.033,(t-last)/1000||.016);last=t;update(dt);draw();requestAnimationFrame(loop)}
-function update(dt){
-  for(let k in cd)cd[k]=Math.max(0,cd[k]-dt);
-  player.comboTime-=dt;if(player.comboTime<=0)player.combo=0;
-  player.mana=Math.min(player.maxMana,player.mana+10*dt);
-  let dx=(keys.d?1:0)-(keys.a?1:0),dy=(keys.s?1:0)-(keys.w?1:0);
-  if(dx||dy){let l=Math.hypot(dx,dy);player.x+=dx/l*player.speed*dt;player.y+=dy/l*player.speed*dt}
-  player.x=Math.max(35,Math.min(W-35,player.x));player.y=Math.max(90,Math.min(H-125,player.y));
-  spawnTimer-=dt;if(spawnTimer<=0&&enemies.length<7){spawnEnemy();spawnTimer=1.8}
-  enemies.forEach(e=>{let dx=player.x-e.x,dy=player.y-e.y,d=Math.hypot(dx,dy)||1;e.atk-=dt;if(d>45){e.x+=dx/d*e.spd*dt;e.y+=dy/d*e.spd*dt}else if(e.atk<=0){player.hp-=6;e.atk=1.1;damageText(player.x,player.y-30,'-6','#ff4f67');shake=5}});
-  if(player.hp<=0){player.hp=player.maxHp;player.gold=Math.max(0,player.gold-30);toast('💀 Bị hạ! -30 vàng');player.x=W/2;player.y=H*.55}
-  if(boss)updateBoss(dt);
-  particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;p.vx*=.97;p.vy*=.97});particles=particles.filter(p=>p.life>0);
-  updateUI();
-}
-function updateBoss(dt){
- let dx=player.x-boss.x,dy=player.y-boss.y,d=Math.hypot(dx,dy)||1;
- boss.x+=dx/d*45*dt;boss.y+=dy/d*45*dt;boss.hit-=dt;
- if(d<75&&boss.hit<=0){player.hp-=18;boss.hit=1.2;shake=10;damageText(player.x,player.y-35,'-18','#ff335f')}
- if(boss.hp<boss.maxHp*.5)boss.phase=2;
- document.getElementById('bossfill').style.width=(boss.hp/boss.maxHp*100)+'%';
-}
-function attack(){
- let hit=false;
- enemies.forEach(e=>{let d=Math.hypot(e.x-player.x,e.y-player.y);if(d<105){hit=true;let dmg=Math.round(player.damage*(1+player.combo*.08));e.hp-=dmg;damageText(e.x,e.y-25,'-'+dmg,'#ffe14d');burst(e.x,e.y,'#a56cff',9);if(e.hp<=0)killEnemy(e)}});
- if(boss&&Math.hypot(boss.x-player.x,boss.y-player.y)<145){hit=true;let dmg=Math.round(player.damage*(1+player.combo*.1));boss.hp-=dmg;damageText(boss.x,boss.y-55,'-'+dmg,'#ffdf4d');burst(boss.x,boss.y,'#ff4e9b',18);if(boss.hp<=0)killBoss()}
- if(hit){player.combo=Math.min(20,player.combo+1);player.comboTime=2.2;showCombo()}
-}
-function killEnemy(e){enemies=enemies.filter(x=>x!==e);player.kills++;questKills++;let g=10+Math.floor(Math.random()*18);player.gold+=g;player.xp+=22;burst(e.x,e.y,'#5cffad',20);damageText(e.x,e.y-45,'+'+g+' 🪙','#ffd33d');if(questKills===8){player.gold+=180;player.gem+=5;toast('🏆 Nhiệm vụ hoàn thành! +180 vàng +5💎');questKills=0}levelCheck();updateQuest()}
-function killBoss(){player.gold+=500;player.gem+=25;player.xp+=180;toast('☠ BOSS BỊ TIÊU DIỆT! +500 vàng +25💎');burst(boss.x,boss.y,'#ff3da8',90);boss=null;document.getElementById('bossbar').style.display='none';setTimeout(()=>{if(started)spawnWave()},1500);levelCheck()}
-function levelCheck(){while(player.xp>=player.next){player.xp-=player.next;player.lvl++;player.next=Math.floor(player.next*1.35);player.maxHp+=18;player.maxMana+=10;player.damage+=5;player.hp=player.maxHp;player.mana=player.maxMana;toast('✨ LÊN CẤP '+player.lvl+'!');burst(player.x,player.y,'#70eaff',35)}}
-function useSkill(type){if(!started||cd[type]>0)return;let s=skills[type];if(player.mana<s.cost){toast('⚡ Không đủ năng lượng');return}player.mana-=s.cost;cd[type]=s.cd;
- if(type==='dash'){let dx=(keys.d?1:keys.a?-1:0),dy=(keys.s?1:keys.w?-1:0);if(!dx&&!dy)dx=1;let l=Math.hypot(dx,dy);player.x=Math.max(35,Math.min(W-35,player.x+dx/l*150));player.y=Math.max(90,Math.min(H-125,player.y+dy/l*150));burst(player.x,player.y,'#55eaff',35);attack()}
- if(type==='nova'){burst(player.x,player.y,'#ff4caa',55);shake=16;enemies.slice().forEach(e=>{if(Math.hypot(e.x-player.x,e.y-player.y)<190){e.hp-=player.damage*4;damageText(e.x,e.y-20,'-'+player.damage*4,'#ff67c8');if(e.hp<=0)killEnemy(e)}});if(boss&&Math.hypot(boss.x-player.x,boss.y-player.y)<220){boss.hp-=player.damage*7;damageText(boss.x,boss.y-50,'-'+player.damage*7,'#ff67c8');if(boss.hp<=0)killBoss()}}
- if(type==='heal'){player.hp=Math.min(player.maxHp,player.hp+45);burst(player.x,player.y,'#5cffad',30);toast('❤️ +45 HP')}
-}
-function showCombo(){let el=document.getElementById('combo');el.textContent='x'+Math.max(1,player.combo)+' COMBO!';el.style.opacity='1';el.style.transform='translateX(-50%) scale(1.08)';setTimeout(()=>{el.style.opacity='.25';el.style.transform='translateX(-50%) scale(1)'},250)}
-function damageText(x,y,t,c){let e=document.createElement('div');e.className='dmg';e.textContent=t;e.style.left=x+'px';e.style.top=y+'px';e.style.color=c;document.getElementById('damageLayer').appendChild(e);setTimeout(()=>e.remove(),700)}
-function toast(t){let e=document.getElementById('toast');e.textContent=t;e.style.opacity=1;e.style.transform='translate(-50%,-50%) scale(1)';setTimeout(()=>{e.style.opacity=0;e.style.transform='translate(-50%,-50%) scale(.8)'},1100)}
-function burst(x,y,color,n){for(let i=0;i<n;i++){let a=Math.random()*Math.PI*2,s=40+Math.random()*180;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.35+Math.random()*.55,color,size:2+Math.random()*5})}}
-function draw(){
- ctx.clearRect(0,0,W,H);
- let g=ctx.createRadialGradient(W/2,H/2,20,W/2,H/2,Math.max(W,H)*.7);g.addColorStop(0,'#10142e');g.addColorStop(1,'#03050e');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
- ctx.save();if(shake>0){ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake*=.88}
- // arena grid
- ctx.globalAlpha=.22;ctx.strokeStyle='#4c6aff';ctx.lineWidth=1;
- for(let x=0;x<W;x+=55){ctx.beginPath();ctx.moveTo(x,70);ctx.lineTo(x,H);ctx.stroke()}
- for(let y=70;y<H;y+=55){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
- ctx.globalAlpha=1;
- enemies.forEach(drawEnemy);if(boss)drawBoss();drawPlayer();
- particles.forEach(p=>{ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill()});ctx.globalAlpha=1;ctx.restore();
-}
-function drawPlayer(){ctx.save();ctx.shadowBlur=25;ctx.shadowColor='#7f5cff';ctx.fillStyle='#7d4cff';ctx.beginPath();ctx.arc(player.x,player.y,player.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#e4d7ff';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(player.x-7,player.y-4,5,0,Math.PI*2);ctx.arc(player.x+7,player.y-4,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#10101d';ctx.beginPath();ctx.arc(player.x-7,player.y-4,2,0,Math.PI*2);ctx.arc(player.x+7,player.y-4,2,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#ffd45a';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(player.x+8,player.y+7);ctx.lineTo(player.x+37,player.y-12);ctx.stroke();ctx.restore()}
-function drawEnemy(e){ctx.save();ctx.shadowBlur=18;ctx.shadowColor='#2dff75';ctx.fillStyle='#24c95b';ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#111';ctx.beginPath();ctx.arc(e.x-5,e.y-2,3,0,Math.PI*2);ctx.arc(e.x+5,e.y-2,3,0,Math.PI*2);ctx.fill();ctx.fillStyle='#171322';ctx.fillRect(e.x-e.r,e.y-e.r-10,e.r*2,4);ctx.fillStyle='#ff365d';ctx.fillRect(e.x-e.r,e.y-e.r-10,e.r*2*(e.hp/e.maxHp),4);ctx.restore()}
-function drawBoss(){ctx.save();ctx.shadowBlur=35;ctx.shadowColor='#ff258e';ctx.fillStyle=boss.phase===2?'#ff3d92':'#9a45ff';ctx.beginPath();ctx.arc(boss.x,boss.y,boss.r,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#ffd44d';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 13px Arial';ctx.textAlign='center';ctx.fillText('OVERLORD',boss.x,boss.y+4);ctx.restore()}
-function updateUI(){document.getElementById('lvl').textContent=player.lvl;document.getElementById('class').textContent=player.lvl>=10?'RIFT MASTER':player.lvl>=5?'NEON HUNTER':'TÂN THỦ';document.getElementById('hp').style.width=Math.max(0,player.hp/player.maxHp*100)+'%';document.getElementById('mana').style.width=player.mana/player.maxMana*100+'%';document.getElementById('xp').style.width=player.xp/player.next*100+'%';document.getElementById('hpTxt').textContent=Math.ceil(player.hp)+'/'+player.maxHp;document.getElementById('manaTxt').textContent=Math.ceil(player.mana)+'/'+player.maxMana;document.getElementById('gold').textContent=player.gold;document.getElementById('gem').textContent=player.gem;for(let k of ['dash','nova','heal'])document.getElementById('cd'+k[0].toUpperCase()+k.slice(1)).textContent=cd[k]>0?cd[k].toFixed(1):''}
-function openMenu(){showModal(`<h2>☰ MENU</h2><div class="row"><div class="item"><b>💾 Lưu tiến trình</b>Tiến trình được lưu trên thiết bị.</div><div class="item"><b>🎮 Điều khiển</b>Joystick hoặc WASD + nút skill.</div></div><button class="action" onclick="saveGame()">💾 LƯU GAME</button><button class="action" onclick="loadGame()">📂 TẢI GAME</button>`)}
-function openShop(){showModal(`<h2>🛒 SHOP</h2><div class="row"><div class="item"><b>🗡️ Kiếm Plasma</b>+12 sát thương<br>Giá: 300🪙<button class="action" onclick="buy(300,()=>{player.damage+=12;inventory.push('🗡️ Kiếm Plasma')})">MUA</button></div><div class="item"><b>❤️ Giáp Rift</b>+50 HP tối đa<br>Giá: 450🪙<button class="action" onclick="buy(450,()=>{player.maxHp+=50;player.hp=player.maxHp})">MUA</button></div><div class="item"><b>💎 Tinh thể</b>+5💎<br>Giá: 800🪙<button class="action" onclick="buy(800,()=>player.gem+=5)">MUA</button></div></div>`)}
-function buy(cost,fn){if(player.gold<cost){toast('Không đủ vàng');return}player.gold-=cost;fn();toast('✅ Mua thành công');closeModal();updateUI()}
-function openInv(){showModal(`<h2>🎒 TÚI ĐỒ</h2><div class="row">${inventory.map(x=>`<div class="item"><b>${x}</b>Đã sở hữu</div>`).join('')}</div>`)}
-function openSkills(){showModal(`<h2>✨ KỸ NĂNG</h2><div class="row">${Object.values(skills).map(s=>`<div class="item"><b>${s.name}</b>Hồi chiêu ${s.cd}s • Năng lượng ${s.cost}</div>`).join('')}</div>`)}
-function showModal(html){document.getElementById('modalBody').innerHTML=html;document.getElementById('modal').style.display='flex'}
-function closeModal(){document.getElementById('modal').style.display='none'}
-function saveGame(){localStorage.riftHuntSave=JSON.stringify({player,inventory});toast('💾 Đã lưu tiến trình');closeModal()}
-function loadGame(){if(!localStorage.riftHuntSave){toast('Chưa có dữ liệu lưu');return}let d=JSON.parse(localStorage.riftHuntSave);Object.assign(player,d.player);inventory.length=0;inventory.push(...d.inventory);closeModal();updateUI();toast('📂 Đã tải tiến trình')}
-addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.code==='Space')attack();if(e.key==='1')useSkill('dash');if(e.key==='2')useSkill('nova');if(e.key==='3')useSkill('heal')});
-addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
-canvas.addEventListener('pointerdown',e=>{if(started)attack()});
-let joy=document.getElementById('joy'),knob=joy.querySelector('.knob'),drag=false;
-joy.addEventListener('pointerdown',e=>{drag=true;joy.setPointerCapture(e.pointerId);moveJoy(e)});
-joy.addEventListener('pointermove',e=>{if(drag)moveJoy(e)});joy.addEventListener('pointerup',()=>{drag=false;knob.style.transform='translate(-50%,-50%)';keys.w=keys.a=keys.s=keys.d=false});
-function moveJoy(e){let r=joy.getBoundingClientRect(),x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2,l=Math.hypot(x,y),m=r.width*.34;if(l>m){x=x/l*m;y=y/l*m}knob.style.transform=`translate(calc(-50% + ${x}px),calc(-50% + ${y}px))`;keys.d=x>12;keys.a=x<-12;keys.s=y>12;keys.w=y<-12}
-</script>
+        <a href="https://www.facebook.com/nguyenvantien183273" class="link-card facebook" target="_blank">
+            <i class="fab fa-facebook-f left-icon"></i>
+            <span>Facebook cá nhân</span>
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+
+        <a href="https://instagram.com" class="link-card instagram" target="_blank">
+            <i class="fab fa-instagram left-icon"></i>
+            <span>Instagram</span>
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+
+        <!-- Nhóm Liên Kết File & Tài Liệu -->
+        <div class="section-title">Tài liệu & File tải xuống</div>
+
+        <a href="files/tai-lieu.docx" class="link-card file" download>
+            <i class="fa-solid fa-file-word left-icon" style="color: #3182ce;"></i>
+            <span>Tài liệu / Script của tôi</span>
+            <i class="fa-solid fa-download"></i>
+        </a>
+
+        <a href="https://drive.google.com" class="link-card file" target="_blank">
+            <i class="fa-solid fa-folder-open left-icon" style="color: #d69e2e;"></i>
+            <span>Kho lưu trữ Google Drive</span>
+            <i class="fa-solid fa-external-link"></i>
+        </a>
+
+        <!-- Bản quyền -->
+        <div class="footer">
+            &copy; 2026 Gà Gaming
+        </div>
+    </div>
+
 </body>
 </html>
