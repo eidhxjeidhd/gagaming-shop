@@ -3,305 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gà Gaming - Hệ Thống Shop Game Thông Minh & File ID</title>
-    <!-- Sử dụng Tailwind CSS để thiết kế giao diện cực đẹp -->
+    <title>Gà Gaming Shop - Live Database</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Thư viện hiệu ứng icon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen selection:bg-yellow-500 selection:text-slate-950">
-    
-    <!-- Header thông minh -->
-    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-400 text-xl font-bold">🐔</div>
-                <div>
-                    <span class="font-black text-lg text-white tracking-wide block">GÀ GAMING CORP</span>
-                    <span class="text-[10px] text-emerald-400 font-mono tracking-wider flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> HỆ THỐNG TỰ ĐỘNG 24/7</span>
-                </div>
-            </div>
-            <button onclick="toggleAdminPanel()" id="adminBtnText" class="bg-slate-900 hover:bg-slate-800 text-yellow-400 border border-slate-800 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-lg">
-                <i class="fa-solid fa-shield-halved"></i> Quản Trị Công Ty
-            </button>
-        </div>
-    </header>
+<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center p-4">
 
-    <!-- Main Shop View -->
-    <main id="shopView" class="max-w-6xl mx-auto px-4 py-8 space-y-8">
-        <!-- Banner -->
-        <div class="relative overflow-hidden bg-gradient-to-r from-yellow-600/20 via-orange-600/20 to-red-600/20 border border-yellow-500/30 rounded-3xl p-8 md:p-12 text-center shadow-2xl">
-            <div class="absolute -right-10 -bottom-10 text-9xl opacity-10 select-none">🍎</div>
-            <h1 class="text-3xl md:text-5xl font-black text-white mb-3 tracking-tight">SHOP BLOX FRUIT TỰ ĐỘNG & FILE ID</h1>
-            <p class="text-slate-400 max-w-xl mx-auto text-sm md:text-base">Giao dịch thông minh 100%, tự động trừ kho, cấp mã File ID định danh doanh nghiệp chuẩn xác ngay sau 1 giây.</p>
-        </div>
+    <div id="root" class="w-full max-w-md"></div>
 
-        <div class="flex items-center justify-between">
-            <h2 class="text-xl font-bold text-white border-l-4 border-yellow-500 pl-3 flex items-center gap-2">
-                <span>DANH MỤC TÀI KHOẢN TỰ ĐỘNG</span>
-            </h2>
-        </div>
-        
-        <!-- Danh sách sản phẩm -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="productList">
-            <!-- Render bằng JavaScript bên dưới -->
-        </div>
-    </main>
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect } from 'https://esm.sh/react@18';
+        import { createRoot } from 'https://esm.sh/react-dom@18/client';
 
-    <!-- Admin Panel View (Ẩn mặc định) -->
-    <div id="adminView" class="max-w-6xl mx-auto px-4 py-8 hidden space-y-6">
-        <div class="flex items-center justify-between bg-slate-900 p-4 rounded-2xl border border-slate-800">
-            <h1 class="text-xl font-bold text-yellow-400 flex items-center gap-2">
-                <i class="fa-solid fa-gauge-high"></i> Bảng Điều Khiển Doanh Nghiệp Thông Minh
-            </h1>
-            <button onclick="toggleAdminPanel()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
-                <i class="fa-solid fa-arrow-left"></i> Về Trang Shop
-            </button>
-        </div>
+        // --- CẤU HÌNH KẾT NỐI SUPABASE THẬT CỦA ÔNG ---
+        const SUPABASE_URL = 'https://nqozzdvaousgacpjiglw.supabase.co';
+        const SUPABASE_ANON_KEY = 'Sb_publishable_sUYd7prmWNfB2ZUo7gMHEg_BnzBLOAM';
 
-        <!-- Thống kê tài chính / cổ tiền -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl shadow-xl">
-                <p class="text-xs text-slate-400 font-medium">Tổng Tài Chính / Cổ Tiền</p>
-                <h3 id="statTreasury" class="text-2xl font-black text-cyan-400 mt-2">0đ</h3>
-            </div>
-            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl shadow-xl">
-                <p class="text-xs text-slate-400 font-medium">Doanh Thu Bán Hàng</p>
-                <h3 id="statRevenue" class="text-2xl font-black text-emerald-400 mt-2">0đ</h3>
-            </div>
-            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl shadow-xl">
-                <p class="text-xs text-slate-400 font-medium">Tổng Đơn File ID</p>
-                <h3 id="statOrders" class="text-2xl font-black text-yellow-400 mt-2">0</h3>
-            </div>
-            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl shadow-xl">
-                <p class="text-xs text-slate-400 font-medium">Acc Tồn Kho</p>
-                <h3 id="statStock" class="text-2xl font-black text-blue-400 mt-2">0</h3>
-            </div>
-        </div>
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        <!-- Bảng quản lý File ID chi tiết -->
-        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
-            <h3 class="font-bold text-white text-sm flex items-center gap-2">
-                <i class="fa-solid fa-file-invoice"></i> Sổ Giao Dịch & File ID Định Danh Công Ty:
-            </h3>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs border-collapse">
-                    <thead>
-                        <tr class="border-b border-slate-800 text-yellow-500 bg-slate-950/40">
-                            <th class="p-3">Mã File ID</th>
-                            <th class="p-3">Thời gian</th>
-                            <th class="p-3">Khách hàng</th>
-                            <th class="p-3">Sản phẩm</th>
-                            <th class="p-3">Tài khoản xuất kho</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminLogsTable">
-                        <tr><td colspan="5" class="p-4 text-center text-slate-500">Chưa có giao dịch nào.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+        function App() {
+            const [products, setProducts] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [errorMsg, setErrorMsg] = useState('');
 
-    <!-- Modal Thông Báo Giao Dịch Thành Công Thông Minh -->
-    <div id="successModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in duration-200">
-            <div class="text-center space-y-2">
-                <div class="w-16 h-16 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 rounded-2xl flex items-center justify-center text-3xl mx-auto">
-                    <i class="fa-solid fa-check"></i>
-                </div>
-                <h3 class="text-xl font-black text-white">Giao Dịch Thành Công!</h3>
-                <p class="text-xs text-slate-400">Hệ thống đã tự động xuất kho và lập File ID bảo hành.</p>
-            </div>
+            useEffect(() => {
+                fetchProducts();
+            }, []);
 
-            <div class="space-y-3 bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
-                <div>
-                    <span class="text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">Mã File ID Định Danh:</span>
-                    <div class="flex items-center justify-between mt-1 bg-slate-900 p-2 rounded-xl border border-slate-800">
-                        <span id="modalFileId" class="font-mono text-sm text-cyan-300 font-bold"></span>
-                        <button onclick="copyText('modalFileId')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded-lg transition">Copy</button>
+            // Lấy danh sách sản phẩm từ bảng 'products' trên Supabase
+            async function fetchProducts() {
+                setLoading(true);
+                setErrorMsg('');
+                try {
+                    const { data, error } = await supabase.from('products').select('*');
+                    if (error) throw error;
+                    setProducts(data || []);
+                } catch (err) {
+                    setErrorMsg('Không thể tải dữ liệu. Hãy kiểm tra lại kết nối bảng products!');
+                    console.error('Lỗi:', err.message);
+                } finally {
+                    setLoading(false);
+                }
+            }
+
+            return (
+                <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl space-y-4">
+                    <div className="text-center">
+                        <div className="text-3xl">🐔</div>
+                        <h1 className="text-xl font-black text-yellow-400">GÀ GAMING SHOP</h1>
+                        <p className="text-slate-400 text-xs">Hệ thống Shop Game Tự Động 100%</p>
                     </div>
-                </div>
-                <div>
-                    <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">Tài khoản & Mật khẩu Game:</span>
-                    <div class="flex items-center justify-between mt-1 bg-slate-900 p-2 rounded-xl border border-slate-800">
-                        <span id="modalAccount" class="font-mono text-xs text-emerald-300 font-bold"></span>
-                        <button onclick="copyText('modalAccount')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded-lg transition">Copy</button>
-                    </div>
-                </div>
-            </div>
 
-            <button onclick="closeModal()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold py-3 rounded-xl text-sm transition shadow-lg">
-                Đã hiểu & Lưu thông tin
-            </button>
-        </div>
-    </div>
+                    <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-sm font-bold text-cyan-400">Kho Tài Khoản (Live DB):</h2>
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        </div>
 
-    <!-- Script Xử Lý Thông Minh -->
-    <script>
-        // Khởi tạo dữ liệu mẫu thông minh vào LocalStorage nếu chưa có
-        if (!localStorage.getItem('stockAccounts')) {
-            const initialStock = [
-                { id: 1, type: "Random Trái Ác Quỷ Víp", desc: "Tỷ lệ trúng Leopard/Dough cực cao.", icon: "🍎", account: "bloxfruit_ga1@gmail.com | pass123", price: 20000, sold: false },
-                { id: 2, type: "Random Trái Ác Quỷ Víp", desc: "Tỷ lệ trúng Leopard/Dough cực cao.", icon: "🍎", account: "bloxfruit_ga2@gmail.com | pass456", price: 20000, sold: false },
-                { id: 3, type: "Acc Max Level + Godhuman", desc: "Full skill, sẵn sàng chiến đấu.", icon: "⚔️", account: "godhuman_pro1@gmail.com | pass789", price: 50000, sold: false },
-                { id: 4, type: "Acc Cực VIP Tộc V4", desc: "Full gear, max trang bị khủng.", icon: "🔥", account: "tocv4_vip99@gmail.com | pass999", price: 100000, sold: false }
-            ];
-            localStorage.setItem('stockAccounts', JSON.stringify(initialStock));
-        }
-
-        if (!localStorage.getItem('transactionLogs')) {
-            localStorage.setItem('transactionLogs', JSON.stringify([]));
-        }
-
-        if (!localStorage.getItem('revenue')) {
-            localStorage.setItem('revenue', '0');
-        }
-
-        const baseCapital = 500000; // Vốn / Cổ tiền ban đầu của công ty
-
-        // Render danh sách sản phẩm ra giao diện
-        function renderProducts() {
-            let stock = JSON.parse(localStorage.getItem('stockAccounts'));
-            let productListEl = document.getElementById('productList');
-            productListEl.innerHTML = "";
-
-            // Gom nhóm sản phẩm theo tên loại
-            let types = [...new Set(stock.map(item => item.type))];
-
-            types.forEach(typeName => {
-                let availableItems = stock.filter(acc => acc.type === typeName && !acc.sold);
-                let sampleItem = stock.find(acc => acc.type === typeName);
-                let isOutOfStock = availableItems.length === 0;
-
-                productListEl.innerHTML += `
-                    <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between transition hover:border-slate-700">
-                        <div>
-                            <div class="bg-slate-800/50 h-36 flex items-center justify-center text-5xl border-b border-slate-800">${sampleItem.icon}</div>
-                            <div class="p-5 space-y-2">
-                                <h3 class="font-bold text-lg text-white">${typeName}</h3>
-                                <p class="text-slate-400 text-xs">${sampleItem.desc}</p>
-                                <div class="flex items-center gap-2 pt-1">
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${isOutOfStock ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}">
-                                        ${isOutOfStock ? 'Hết hàng' : 'Còn lại: ' + availableItems.length}
-                                    </span>
+                        {loading ? (
+                            <p className="text-xs text-slate-500 text-center py-4">Đang đồng bộ dữ liệu với server...</p>
+                        ) : errorMsg ? (
+                            <p className="text-xs text-red-400 text-center py-2 bg-red-500/10 p-3 rounded-xl border border-red-500/20">{errorMsg}</p>
+                        ) : products.length === 0 ? (
+                            <p className="text-xs text-slate-500 text-center py-4">Database đang trống (Chưa có sản phẩm nào).</p>
+                        ) : (
+                            products.map((item, index) => (
+                                <div key={index} className="flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-800 text-xs">
+                                    <div className="space-y-1">
+                                        <div className="font-bold text-white">{item.name || item.title || 'Sản phẩm'}</div>
+                                        <div className="text-[10px] text-slate-400">Kho: Còn hàng</div>
+                                    </div>
+                                    <div className="text-right space-y-1">
+                                        <div className="text-yellow-400 font-bold">{item.price ? Number(item.price).toLocaleString() + 'đ' : '0đ'}</div>
+                                        <button 
+                                            onClick={() => alert('Thông tin tài khoản: ' + (item.account_info || 'Chưa cập nhật'))}
+                                            className="bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 px-2.5 py-1 rounded-lg text-[10px] font-bold transition">
+                                            Mua Ngay
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="p-5 pt-0 flex items-center justify-between">
-                            <span class="text-yellow-400 font-black text-lg">${sampleItem.price.toLocaleString()} đ</span>
-                            <button onclick="buyProduct('${typeName}', ${sampleItem.price})" 
-                                class="${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-yellow-500 hover:bg-yellow-400 text-slate-950 shadow-lg shadow-yellow-500/20'} font-bold px-4 py-2.5 rounded-xl text-sm transition">
-                                ${isOutOfStock ? 'Hết Hàng' : 'Mua Ngay'}
-                            </button>
-                        </div>
+                            ))
+                        )}
                     </div>
-                `;
-            });
+
+                    <button 
+                        onClick={fetchProducts}
+                        className="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-yellow-500/20">
+                        Làm Mới Dữ Liệu
+                    </button>
+                </div>
+            );
         }
 
-        // Xử lý thông minh khi khách bấm mua
-        function buyProduct(productType, price) {
-            let stock = JSON.parse(localStorage.getItem('stockAccounts'));
-            let availableAcc = stock.find(acc => acc.type === productType && !acc.sold);
-
-            if (!availableAcc) {
-                alert("❌ Sản phẩm này trong kho công ty đã tạm hết!");
-                return;
-            }
-
-            let username = prompt("Nhập tên nhân vật hoặc tài khoản của bạn để nhận hàng:");
-            if (!username) return;
-
-            // Đánh dấu tài khoản đã bán
-            availableAcc.sold = true;
-            localStorage.setItem('stockAccounts', JSON.stringify(stock));
-
-            // Sinh mã File ID định danh doanh nghiệp độc quyền
-            let fileId = `GA-CORP-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
-
-            // Cộng doanh thu tài chính
-            let currentRev = parseInt(localStorage.getItem('revenue')) + price;
-            localStorage.setItem('revenue', currentRev);
-
-            // Lưu lịch sử giao dịch
-            let logs = JSON.parse(localStorage.getItem('transactionLogs'));
-            logs.push({
-                fileId: fileId,
-                time: new Date().toLocaleString(),
-                buyer: username,
-                product: productType,
-                accountInfo: availableAcc.account
-            });
-            localStorage.setItem('transactionLogs', JSON.stringify(logs));
-
-            // Hiển thị Modal thông báo thông minh
-            document.getElementById('modalFileId').innerText = fileId;
-            document.getElementById('modalAccount').innerText = availableAcc.account;
-            document.getElementById('successModal').classList.remove('hidden');
-
-            // Cập nhật lại giao diện shop
-            renderProducts();
-        }
-
-        function closeModal() {
-            document.getElementById('successModal').classList.add('hidden');
-        }
-
-        // Tính năng copy thông minh
-        function copyText(elementId) {
-            let text = document.getElementById(elementId).innerText;
-            navigator.clipboard.writeText(text);
-            alert("📋 Đã sao chép vào bộ nhớ tạm!");
-        }
-
-        // Chuyển đổi qua lại giữa Shop và Bảng Admin
-        function toggleAdminPanel() {
-            let shop = document.getElementById('shopView');
-            let admin = document.getElementById('adminView');
-
-            if (admin.classList.contains('hidden')) {
-                shop.classList.add('hidden');
-                admin.classList.remove('hidden');
-                loadAdminData();
-            } else {
-                admin.classList.add('hidden');
-                shop.classList.remove('hidden');
-            }
-        }
-
-        // Load dữ liệu thông kê cho Admin Công ty
-        function loadAdminData() {
-            let stock = JSON.parse(localStorage.getItem('stockAccounts'));
-            let logs = JSON.parse(localStorage.getItem('transactionLogs'));
-            let revenue = parseInt(localStorage.getItem('revenue'));
-            let stockCount = stock.filter(acc => !acc.sold).length;
-
-            document.getElementById('statTreasury').innerText = (baseCapital + revenue).toLocaleString() + 'đ';
-            document.getElementById('statRevenue').innerText = revenue.toLocaleString() + 'đ';
-            document.getElementById('statOrders').innerText = logs.length;
-            document.getElementById('statStock').innerText = stockCount;
-
-            let table = document.getElementById('adminLogsTable');
-            if (logs.length === 0) {
-                table.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Chưa có File ID nào được tạo.</td></tr>`;
-            } else {
-                table.innerHTML = "";
-                logs.slice().reverse().forEach(log => {
-                    table.innerHTML += `
-                        <tr class="border-b border-slate-800/50 hover:bg-slate-900/50">
-                            <td class="p-3 font-mono text-cyan-400 font-bold">${log.fileId}</td>
-                            <td class="p-3 text-slate-400">${log.time}</td>
-                            <td class="p-3 font-bold text-white">${log.buyer}</td>
-                            <td class="p-3 text-yellow-400">${log.product}</td>
-                            <td class="p-3 font-mono text-emerald-400">${log.accountInfo}</td>
-                        </tr>`;
-                });
-            }
-        }
-
-        // Khởi chạy khi mở trang
-        renderProducts();
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
