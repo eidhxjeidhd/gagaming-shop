@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gà Gaming Shop</title>
+    <title>Gà Gaming Shop - Tự Động 100%</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center p-4">
@@ -16,18 +16,17 @@
                 <p class="text-slate-400 text-[10px]">Hệ thống Shop Game Tự Động</p>
             </div>
             <div id="user-box" class="text-right">
-                <!-- Hiển thị khi chưa đăng nhập -->
                 <button onclick="showAuthModal()" class="bg-yellow-500 text-slate-950 px-3 py-1.5 rounded-xl text-xs font-bold">Đăng Nhập</button>
             </div>
         </div>
 
-        <!-- Nội dung chính: Danh sách sản phẩm -->
+        <!-- Nội dung chính: Kho sản phẩm -->
         <div class="space-y-3">
             <div class="flex justify-between items-center">
                 <h2 class="text-xs font-bold text-cyan-400">Kho Tài Khoản:</h2>
                 <button onclick="openDepositModal()" class="text-[10px] bg-green-500/20 text-green-400 px-2 py-1 rounded-lg font-bold border border-green-500/30">Nạp Tiền Thẻ Cào</button>
             </div>
-            <div id="product-list" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+            <div id="product-list" class="space-y-2 max-h-56 overflow-y-auto pr-1">
                 <p class="text-xs text-slate-500 text-center py-4">Đang tải sản phẩm...</p>
             </div>
         </div>
@@ -55,7 +54,7 @@
     <!-- Modal Nạp Thẻ -->
     <div id="deposit-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl w-full max-w-sm space-y-3">
-            <h3 class="text-sm font-bold text-green-400 text-center">Nạp Tiền Thẻ Cào Chờ Duyệt</h3>
+            <h3 class="text-sm font-bold text-green-400 text-center">Nạp Thẻ Cào Chờ Duyệt</h3>
             <select id="card-type" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white">
                 <option value="Viettel">Viettel</option>
                 <option value="Vinaphone">Vinaphone</option>
@@ -78,23 +77,31 @@
 
     <!-- Modal Admin Quản Trị -->
     <div id="admin-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl w-full max-w-md space-y-4 max-h-[80vh] overflow-y-auto">
-            <div class="flex justify-between items-center">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl w-full max-w-md space-y-4 max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                 <h3 class="text-sm font-bold text-red-400">Trang Quản Trị Admin</h3>
                 <button onclick="closeAdminModal()" class="text-slate-400 text-xs">Đóng</button>
             </div>
             <div id="admin-content">
-                <!-- Form nhập mật khẩu admin -->
+                <!-- Form đăng nhập Admin -->
                 <div id="admin-login-box" class="space-y-3">
                     <p class="text-xs text-slate-400">Nhập mật khẩu quản trị (Mặc định: 123456):</p>
                     <input type="password" id="admin-pass-input" placeholder="Mật khẩu admin" class="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs text-white">
                     <button onclick="checkAdminLogin()" class="w-full bg-red-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs">Truy Cập</button>
                 </div>
-                <!-- Bảng duyệt thẻ của admin -->
-                <div id="admin-dashboard" class="hidden space-y-3">
-                    <h4 class="text-xs font-bold text-yellow-400">Danh Sách Thẻ Chờ Duyệt:</h4>
-                    <div id="admin-deposits-list" class="space-y-2">
-                        <p class="text-xs text-slate-500 text-center">Chưa có thẻ nào.</p>
+                <!-- Dashboard của Admin: Quản lý Thẻ và Khách hàng -->
+                <div id="admin-dashboard" class="hidden space-y-4">
+                    <div>
+                        <h4 class="text-xs font-bold text-yellow-400 mb-2">Thẻ Cào Chờ Duyệt:</h4>
+                        <div id="admin-deposits-list" class="space-y-2">
+                            <p class="text-xs text-slate-500 text-center">Đang tải...</p>
+                        </div>
+                    </div>
+                    <div class="border-t border-slate-800 pt-3">
+                        <h4 class="text-xs font-bold text-cyan-400 mb-2">Danh Sách Khách Hàng Đã Đăng Ký:</h4>
+                        <div id="admin-users-list" class="space-y-2">
+                            <p class="text-xs text-slate-500 text-center">Đang tải...</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -147,11 +154,10 @@
                 });
                 listDiv.innerHTML = html;
             } catch (err) {
-                listDiv.innerHTML = '<p class="text-xs text-red-400 text-center">Lỗi tải dữ liệu.</p>';
+                listDiv.innerHTML = '<p class="text-xs text-red-400 text-center">Lỗi tải dữ liệu sản phẩm.</p>';
             }
         }
 
-        // Auth Logic
         let isRegisterMode = false;
         function showAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
         function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
@@ -168,32 +174,43 @@
             if(!u || !p) { alert("Vui lòng điền đủ thông tin!"); return; }
 
             if(isRegisterMode) {
-                let res = await fetch(`${SUPABASE_URL}/rest/v1/users`, {
-                    method: 'POST',
-                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-                    body: JSON.stringify({ username: u, password: p, balance: 0 })
-                });
-                if(res.ok) { alert("Đăng ký thành công! Hãy đăng nhập."); toggleAuthMode(); }
-                else { alert("Tên tài khoản đã tồn tại hoặc lỗi kết nối!"); }
+                try {
+                    let res = await fetch(`${SUPABASE_URL}/rest/v1/users`, {
+                        method: 'POST',
+                        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                        body: JSON.stringify({ username: u, password: p, balance: 0 })
+                    });
+                    if(res.ok || res.status === 201) {
+                        alert("Đăng ký thành công! Hãy chuyển sang đăng nhập.");
+                        toggleAuthMode();
+                    } else {
+                        alert("Tên tài khoản đã tồn tại hoặc lỗi kết nối!");
+                    }
+                } catch(e) {
+                    alert("Lỗi kết nối mạng!");
+                }
             } else {
-                let res = await fetch(`${SUPABASE_URL}/rest/v1/users?username=eq.${u}&password=eq.${p}&select=*`, {
-                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-                });
-                let data = await res.json();
-                if(data && data.length > 0) {
-                    currentUser = data[0];
-                    localStorage.setItem('shop_user', JSON.stringify(currentUser));
-                    closeAuthModal();
-                    updateUI();
-                    alert("Đăng nhập thành công!");
-                } else {
-                    alert("Sai tên tài khoản hoặc mật khẩu!");
+                try {
+                    let res = await fetch(`${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(u)}&password=eq.${encodeURIComponent(p)}&select=*`, {
+                        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                    });
+                    let data = await res.json();
+                    if(data && data.length > 0) {
+                        currentUser = data[0];
+                        localStorage.setItem('shop_user', JSON.stringify(currentUser));
+                        closeAuthModal();
+                        updateUI();
+                        alert("Đăng nhập thành công!");
+                    } else {
+                        alert("Sai tên tài khoản hoặc mật khẩu!");
+                    }
+                } catch(e) {
+                    alert("Lỗi kết nối khi đăng nhập!");
                 }
             }
         }
         function logout() { currentUser = null; localStorage.removeItem('shop_user'); updateUI(); }
 
-        // Nạp Thẻ
         function openDepositModal() {
             if(!currentUser) { alert("Vui lòng đăng nhập trước khi nạp tiền!"); showAuthModal(); return; }
             document.getElementById('deposit-modal').classList.remove('hidden');
@@ -222,7 +239,6 @@
             }
         }
 
-        // Mua Hàng
         async function buyProduct(id, name, price, info) {
             if(!currentUser) { alert("Vui lòng đăng nhập để mua hàng!"); showAuthModal(); return; }
             if(Number(currentUser.balance) < Number(price)) { alert("Số dư trong ví không đủ! Vui lòng nạp thêm tiền."); return; }
@@ -246,7 +262,6 @@
             }
         }
 
-        // Admin Quản Trị
         function openAdminLogin() { document.getElementById('admin-modal').classList.remove('hidden'); }
         function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
 
@@ -255,45 +270,68 @@
             if(pass === "123456") {
                 document.getElementById('admin-login-box').classList.add('hidden');
                 document.getElementById('admin-dashboard').classList.remove('hidden');
-                loadAdminDeposits();
+                loadAdminData();
             } else {
                 alert("Sai mật khẩu Admin!");
             }
         }
 
-        async function loadAdminDeposits() {
-            let listDiv = document.getElementById('admin-deposits-list');
-            let res = await fetch(`${SUPABASE_URL}/rest/v1/deposits?status=eq.pending&select=*`, {
+        async function loadAdminData() {
+            // Tải danh sách thẻ chờ duyệt
+            let listDepositsDiv = document.getElementById('admin-deposits-list');
+            let resDep = await fetch(`${SUPABASE_URL}/rest/v1/deposits?status=eq.pending&select=*`, {
                 headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
             });
-            let data = await res.json();
-            if(!data || data.length === 0) {
-                listDiv.innerHTML = '<p class="text-xs text-slate-500 text-center">Không có thẻ nào đang chờ duyệt.</p>';
-                return;
+            let depData = await resDep.json();
+            if(!depData || depData.length === 0) {
+                listDepositsDiv.innerHTML = '<p class="text-xs text-slate-500 text-center">Không có thẻ nào đang chờ duyệt.</p>';
+            } else {
+                let htmlDep = '';
+                depData.forEach(item => {
+                    htmlDep += `
+                        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs space-y-1">
+                            <div><b>User:</b> ${item.username} | <b>Loại:</b> ${item.card_type}</div>
+                            <div><b>Mệnh giá:</b> ${Number(item.card_amount).toLocaleString()}đ</div>
+                            <div><b>Serial:</b> ${item.serial} | <b>Mã:</b> ${item.code}</div>
+                            <button onclick="approveCard(${item.id}, '${item.username}', ${item.card_amount})" class="w-full bg-green-500 text-slate-950 font-bold py-1 rounded-lg mt-1">Duyệt & Cộng Tiền</button>
+                        </div>
+                    `;
+                });
+                listDepositsDiv.innerHTML = htmlDep;
             }
-            let html = '';
-            data.forEach(item => {
-                html += `
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-1">
-                        <div><b>User:</b> ${item.username} | <b>Loại:</b> ${item.card_type}</div>
-                        <div><b>Mệnh giá:</b> ${Number(item.card_amount).toLocaleString()}đ</div>
-                        <div><b>Serial:</b> ${item.serial} | <b>Mã:</b> ${item.code}</div>
-                        <button onclick="approveCard(${item.id}, '${item.username}', ${item.card_amount})" class="w-full bg-green-500 text-slate-950 font-bold py-1.5 rounded-lg mt-1">Duyệt & Cộng Tiền</button>
-                    </div>
-                `;
+
+            // Tải danh sách khách hàng đã đăng ký
+            let listUsersDiv = document.getElementById('admin-users-list');
+            let resUsr = await fetch(`${SUPABASE_URL}/rest/v1/users?select=*`, {
+                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
             });
-            listDiv.innerHTML = html;
+            let usrData = await resUsr.json();
+            if(!usrData || usrData.length === 0) {
+                listUsersDiv.innerHTML = '<p class="text-xs text-slate-500 text-center">Chưa có khách hàng nào đăng ký.</p>';
+            } else {
+                let htmlUsr = `<p class="text-[10px] text-slate-400 mb-1">Tổng số: <b>${usrData.length}</b> khách hàng đã đăng ký</p>`;
+                usrData.forEach(u => {
+                    htmlUsr += `
+                        <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 text-xs flex justify-between items-center">
+                            <div>
+                                <span class="text-yellow-400 font-bold">${u.username}</span> 
+                                <span class="text-[10px] text-slate-500">(MK: ${u.password})</span>
+                            </div>
+                            <div class="text-green-400 font-bold">Ví: ${Number(u.balance || 0).toLocaleString()}đ</div>
+                        </div>
+                    `;
+                });
+                listUsersDiv.innerHTML = htmlUsr;
+            }
         }
 
         async function approveCard(depositId, username, amount) {
-            // 1. Đổi trạng thái thẻ thành approved
             await fetch(`${SUPABASE_URL}/rest/v1/deposits?id=eq.${depositId}`, {
                 method: 'PATCH',
                 headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: 'approved' })
             });
 
-            // 2. Lấy số dư hiện tại của user đó để cộng thêm tiền
             let userRes = await fetch(`${SUPABASE_URL}/rest/v1/users?username=eq.${username}&select=*`, {
                 headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
             });
@@ -308,8 +346,8 @@
                     body: JSON.stringify({ balance: updatedBalance })
                 });
 
-                alert(`Đã duyệt thành công thẻ cho tài khoản ${username}, cộng thêm ${Number(amount).toLocaleString()}đ vào ví!`);
-                loadAdminDeposits();
+                alert(`Đã duyệt thẻ cho ${username}, cộng ${Number(amount).toLocaleString()}đ thành công!`);
+                loadAdminData();
             }
         }
 
