@@ -3,179 +3,679 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gà Gaming - Trang Liên Kết</title>
-    <!-- Thư viện FontAwesome để sử dụng icon mạng xã hội -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <title>Ghi Chú VIP - Gà Gaming</title>
+    <!-- Font chữ Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
+        :root {
+            --bg-color: #0b0f19;
+            --panel-bg: rgba(17, 24, 39, 0.7);
+            --border-color: #1f293d;
+            --primary-glow: #00ffcc;
+            --secondary-glow: #ff007f;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Rajdhani', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 204, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 127, 0.05) 0%, transparent 40%);
+            color: var(--text-main);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
 
         .container {
-            width: 100%;
-            max-width: 480px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        /* Phần thông tin cá nhân / Avatar */
-        .profile-img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #fff;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        /* Header Style */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-area i {
+            font-size: 2.5rem;
+            color: var(--primary-glow);
+            filter: drop-shadow(0 0 10px var(--primary-glow));
+        }
+
+        .logo-area h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stats {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            background: rgba(0,0,0,0.3);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stats span {
+            color: var(--primary-glow);
+            font-weight: bold;
+        }
+
+        /* Download App Button Style */
+        .download-btn {
+            background: linear-gradient(45deg, #ff007f, #9c27b0);
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            border: 1px solid rgba(255, 0, 127, 0.5);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.3);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(255, 0, 127, 0.6);
+            border-color: var(--secondary-glow);
+        }
+
+        /* Main Grid Layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Editor Panel */
+        .editor-panel {
+            background: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            height: fit-content;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .editor-panel h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--primary-glow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group {
             margin-bottom: 15px;
         }
 
-        .profile-name {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #2d3748;
-            margin-bottom: 5px;
-        }
-
-        .profile-bio {
-            font-size: 0.9rem;
-            color: #718096;
-            margin-bottom: 25px;
-        }
-
-        /* Tiêu đề nhóm */
-        .section-title {
-            font-size: 1rem;
-            color: #4a5568;
-            margin: 20px 0 10px 0;
-            text-align: left;
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
             font-weight: 600;
-            border-left: 4px solid #667eea;
-            padding-left: 8px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
         }
 
-        /* Các nút liên kết chung */
-        .link-card {
+        .input-group input, .input-group textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 15px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group textarea:focus {
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .btn {
+            width: 100%;
+            background: linear-gradient(45deg, #00ffcc, #00b3ff);
+            color: #0b0f19;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.6);
+        }
+
+        .btn-cancel {
+            background: linear-gradient(45deg, #ff007f, #ff5500);
+            color: white;
+            margin-top: 10px;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.3);
+            display: none;
+        }
+
+        /* Notes Display Area */
+        .notes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .search-bar {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            background: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px 20px 15px 50px;
+            color: white;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--secondary-glow);
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.2);
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        /* Custom Scrollbar */
+        .notes-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+        .notes-grid::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+        .notes-grid::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        .notes-grid::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-glow);
+        }
+
+        .note-card {
+            background: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .note-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-glow);
+        }
+
+        .note-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-glow);
+            box-shadow: 0 10px 25px rgba(0, 255, 204, 0.15);
+        }
+
+        .note-header-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            word-break: break-word;
+        }
+
+        .note-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .note-body {
+            font-size: 1rem;
+            color: #d1d5db;
+            word-break: break-word;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .note-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+        }
+
+        .action-btn {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            padding: 12px 18px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            text-decoration: none;
-            color: #2d3748;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            justify-content: center;
+            transition: all 0.2s ease;
         }
 
-        .link-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-color: #667eea;
-            color: #667eea;
+        .action-btn:hover {
+            background: var(--border-color);
+            color: white;
         }
 
-        .link-card i.left-icon {
-            font-size: 1.2rem;
-            width: 25px;
+        .action-btn.copy:hover {
+            color: #00ffcc;
+            border-color: #00ffcc;
+        }
+
+        .action-btn.edit:hover {
+            color: #ffaa00;
+            border-color: #ffaa00;
+        }
+
+        .action-btn.delete:hover {
+            color: #ff007f;
+            border-color: #ff007f;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
             text-align: center;
+            padding: 50px;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            background: var(--panel-bg);
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
         }
 
-        .link-card span {
-            flex-grow: 1;
-            text-align: left;
-            margin-left: 10px;
+        /* Toast Thông báo sao chép thành công */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #00ffcc;
+            color: #0b0f19;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
         }
 
-        /* Màu riêng khi rê chuột hoặc chạm vào mạng xã hội */
-        .link-card.facebook:hover { background: #1877f2; color: white; border-color: #1877f2; }
-        .link-card.instagram:hover { background: #e4405f; color: white; border-color: #e4405f; }
-        .link-card.tiktok:hover { background: #000000; color: white; border-color: #000000; }
-        .link-card.youtube:hover { background: #ff0000; color: white; border-color: #ff0000; }
-        .link-card.file:hover { background: #2b6cb0; color: white; border-color: #2b6cb0; }
-
-        /* Footer */
-        .footer {
-            margin-top: 25px;
-            font-size: 0.8rem;
-            color: #a0aec0;
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- Ảnh đại diện -->
-        <img src="https://via.placeholder.com/150" alt="Avatar" class="profile-img">
-        <h1 class="profile-name">Gà Gaming</h1>
-        <p class="profile-bio">Chào mừng bạn đến với trang liên kết chính thức của tôi!</p>
+        <!-- Header -->
+        <header>
+            <div class="logo-area">
+                <i class="fa-solid fa-gamepad"></i>
+                <h1>Ghi Chú VIP Gà Gaming</h1>
+            </div>
+            <div class="header-right">
+                <!-- Nút Tải xuống App APK -->
+                <a href="https://www.mediafire.com/file/gyfnckizrufc4od/ghi+chú+Gà+gaming+vip_1.0.apk/file" target="_blank" class="download-btn">
+                    <i class="fa-solid fa-download"></i> Tải Xuống App APK
+                </a>
+                <div class="stats">
+                    Tổng ghi chú: <span id="note-count">0</span>
+                </div>
+            </div>
+        </header>
 
-        <!-- Nhóm Mạng Xã Hội -->
-        <div class="section-title">Mạng xã hội</div>
-        
-        <a href="https://www.tiktok.com/@idollatao" class="link-card tiktok" target="_blank">
-            <i class="fab fa-tiktok left-icon"></i>
-            <span>TikTok: @idollatao</span>
-            <i class="fa-solid fa-arrow-right"></i>
-        </a>
+        <!-- Main Layout -->
+        <div class="main-grid">
+            <!-- Form Tạo/Sửa Ghi Chú -->
+            <div class="editor-panel">
+                <h2 id="form-title"><i class="fa-solid fa-pen-nib"></i> Tạo Ghi Chú Mới</h2>
+                <input type="hidden" id="note-id">
+                
+                <div class="input-group">
+                    <label for="note-title">Tiêu đề chiến dịch</label>
+                    <input type="text" id="note-title" placeholder="Nhập tiêu đề...">
+                </div>
 
-        <a href="https://www.youtube.com/@gagaming-u2x" class="link-card youtube" target="_blank">
-            <i class="fab fa-youtube left-icon"></i>
-            <span>YouTube: Gà Gaming</span>
-            <i class="fa-solid fa-arrow-right"></i>
-        </a>
+                <div class="input-group">
+                    <label for="note-content">Nội dung ghi chú</label>
+                    <textarea id="note-content" placeholder="Nhập nội dung không giới hạn..."></textarea>
+                </div>
 
-        <a href="https://www.facebook.com/nguyenvantien183273" class="link-card facebook" target="_blank">
-            <i class="fab fa-facebook-f left-icon"></i>
-            <span>Facebook cá nhân</span>
-            <i class="fa-solid fa-arrow-right"></i>
-        </a>
+                <button class="btn" id="save-btn" onclick="saveNote()">
+                    <i class="fa-solid fa-floppy-disk"></i> Lưu Ghi Chú
+                </button>
+                <button class="btn btn-cancel" id="cancel-btn" onclick="resetForm()">
+                    <i class="fa-solid fa-xmark"></i> Hủy Sửa
+                </button>
+            </div>
 
-        <a href="https://instagram.com" class="link-card instagram" target="_blank">
-            <i class="fab fa-instagram left-icon"></i>
-            <span>Instagram</span>
-            <i class="fa-solid fa-arrow-right"></i>
-        </a>
+            <!-- Khu vực Danh sách ghi chú & Tìm kiếm -->
+            <div class="notes-container">
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search-input" placeholder="Tìm kiếm ghi chú bất kỳ..." oninput="renderNotes()">
+                </div>
 
-        <!-- Nhóm Liên Kết File & Tài Liệu -->
-        <div class="section-title">Tài liệu & File tải xuống</div>
-
-        <a href="files/tai-lieu.docx" class="link-card file" download>
-            <i class="fa-solid fa-file-word left-icon" style="color: #3182ce;"></i>
-            <span>Tài liệu / Script của tôi</span>
-            <i class="fa-solid fa-download"></i>
-        </a>
-
-        <a href="https://drive.google.com" class="link-card file" target="_blank">
-            <i class="fa-solid fa-folder-open left-icon" style="color: #d69e2e;"></i>
-            <span>Kho lưu trữ Google Drive</span>
-            <i class="fa-solid fa-external-link"></i>
-        </a>
-
-        <!-- Bản quyền -->
-        <div class="footer">
-            &copy; 2026 Gà Gaming
+                <div class="notes-grid" id="notes-grid">
+                    <!-- Danh sách ghi chú render ở đây -->
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- Toast thông báo -->
+    <div class="toast" id="toast">
+        <i class="fa-solid fa-circle-check"></i> <span id="toast-msg">Đã sao chép nội dung!</span>
+    </div>
+
+    <script>
+        // Lấy dữ liệu từ localStorage hoặc mảng rỗng
+        let notes = JSON.parse(localStorage.getItem('ga_gaming_notes')) || [];
+        
+        let isEditing = false;
+
+        // Lưu hoặc Cập nhật ghi chú
+        function saveNote() {
+            const idInput = document.getElementById('note-id').value;
+            const titleInput = document.getElementById('note-title').value.trim();
+            const contentInput = document.getElementById('note-content').value.trim();
+
+            if (!titleInput && !contentInput) {
+                showToast("Vui lòng nhập tiêu đề hoặc nội dung!", "#ff007f");
+                return;
+            }
+
+            const currentTime = new Date().toLocaleString('vi-VN');
+
+            if (isEditing) {
+                // Cập nhật ghi chú cũ
+                notes = notes.map(note => {
+                    if (note.id == idInput) {
+                        return {
+                            ...note,
+                            title: titleInput || "Không có tiêu đề",
+                            content: contentInput,
+                            date: currentTime + " (Đã sửa)"
+                        };
+                    }
+                    return note;
+                });
+                showToast("Đã cập nhật ghi chú thành công!");
+            } else {
+                // Tạo mới ghi chú (Không giới hạn số lượng)
+                const newNote = {
+                    id: Date.now(),
+                    title: titleInput || "Không có tiêu đề",
+                    content: contentInput,
+                    date: currentTime
+                };
+                notes.unshift(newNote); // Đưa lên đầu danh sách
+                showToast("Đã lưu ghi chú mới thành công!");
+            }
+
+            saveToLocalStorage();
+            resetForm();
+            renderNotes();
+        }
+
+        // Lưu vào LocalStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('ga_gaming_notes', JSON.stringify(notes));
+        }
+
+        // Hiển thị danh sách ghi chú
+        function renderNotes() {
+            const searchKeyword = document.getElementById('search-input').value.toLowerCase();
+            const notesGrid = document.getElementById('notes-grid');
+            
+            // Lọc ghi chú theo từ khóa tìm kiếm
+            const filteredNotes = notes.filter(note => 
+                note.title.toLowerCase().includes(searchKeyword) || 
+                note.content.toLowerCase().includes(searchKeyword)
+            );
+
+            document.getElementById('note-count').innerText = notes.length;
+
+            if (filteredNotes.length === 0) {
+                notesGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-ghost" style="font-size: 3rem; margin-bottom: 10px;"></i>
+                        <p>Không tìm thấy ghi chú nào cả, Đại Vương ơi!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            filteredNotes.forEach(note => {
+                html += `
+                    <div class="note-card">
+                        <div>
+                            <div class="note-header-info">
+                                <h3>${escapeHtml(note.title)}</h3>
+                            </div>
+                            <div class="note-date"><i class="fa-regular fa-clock"></i> ${note.date}</div>
+                            <div class="note-body">${escapeHtml(note.content)}</div>
+                        </div>
+                        <div class="note-footer">
+                            <button class="action-btn copy" title="Sao chép nội dung" onclick="copyNote('${escapeQuotes(note.content)}')">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                            <button class="action-btn edit" title="Chỉnh sửa" onclick="editNote(${note.id})">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="action-btn delete" title="Xóa ghi chú" onclick="deleteNote(${note.id})">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            notesGrid.innerHTML = html;
+        }
+
+        // Đưa dữ liệu lên form để sửa
+        function editNote(id) {
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+
+            document.getElementById('note-id').value = note.id;
+            document.getElementById('note-title').value = note.title;
+            document.getElementById('note-content').value = note.content;
+
+            document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Sửa Ghi Chú`;
+            document.getElementById('save-btn').innerHTML = `<i class="fa-solid fa-check"></i> Cập Nhật`;
+            document.getElementById('cancel-btn').style.display = 'flex';
+
+            isEditing = true;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Xóa ghi chú
+        function deleteNote(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa ghi chú này không?')) {
+                notes = notes.filter(n => n.id !== id);
+                saveToLocalStorage();
+                renderNotes();
+                showToast("Đã xóa ghi chú!", "#ff007f");
+            }
+        }
+
+        // Sao chép nội dung nhanh
+        function copyNote(content) {
+            navigator.clipboard.writeText(content).then(() => {
+                showToast("Đã sao chép vào bộ nhớ tạm!");
+            }).catch(err => {
+                showToast("Lỗi sao chép!", "#ff007f");
+            });
+        }
+
+        // Reset form về trạng thái tạo mới
+        function resetForm() {
+            document.getElementById('note-id').value = '';
+            document.getElementById('note-title').value = '';
+            document.getElementById('note-content').value = '';
+
+            document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-nib"></i> Tạo Ghi Chú Mới`;
+            document.getElementById('save-btn').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Lưu Ghi Chú`;
+            document.getElementById('cancel-btn').style.display = 'none';
+
+            isEditing = false;
+        }
+
+        // Hiển thị Toast thông báo đẹp mắt
+        function showToast(message, color = "#00ffcc") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            
+            toastMsg.innerText = message;
+            toast.style.background = color;
+            toast.style.color = color === "#00ffcc" ? "#0b0f19" : "#ffffff";
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // Chống lỗi ký tự đặc biệt khi hiển thị HTML
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function escapeQuotes(text) {
+            return text.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n');
+        }
+
+        // Khởi chạy khi load trang
+        renderNotes();
+    </script>
 </body>
 </html>
