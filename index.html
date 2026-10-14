@@ -1,681 +1,75 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ghi Chú VIP - Gà Gaming</title>
-    <!-- Font chữ Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --bg-color: #0b0f19;
-            --panel-bg: rgba(17, 24, 39, 0.7);
-            --border-color: #1f293d;
-            --primary-glow: #00ffcc;
-            --secondary-glow: #ff007f;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Rajdhani', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 255, 204, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(255, 0, 127, 0.05) 0%, transparent 40%);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Header Style */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--panel-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 16px;
-            padding: 20px 30px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo-area i {
-            font-size: 2.5rem;
-            color: var(--primary-glow);
-            filter: drop-shadow(0 0 10px var(--primary-glow));
-        }
-
-        .logo-area h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .stats {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            background: rgba(0,0,0,0.3);
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .stats span {
-            color: var(--primary-glow);
-            font-weight: bold;
-        }
-
-        /* Download App Button Style */
-        .download-btn {
-            background: linear-gradient(45deg, #ff007f, #9c27b0);
-            color: white;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            padding: 10px 18px;
-            border-radius: 8px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-            border: 1px solid rgba(255, 0, 127, 0.5);
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(255, 0, 127, 0.3);
-        }
-
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 25px rgba(255, 0, 127, 0.6);
-            border-color: var(--secondary-glow);
-        }
-
-        /* Main Grid Layout */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 30px;
-        }
-
-        @media (max-width: 900px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Editor Panel */
-        .editor-panel {
-            background: var(--panel-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 16px;
-            padding: 25px;
-            backdrop-filter: blur(10px);
-            height: fit-content;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        .editor-panel h2 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: var(--primary-glow);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-        }
-
-        .input-group input, .input-group textarea {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px 15px;
-            color: white;
-            font-size: 1rem;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .input-group input:focus, .input-group textarea:focus {
-            border-color: var(--primary-glow);
-            box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
-        }
-
-        .input-group textarea {
-            resize: vertical;
-            min-height: 150px;
-        }
-
-        .btn {
-            width: 100%;
-            background: linear-gradient(45deg, #00ffcc, #00b3ff);
-            color: #0b0f19;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 25px rgba(0, 255, 204, 0.6);
-        }
-
-        .btn-cancel {
-            background: linear-gradient(45deg, #ff007f, #ff5500);
-            color: white;
-            margin-top: 10px;
-            box-shadow: 0 0 15px rgba(255, 0, 127, 0.3);
-            display: none;
-        }
-
-        /* Notes Display Area */
-        .notes-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .search-bar {
-            position: relative;
-            margin-bottom: 10px;
-        }
-
-        .search-bar input {
-            width: 100%;
-            background: var(--panel-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            padding: 15px 20px 15px 50px;
-            color: white;
-            font-size: 1.1rem;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .search-bar input:focus {
-            border-color: var(--secondary-glow);
-            box-shadow: 0 0 15px rgba(255, 0, 127, 0.2);
-        }
-
-        .search-bar i {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 1.2rem;
-        }
-
-        .notes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            max-height: 70vh;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        /* Custom Scrollbar */
-        .notes-grid::-webkit-scrollbar {
-            width: 8px;
-        }
-        .notes-grid::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.2);
-            border-radius: 4px;
-        }
-        .notes-grid::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 4px;
-        }
-        .notes-grid::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-glow);
-        }
-
-        .note-card {
-            background: var(--panel-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 16px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-        }
-
-        .note-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--primary-glow);
-        }
-
-        .note-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary-glow);
-            box-shadow: 0 10px 25px rgba(0, 255, 204, 0.15);
-        }
-
-        .note-header-info h3 {
-            font-size: 1.3rem;
-            margin-bottom: 8px;
-            color: var(--text-main);
-            word-break: break-word;
-        }
-
-        .note-date {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-        }
-
-        .note-body {
-            font-size: 1rem;
-            color: #d1d5db;
-            word-break: break-word;
-            white-space: pre-wrap;
-            margin-bottom: 20px;
-            line-height: 1.5;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-
-        .note-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 12px;
-        }
-
-        .action-btn {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            width: 35px;
-            height: 35px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .action-btn:hover {
-            background: var(--border-color);
-            color: white;
-        }
-
-        .action-btn.copy:hover {
-            color: #00ffcc;
-            border-color: #00ffcc;
-        }
-
-        .action-btn.edit:hover {
-            color: #ffaa00;
-            border-color: #ffaa00;
-        }
-
-        .action-btn.delete:hover {
-            color: #ff007f;
-            border-color: #ff007f;
-        }
-
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 50px;
-            color: var(--text-muted);
-            font-size: 1.2rem;
-            background: var(--panel-bg);
-            border: 2px dashed var(--border-color);
-            border-radius: 16px;
-        }
-
-        /* Toast Thông báo sao chép thành công */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #00ffcc;
-            color: #0b0f19;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 1000;
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080b14">
+<title>Ga Gaming — Get Key</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:18px 12px;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at top,#17284b,transparent 65%),#080b14;color:#f8fafc;font-family:Arial,sans-serif}
+.panel{width:100%;max-width:470px;padding:23px;border:1px solid #293956;border-radius:20px;background:#101827;box-shadow:0 15px 55px #0008}.logo{font-size:12px;letter-spacing:4px;color:#22d3ee}h1{font-size:30px;margin:12px 0}h1 span{color:#22d3ee}.desc{color:#94a3b8;font-size:14px;line-height:1.7}.line{height:1px;background:#293956;margin:21px 0}.step{display:flex;gap:12px;align-items:center;padding:13px;background:#0b1220;border-radius:10px;margin:10px 0}.num{min-width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:#183149;color:#22d3ee}.step small{display:block;color:#94a3b8;margin-top:5px;line-height:1.4}button{width:100%;padding:14px;margin-top:12px;border:0;border-radius:10px;font-weight:bold;font-size:14px;cursor:pointer}.primary{background:#22d3ee;color:#06121b}.secondary{background:#253249;color:white}input{width:100%;padding:13px;background:#080e19;color:white;border:1px solid #334155;border-radius:9px;margin-top:9px;font-size:14px}.result{margin-top:13px;padding:12px;background:#080e19;border:1px solid #293956;border-radius:9px;overflow-wrap:anywhere;font-size:13px;line-height:1.7;color:#dbeafe}.note{color:#fbbf24;font-size:12px;line-height:1.6}footer{text-align:center;color:#64748b;font-size:11px;line-height:1.6;margin-top:22px}
+</style>
 </head>
 <body>
-
-    <div class="container">
-        <!-- Header -->
-        <header>
-            <div class="logo-area">
-                <i class="fa-solid fa-gamepad"></i>
-                <h1>Ghi Chú VIP Gà Gaming</h1>
-            </div>
-            <div class="header-right">
-                <!-- Nút Tải xuống App APK -->
-                <a href="https://www.mediafire.com/file/gyfnckizrufc4od/ghi+chú+Gà+gaming+vip_1.0.apk/file" target="_blank" class="download-btn">
-                    <i class="fa-solid fa-download"></i> Tải Xuống App APK
-                </a>
-                <div class="stats">
-                    Tổng ghi chú: <span id="note-count">0</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- Main Layout -->
-        <div class="main-grid">
-            <!-- Form Tạo/Sửa Ghi Chú -->
-            <div class="editor-panel">
-                <h2 id="form-title"><i class="fa-solid fa-pen-nib"></i> Tạo Ghi Chú Mới</h2>
-                <input type="hidden" id="note-id">
-                
-                <div class="input-group">
-                    <label for="note-title">Tiêu đề chiến dịch</label>
-                    <input type="text" id="note-title" placeholder="Nhập tiêu đề...">
-                </div>
-
-                <div class="input-group">
-                    <label for="note-content">Nội dung ghi chú</label>
-                    <textarea id="note-content" placeholder="Nhập nội dung không giới hạn..."></textarea>
-                </div>
-
-                <button class="btn" id="save-btn" onclick="saveNote()">
-                    <i class="fa-solid fa-floppy-disk"></i> Lưu Ghi Chú
-                </button>
-                <button class="btn btn-cancel" id="cancel-btn" onclick="resetForm()">
-                    <i class="fa-solid fa-xmark"></i> Hủy Sửa
-                </button>
-            </div>
-
-            <!-- Khu vực Danh sách ghi chú & Tìm kiếm -->
-            <div class="notes-container">
-                <div class="search-bar">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="search-input" placeholder="Tìm kiếm ghi chú bất kỳ..." oninput="renderNotes()">
-                </div>
-
-                <div class="notes-grid" id="notes-grid">
-                    <!-- Danh sách ghi chú render ở đây -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast thông báo -->
-    <div class="toast" id="toast">
-        <i class="fa-solid fa-circle-check"></i> <span id="toast-msg">Đã sao chép nội dung!</span>
-    </div>
-
-    <script>
-        // Lấy dữ liệu từ localStorage hoặc mảng rỗng
-        let notes = JSON.parse(localStorage.getItem('ga_gaming_notes')) || [];
-        
-        let isEditing = false;
-
-        // Lưu hoặc Cập nhật ghi chú
-        function saveNote() {
-            const idInput = document.getElementById('note-id').value;
-            const titleInput = document.getElementById('note-title').value.trim();
-            const contentInput = document.getElementById('note-content').value.trim();
-
-            if (!titleInput && !contentInput) {
-                showToast("Vui lòng nhập tiêu đề hoặc nội dung!", "#ff007f");
-                return;
-            }
-
-            const currentTime = new Date().toLocaleString('vi-VN');
-
-            if (isEditing) {
-                // Cập nhật ghi chú cũ
-                notes = notes.map(note => {
-                    if (note.id == idInput) {
-                        return {
-                            ...note,
-                            title: titleInput || "Không có tiêu đề",
-                            content: contentInput,
-                            date: currentTime + " (Đã sửa)"
-                        };
-                    }
-                    return note;
-                });
-                showToast("Đã cập nhật ghi chú thành công!");
-            } else {
-                // Tạo mới ghi chú (Không giới hạn số lượng)
-                const newNote = {
-                    id: Date.now(),
-                    title: titleInput || "Không có tiêu đề",
-                    content: contentInput,
-                    date: currentTime
-                };
-                notes.unshift(newNote); // Đưa lên đầu danh sách
-                showToast("Đã lưu ghi chú mới thành công!");
-            }
-
-            saveToLocalStorage();
-            resetForm();
-            renderNotes();
-        }
-
-        // Lưu vào LocalStorage
-        function saveToLocalStorage() {
-            localStorage.setItem('ga_gaming_notes', JSON.stringify(notes));
-        }
-
-        // Hiển thị danh sách ghi chú
-        function renderNotes() {
-            const searchKeyword = document.getElementById('search-input').value.toLowerCase();
-            const notesGrid = document.getElementById('notes-grid');
-            
-            // Lọc ghi chú theo từ khóa tìm kiếm
-            const filteredNotes = notes.filter(note => 
-                note.title.toLowerCase().includes(searchKeyword) || 
-                note.content.toLowerCase().includes(searchKeyword)
-            );
-
-            document.getElementById('note-count').innerText = notes.length;
-
-            if (filteredNotes.length === 0) {
-                notesGrid.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fa-solid fa-ghost" style="font-size: 3rem; margin-bottom: 10px;"></i>
-                        <p>Không tìm thấy ghi chú nào cả, Đại Vương ơi!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            let html = '';
-            filteredNotes.forEach(note => {
-                html += `
-                    <div class="note-card">
-                        <div>
-                            <div class="note-header-info">
-                                <h3>${escapeHtml(note.title)}</h3>
-                            </div>
-                            <div class="note-date"><i class="fa-regular fa-clock"></i> ${note.date}</div>
-                            <div class="note-body">${escapeHtml(note.content)}</div>
-                        </div>
-                        <div class="note-footer">
-                            <button class="action-btn copy" title="Sao chép nội dung" onclick="copyNote('${escapeQuotes(note.content)}')">
-                                <i class="fa-regular fa-copy"></i>
-                            </button>
-                            <button class="action-btn edit" title="Chỉnh sửa" onclick="editNote(${note.id})">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button class="action-btn delete" title="Xóa ghi chú" onclick="deleteNote(${note.id})">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            notesGrid.innerHTML = html;
-        }
-
-        // Đưa dữ liệu lên form để sửa
-        function editNote(id) {
-            const note = notes.find(n => n.id === id);
-            if (!note) return;
-
-            document.getElementById('note-id').value = note.id;
-            document.getElementById('note-title').value = note.title;
-            document.getElementById('note-content').value = note.content;
-
-            document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Sửa Ghi Chú`;
-            document.getElementById('save-btn').innerHTML = `<i class="fa-solid fa-check"></i> Cập Nhật`;
-            document.getElementById('cancel-btn').style.display = 'flex';
-
-            isEditing = true;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // Xóa ghi chú
-        function deleteNote(id) {
-            if (confirm('Bạn có chắc chắn muốn xóa ghi chú này không?')) {
-                notes = notes.filter(n => n.id !== id);
-                saveToLocalStorage();
-                renderNotes();
-                showToast("Đã xóa ghi chú!", "#ff007f");
-            }
-        }
-
-        // Sao chép nội dung nhanh
-        function copyNote(content) {
-            navigator.clipboard.writeText(content).then(() => {
-                showToast("Đã sao chép vào bộ nhớ tạm!");
-            }).catch(err => {
-                showToast("Lỗi sao chép!", "#ff007f");
-            });
-        }
-
-        // Reset form về trạng thái tạo mới
-        function resetForm() {
-            document.getElementById('note-id').value = '';
-            document.getElementById('note-title').value = '';
-            document.getElementById('note-content').value = '';
-
-            document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-nib"></i> Tạo Ghi Chú Mới`;
-            document.getElementById('save-btn').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Lưu Ghi Chú`;
-            document.getElementById('cancel-btn').style.display = 'none';
-
-            isEditing = false;
-        }
-
-        // Hiển thị Toast thông báo đẹp mắt
-        function showToast(message, color = "#00ffcc") {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toast-msg');
-            
-            toastMsg.innerText = message;
-            toast.style.background = color;
-            toast.style.color = color === "#00ffcc" ? "#0b0f19" : "#ffffff";
-            toast.classList.add('show');
-
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2500);
-        }
-
-        // Chống lỗi ký tự đặc biệt khi hiển thị HTML
-        function escapeHtml(text) {
-            return text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        function escapeQuotes(text) {
-            return text.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n');
-        }
-
-        // Khởi chạy khi load trang
-        renderNotes();
-    </script>
+<main class="panel">
+ <div class="logo">GA GAMING / KEY SYSTEM</div>
+ <h1>GET <span>YOUR KEY</span></h1>
+ <p class="desc">Tạo link vượt qua Link4M và kiểm tra key qua máy chủ. API token không được đặt trong trang HTML.</p>
+ <div class="line"></div>
+ <div class="step"><div class="num">01</div><div><b>Tạo link vượt</b><small>Máy chủ yêu cầu Link4M tạo link</small></div></div>
+ <div class="step"><div class="num">02</div><div><b>Hoàn thành nhiệm vụ</b><small>Quay lại trang Gà Gaming sau khi vượt</small></div></div>
+ <div class="step"><div class="num">03</div><div><b>Nhận và xác minh key</b><small>Chỉ cấp key khi backend xác minh được</small></div></div>
+ <button class="primary" id="get">GET KEY NOW ↗</button>
+ <div class="result" id="status" role="status">Sẵn sàng. Nhấn GET KEY NOW để yêu cầu tạo link.</div>
+ <div class="line"></div>
+ <b>VERIFY YOUR KEY</b>
+ <input id="key" autocomplete="off" placeholder="Nhập key của bạn...">
+ <button class="secondary" id="verify">VERIFY KEY</button>
+ <div class="result" id="verifyResult">Nhập key để kiểm tra qua backend.</div>
+ <p class="note">Bản khởi tạo này cần backend được triển khai và cấu hình. Chưa xác nhận key nào là hợp lệ nếu backend chưa được kết nối.</p>
+ <footer>GA GAMING · KEY PORTAL<br>Không liên kết chính thức với Roblox hoặc Link4M.</footer>
+</main>
+<script>
+const API_BASE = ""; // Ví dụ: https://your-worker.your-subdomain.workers.dev
+const $ = id => document.getElementById(id);
+$("get").addEventListener("click", async () => {
+  if (!API_BASE) {
+    $("status").textContent = "Chưa cấu hình địa chỉ backend. GitHub Pages không thể giữ API token an toàn hoặc xác minh hoàn thành nhiệm vụ.";
+    return;
+  }
+  $("get").disabled = true;
+  $("status").textContent = "Đang yêu cầu tạo link...";
+  try {
+    const r = await fetch(API_BASE + "/create-link", {method:"POST"});
+    const data = await r.json();
+    if (!r.ok || !data.url) throw new Error(data.error || "Không tạo được link.");
+    const u = new URL(data.url);
+    if (u.protocol !== "https:") throw new Error("Backend trả về URL không an toàn.");
+    location.href = u.href;
+  } catch (e) {
+    $("status").textContent = "Lỗi: " + e.message;
+  } finally { $("get").disabled = false; }
+});
+$("verify").addEventListener("click", async () => {
+  const key = $("key").value.trim();
+  if (!key) { $("verifyResult").textContent = "Vui lòng nhập key."; return; }
+  if (!API_BASE) {
+    $("verifyResult").textContent = "Chưa cấu hình backend xác minh. Không thể xác nhận key từ trình duyệt.";
+    return;
+  }
+  $("verify").disabled = true;
+  try {
+    const r = await fetch(API_BASE + "/verify-key", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({key})
+    });
+    const data = await r.json();
+    $("verifyResult").textContent = data.valid
+      ? "✓ Key hợp lệ" + (data.expiresAt ? " — hết hạn: " + data.expiresAt : "")
+      : "✕ Key không hợp lệ hoặc đã hết hạn.";
+  } catch { $("verifyResult").textContent = "Không thể kết nối máy chủ xác minh."; }
+  finally { $("verify").disabled = false; }
+});
+</script>
 </body>
 </html>
