@@ -1,75 +1,218 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#080b14">
-<title>Ga Gaming — Get Key</title>
-<style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:18px 12px;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at top,#17284b,transparent 65%),#080b14;color:#f8fafc;font-family:Arial,sans-serif}
-.panel{width:100%;max-width:470px;padding:23px;border:1px solid #293956;border-radius:20px;background:#101827;box-shadow:0 15px 55px #0008}.logo{font-size:12px;letter-spacing:4px;color:#22d3ee}h1{font-size:30px;margin:12px 0}h1 span{color:#22d3ee}.desc{color:#94a3b8;font-size:14px;line-height:1.7}.line{height:1px;background:#293956;margin:21px 0}.step{display:flex;gap:12px;align-items:center;padding:13px;background:#0b1220;border-radius:10px;margin:10px 0}.num{min-width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:#183149;color:#22d3ee}.step small{display:block;color:#94a3b8;margin-top:5px;line-height:1.4}button{width:100%;padding:14px;margin-top:12px;border:0;border-radius:10px;font-weight:bold;font-size:14px;cursor:pointer}.primary{background:#22d3ee;color:#06121b}.secondary{background:#253249;color:white}input{width:100%;padding:13px;background:#080e19;color:white;border:1px solid #334155;border-radius:9px;margin-top:9px;font-size:14px}.result{margin-top:13px;padding:12px;background:#080e19;border:1px solid #293956;border-radius:9px;overflow-wrap:anywhere;font-size:13px;line-height:1.7;color:#dbeafe}.note{color:#fbbf24;font-size:12px;line-height:1.6}footer{text-align:center;color:#64748b;font-size:11px;line-height:1.6;margin-top:22px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gà Gaming - Key System</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --border-color: #ced4da;
+            --success-color: #28a745;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            box-sizing: border-box;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .header h2 {
+            margin: 0 0 5px 0;
+            font-size: 22px;
+            color: #222;
+        }
+        .header span {
+            font-size: 13px;
+            background: #6c757d;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: #fff;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .btn-generate {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+        .btn-generate:hover {
+            background-color: var(--primary-hover);
+        }
+        .result-box {
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+        }
+        .key-display {
+            background: #e9ecef;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            margin-top: 8px;
+            word-break: break-all;
+            color: #d9534f;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
 </head>
 <body>
-<main class="panel">
- <div class="logo">GA GAMING / KEY SYSTEM</div>
- <h1>GET <span>YOUR KEY</span></h1>
- <p class="desc">Tạo link vượt qua Link4M và kiểm tra key qua máy chủ. API token không được đặt trong trang HTML.</p>
- <div class="line"></div>
- <div class="step"><div class="num">01</div><div><b>Tạo link vượt</b><small>Máy chủ yêu cầu Link4M tạo link</small></div></div>
- <div class="step"><div class="num">02</div><div><b>Hoàn thành nhiệm vụ</b><small>Quay lại trang Gà Gaming sau khi vượt</small></div></div>
- <div class="step"><div class="num">03</div><div><b>Nhận và xác minh key</b><small>Chỉ cấp key khi backend xác minh được</small></div></div>
- <button class="primary" id="get">GET KEY NOW ↗</button>
- <div class="result" id="status" role="status">Sẵn sàng. Nhấn GET KEY NOW để yêu cầu tạo link.</div>
- <div class="line"></div>
- <b>VERIFY YOUR KEY</b>
- <input id="key" autocomplete="off" placeholder="Nhập key của bạn...">
- <button class="secondary" id="verify">VERIFY KEY</button>
- <div class="result" id="verifyResult">Nhập key để kiểm tra qua backend.</div>
- <p class="note">Bản khởi tạo này cần backend được triển khai và cấu hình. Chưa xác nhận key nào là hợp lệ nếu backend chưa được kết nối.</p>
- <footer>GA GAMING · KEY PORTAL<br>Không liên kết chính thức với Roblox hoặc Link4M.</footer>
-</main>
-<script>
-const API_BASE = ""; // Ví dụ: https://your-worker.your-subdomain.workers.dev
-const $ = id => document.getElementById(id);
-$("get").addEventListener("click", async () => {
-  if (!API_BASE) {
-    $("status").textContent = "Chưa cấu hình địa chỉ backend. GitHub Pages không thể giữ API token an toàn hoặc xác minh hoàn thành nhiệm vụ.";
-    return;
-  }
-  $("get").disabled = true;
-  $("status").textContent = "Đang yêu cầu tạo link...";
-  try {
-    const r = await fetch(API_BASE + "/create-link", {method:"POST"});
-    const data = await r.json();
-    if (!r.ok || !data.url) throw new Error(data.error || "Không tạo được link.");
-    const u = new URL(data.url);
-    if (u.protocol !== "https:") throw new Error("Backend trả về URL không an toàn.");
-    location.href = u.href;
-  } catch (e) {
-    $("status").textContent = "Lỗi: " + e.message;
-  } finally { $("get").disabled = false; }
-});
-$("verify").addEventListener("click", async () => {
-  const key = $("key").value.trim();
-  if (!key) { $("verifyResult").textContent = "Vui lòng nhập key."; return; }
-  if (!API_BASE) {
-    $("verifyResult").textContent = "Chưa cấu hình backend xác minh. Không thể xác nhận key từ trình duyệt.";
-    return;
-  }
-  $("verify").disabled = true;
-  try {
-    const r = await fetch(API_BASE + "/verify-key", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({key})
-    });
-    const data = await r.json();
-    $("verifyResult").textContent = data.valid
-      ? "✓ Key hợp lệ" + (data.expiresAt ? " — hết hạn: " + data.expiresAt : "")
-      : "✕ Key không hợp lệ hoặc đã hết hạn.";
-  } catch { $("verifyResult").textContent = "Không thể kết nối máy chủ xác minh."; }
-  finally { $("verify").disabled = false; }
-});
-</script>
+
+    <div class="container">
+        <div class="header">
+            <h2>Gà Gaming - Key System</h2>
+            <span>Mod Menu Only</span>
+        </div>
+
+        <div id="generator-form">
+            <div class="form-group">
+                <label for="game">Game / Ứng dụng</label>
+                <select id="game">
+                    <option value="thanhdo_external">THANHDO External</option>
+                    <option value="free_fire">Free Fire VIP Menu</option>
+                    <option value="lien_quan">Liên Quân Mobile</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Số lượng thiết bị</label>
+                <input type="text" value="1 device" readonly style="background-color: #e9ecef; color: #555;">
+            </div>
+
+            <div class="form-group">
+                <label for="duration">Thời hạn sử dụng</label>
+                <select id="duration">
+                    <option value="24">24 Giờ</option>
+                    <option value="168">7 Ngày</option>
+                    <option value="720">30 Ngày</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Loại Key</label>
+                <select>
+                    <option>VIP FREE (Vượt Link)</option>
+                </select>
+            </div>
+
+            <button class="btn-generate" onclick="generateKey()">🚀 Tạo Key Ngay</button>
+        </div>
+
+        <div id="result-container" class="result-box">
+            <label>Key của bạn:</label>
+            <div class="key-display" id="final-key">GG-VN-XXXXXX</div>
+            <button class="btn-generate" style="background-color: var(--success-color); margin-top: 10px;" onclick="copyKey()">📋 Sao Chép Key</button>
+        </div>
+
+        <div class="footer">
+            &copy; 2026 Gà Gaming System. All rights reserved.
+        </div>
+    </div>
+
+    <script>
+        const LINK4M_API_TOKEN = "6acf9a55f49ba538753d29e8";
+
+        async function generateKey() {
+            const game = document.getElementById('game').value;
+            const duration = document.getElementById('duration').value;
+            
+            const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const generatedKey = `GG-${game.toUpperCase().substring(0,4)}-${randomCode}-${duration}H`;
+
+            const currentUrl = window.location.href.split('?')[0];
+            const destinationUrl = currentUrl + "?key=" + encodeURIComponent(generatedKey);
+
+            // Dùng dịch vụ corsproxy để gọi API Link4M trực tiếp từ trang web tĩnh mà không bị chặn
+            const targetUrl = `https://link4m.com/api?api=${LINK4M_API_TOKEN}&url=${encodeURIComponent(destinationUrl)}`;
+            const proxyUrl = `https://api.allorigins.win/get?url=` + encodeURIComponent(targetUrl);
+
+            alert("Đang tạo link vượt quảng cáo, vui lòng đợi trong giây lát...");
+
+            try {
+                let response = await fetch(proxyUrl);
+                let data = await response.json();
+                let resData = JSON.parse(data.contents);
+
+                if (resData.status === 'success' && resData.shortened_url) {
+                    window.location.href = resData.shortened_url;
+                } else {
+                    alert("Lỗi tạo link từ hệ thống Link4M!");
+                }
+            } catch (err) {
+                // Fallback nếu lỗi mạng: chuyển hướng trực tiếp qua link API
+                window.location.href = targetUrl;
+            }
+        }
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const keyParam = urlParams.get('key');
+            if (keyParam) {
+                document.getElementById('generator-form').style.display = 'none';
+                document.getElementById('result-container').style.display = 'block';
+                document.getElementById('final-key').innerText = keyParam;
+            }
+        }
+
+        function copyKey() {
+            const keyText = document.getElementById('final-key').innerText;
+            navigator.clipboard.writeText(keyText).then(() => {
+                alert("Đã sao chép key thành công: " + keyText);
+            });
+        }
+    </script>
 </body>
 </html>
