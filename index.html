@@ -375,13 +375,13 @@
                 return;
             }
 
-            // Sửa lỗi hiển thị chữ B bằng cách bỏ dấu bọc markdown không cần thiết ở Seri và PIN
-            const message = `💳 *YÊU CẦU NẠP THẺ CÀO (VÍ TIỀN)*\n\n` +
-                            `👤 *Tài khoản:* ${currentUser}\n` +
-                            `📡 *Nhà mạng:* ${telco} - *Mệnh giá:* ${Number(amount).toLocaleString('vi-VN')} VNĐ\n` +
-                            `🔢 *Số Seri:* ${serial}\n` +
-                            `🔑 *Mã PIN:* ${pin}\n` +
-                            `⏱ *Thời gian:* ${new Date().toLocaleString('vi-VN')}`;
+            // Dùng văn bản thuần túy tránh lỗi định dạng markdown gây mất chữ B trên Telegram
+            const message = "YÊU CẦU NẠP THẺ CÀO (VÍ TIỀN)\n\n" +
+                            "Tài khoản: " + currentUser + "\n" +
+                            "Nhà mạng: " + telco + " - Mệnh giá: " + Number(amount).toLocaleString('vi-VN') + " VNĐ\n" +
+                            "Số Seri: " + serial + "\n" +
+                            "Mã PIN: " + pin + "\n" +
+                            "Thời gian: " + new Date().toLocaleString('vi-VN');
 
             const inlineKeyboard = {
                 inline_keyboard: [
@@ -398,8 +398,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     chat_id: TELEGRAM_CHAT_ID, 
-                    text: message, 
-                    parse_mode: 'Markdown',
+                    text: message,
                     reply_markup: inlineKeyboard
                 })
             }).catch(err => console.log(err));
