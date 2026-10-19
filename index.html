@@ -3,428 +3,529 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop Blox Fruits - Nạp Tiền & Mua Hàng</title>
+    <title>Hệ Thống Bán Key Riêng - Shop Key Tự Động</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
-            --primary: #f59e0b;
-            --primary-hover: #d97706;
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --text: #f8fafc;
-            --gray: #94a3b8;
+            --bg-color: #0b0c10;
+            --card-bg: #1f2833;
+            --primary-color: #66fcf1;
+            --accent-color: #45a29e;
+            --text-color: #c5c6c7;
+            --text-white: #ffffff;
+            --telegram-color: #229ed9;
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
         }
 
         body {
-            background-color: var(--bg);
-            color: var(--text);
-            padding: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
         }
 
-        .container {
+        /* HEADER */
+        header {
+            background: rgba(11, 12, 16, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
             width: 100%;
-            max-width: 450px;
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid #334155;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(102, 252, 241, 0.2);
         }
 
-        h2, h3 {
-            text-align: center;
-            margin-bottom: 15px;
-            color: var(--primary);
-        }
-
-        .shop-header {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        .shop-header h1 {
-            font-size: 18px;
-            color: var(--primary);
-            margin-bottom: 3px;
-        }
-
-        .shop-header p {
-            font-size: 11px;
-            color: var(--gray);
-        }
-
-        .product-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-height: 280px;
-            overflow-y: auto;
-            padding-right: 5px;
-            margin-bottom: 15px;
-        }
-
-        .product-card {
-            background: #0f172a;
-            border: 1px solid #334155;
-            padding: 10px;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .product-title {
-            font-weight: bold;
-            font-size: 13px;
-            color: #38bdf8;
-        }
-
-        .product-price {
-            color: #22c55e;
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        .product-desc {
-            font-size: 11px;
-            color: var(--gray);
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            background: var(--primary);
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 5px;
-            transition: background 0.2s;
-        }
-
-        button:hover {
-            background: var(--primary-hover);
-            color: #fff;
-        }
-
-        .secondary-btn {
-            background: #475569;
-            color: white;
-            margin-top: 8px;
-        }
-
-        .secondary-btn:hover {
-            background: #64748b;
-        }
-
-        .form-group {
-            margin-bottom: 10px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 4px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 9px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            color: white;
-            border-radius: 8px;
-            font-size: 13px;
-            outline: none;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .user-info-bar {
-            background: #0f172a;
-            padding: 10px 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 12px;
-            border: 1px solid #334155;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .user-top-row {
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .maintenance-badge {
-            background: #ef4444;
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--primary-color);
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .user-balance {
+            background: var(--card-bg);
+            border: 1px solid var(--primary-color);
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            color: var(--primary-color);
+        }
+
+        .tele-support-btn {
+            background: var(--telegram-color);
             color: white;
-            font-size: 10px;
-            padding: 2px 6px;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .tele-support-btn:hover {
+            opacity: 0.85;
+            box-shadow: 0 0 10px rgba(34, 158, 217, 0.5);
+        }
+
+        /* HERO */
+        .hero {
+            padding: 130px 20px 30px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: var(--text-white);
+        }
+
+        .hero h1 span {
+            color: var(--primary-color);
+        }
+
+        .hero p {
+            color: var(--text-color);
+            font-size: 15px;
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 10px;
+            color: var(--text-white);
+        }
+
+        /* TABS */
+        .hub-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+        }
+
+        /* PACKAGES GRID */
+        .packages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .package-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: 0.3s;
+        }
+
+        .package-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .package-duration {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            color: var(--text-white);
+            margin-bottom: 8px;
+        }
+
+        .package-price {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .package-desc {
+            font-size: 13px;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .buy-key-btn {
+            width: 100%;
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .buy-key-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+        }
+
+        /* BANNER TELEGRAM BOT */
+        .telegram-banner {
+            background: linear-gradient(135deg, #1f2833, #0b0c10);
+            border: 1px solid var(--telegram-color);
+            border-radius: 12px;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .telegram-info h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--text-white);
+            margin-bottom: 8px;
+        }
+
+        .telegram-info p {
+            font-size: 13px;
+            color: var(--text-color);
+        }
+
+        /* LỊCH SỬ */
+        .history-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .history-table th, .history-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .history-table th {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary-color);
+        }
+
+        .key-code {
+            background: #0b0c10;
+            padding: 4px 8px;
             border-radius: 4px;
-            font-weight: bold;
+            color: #66fcf1;
+            font-family: monospace;
+            user-select: all;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            width: 400px;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid var(--primary-color);
+            text-align: center;
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .generated-key-box {
+            background: #0b0c10;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 15px;
+            color: #fff;
+            font-family: monospace;
+            margin: 15px 0;
+            border: 1px dashed var(--primary-color);
+        }
+
+        .close-modal-btn {
+            background: var(--primary-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #000;
+            margin-top: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: var(--text-color);
+            font-size: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 40px;
         }
     </style>
 </head>
 <body>
 
+    <!-- HEADER -->
+    <header>
+        <div class="nav-container">
+            <div class="logo"><i class="fa-solid fa-key"></i> MY PRIVATE KEY STORE</div>
+            <div class="nav-right">
+                <div class="user-balance">
+                    <i class="fa-solid fa-wallet"></i> Số dư: <span id="balance">50,000đ</span>
+                </div>
+                <a href="http://t.me/botmuakey_bot" target="_blank" class="tele-support-btn">
+                    <i class="fa-brands fa-telegram"></i> Bot Telegram
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+        <h1>MUA KEY CÁ NHÂN <span>TỰ ĐỘNG 24/7</span></h1>
+        <p>Bảng giá chuẩn: 1 Ngày (1k) | 7 Ngày (7k) | 30 Ngày (30k). Nhận key của riêng bạn tức thì!</p>
+    </section>
+
+    <!-- MAIN CONTAINER -->
     <div class="container">
-        <!-- 1. MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ -->
-        <div id="authScreen">
-            <h2>🔐 Đăng Nhập / Đăng Ký</h2>
-            <div class="form-group">
-                <label>Tên tài khoản</label>
-                <input type="text" id="username" placeholder="Nhập tên tài khoản...">
+        <!-- Banner Telegram Bot -->
+        <div class="telegram-banner">
+            <div class="telegram-info">
+                <h3><i class="fa-brands fa-telegram" style="color: var(--telegram-color);"></i> Kết nối Bot Telegram để nạp tiền tự động</h3>
+                <p>Bot @botmuakey_bot tích hợp token <code>8945467143:AAEGCtbTB9m1G4XUGaHxVc3tHf0VWM-zJeE</code> sẵn sàng xử lý tự động.</p>
             </div>
-            <div class="form-group">
-                <label>Mật khẩu</label>
-                <input type="password" id="password" placeholder="Nhập mật khẩu...">
-            </div>
-            <button onclick="handleLogin()">Vào Shop</button>
+            <a href="http://t.me/botmuakey_bot" target="_blank" class="tele-support-btn" style="padding: 12px 20px;">Mở Bot Telegram Ngay</a>
         </div>
 
-        <!-- 2. TRANG CHỦ SHOP & VÍ TIỀN -->
-        <div id="homeScreen" class="hidden">
-            <div class="user-info-bar">
-                <div class="user-top-row">
-                    <span>👤 <b id="displayName" style="color: #38bdf8;"></b></span>
-                    <button onclick="logout()" style="width: auto; padding: 3px 7px; font-size: 10px; background: #ef4444; color: white; margin: 0;">Đăng xuất</button>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
-                    <span>💰 Số dư ví: <b id="userBalance" style="color: #22c55e;">0 VNĐ</b></span>
-                    <button onclick="openDepositScreen()" style="width: auto; padding: 4px 10px; font-size: 11px; background: #22c55e; color: white; margin: 0;">➕ Nạp Tiền</button>
-                </div>
-            </div>
-
-            <div class="shop-header">
-                <h1>🏴‍☠️ SHOP BLOX FRUITS VIP</h1>
-                <p>Nạp tiền vào tài khoản trước khi mua hàng</p>
-            </div>
-            
-            <div class="product-grid">
-                <div class="product-card">
-                    <div class="product-title">🔥 Acc Max Level + Godhuman + CDK</div>
-                    <div class="product-price">150.000 VNĐ</div>
-                    <div class="product-desc">Trái Leopard vĩnh viễn, trắng thông tin.</div>
-                    <button onclick="buyProduct('Acc Max Level + CDK + Godhuman', 150000)">Mua Ngay</button>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-title">⚡ Acc Max Level + Soul Guitar + Dough Awk</div>
-                    <div class="product-price">100.000 VNĐ</div>
-                    <div class="product-desc">Full thức tỉnh Dough, dư Belly.</div>
-                    <button onclick="buyProduct('Acc Max Level + Dough Awk + Soul Guitar', 100000)">Mua Ngay</button>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-title">⭐ Acc Random Level 1500+ (Hên xui Kitsune)</div>
-                    <div class="product-price">30.000 VNĐ</div>
-                    <div class="product-desc">Tỉ lệ trúng trái xịn cao, trắng thông tin.</div>
-                    <button onclick="buyProduct('Acc Random Level 1500+', 30000)">Mua Ngay</button>
-                </div>
-            </div>
+        <!-- Tab chọn Loại Key của bạn -->
+        <div class="hub-tabs">
+            <button class="tab-btn active" onclick="selectKeyType('Key Tiêu Chuẩn')">Key Tiêu Chuẩn</button>
+            <button class="tab-btn" onclick="selectKeyType('Key VIP')">Key VIP</button>
+            <button class="tab-btn" onclick="selectKeyType('Key Siêu Cấp')">Key Siêu Cấp</button>
         </div>
 
-        <!-- 3. MÀN HÌNH NẠP TIỀN (2 HÌNH THỨC) -->
-        <div id="depositScreen" class="hidden">
-            <h2>Chọn Hình Thức Nạp Tiền</h2>
-
-            <div class="form-group">
-                <label>Hình thức nạp tiền</label>
-                <select id="depositMethod" onchange="changeDepositMethod()">
-                    <option value="card">Thẻ Cào Điện Thoại (Báo Telegram có nút duyệt)</option>
-                    <option value="bank" disabled>Chuyển Khoản Ngân Hàng / Momo (Đang bảo trì ❌)</option>
-                </select>
-            </div>
-
-            <!-- Form nạp Thẻ Cào -->
-            <div id="cardDepositForm">
-                <div class="form-group">
-                    <label>Nhà Mạng</label>
-                    <select id="telco">
-                        <option value="VIETTEL">Viettel</option>
-                        <option value="MOBIFONE">Mobifone</option>
-                        <option value="VINAPHONE">Vinaphone</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Mệnh Giá Thẻ</label>
-                    <select id="amount">
-                        <option value="50000">50.000 VNĐ</option>
-                        <option value="100000">100.000 VNĐ</option>
-                        <option value="150000">150.000 VNĐ</option>
-                        <option value="200000">200.000 VNĐ</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Số Seri</label>
-                    <input type="text" id="serialCard" placeholder="Nhập số seri...">
-                </div>
-                <div class="form-group">
-                    <label>Mã PIN (Mã thẻ)</label>
-                    <input type="text" id="pinCard" placeholder="Nhập mã thẻ cào...">
-                </div>
-                <button onclick="submitCardDeposit()">Gửi Thẻ Chờ Duyệt</button>
-            </div>
-
-            <!-- Form chuyển khoản (Bảo trì) -->
-            <div id="bankDepositForm" class="hidden" style="text-align: center; padding: 20px 0;">
-                <span class="maintenance-badge" style="font-size: 14px; padding: 6px 12px;">HỆ THỐNG ĐANG BẢO TRÌ</span>
-                <p style="font-size: 12px; color: var(--gray); margin-top: 15px;">Cổng chuyển khoản ngân hàng và Momo tạm ngưng hoạt động. Vui lòng sử dụng Thẻ cào để nạp tiền!</p>
-            </div>
-
-            <button onclick="goBackHome()" class="secondary-btn">Quay lại trang chủ</button>
+        <!-- Các gói key đúng mức giá yêu cầu -->
+        <h2 class="section-title" id="currentKeyTitle">Bảng Giá: Key Tiêu Chuẩn</h2>
+        <div class="packages-grid" id="packagesContainer">
+            <!-- Render bằng JS -->
         </div>
 
-        <!-- 4. THÔNG BÁO GỬI THẺ THÀNH CÔNG -->
-        <div id="successScreen" class="hidden" style="text-align: center; padding: 15px 0;">
-            <h2 style="color: #22c55e;">🎉 Gửi Thẻ Thành Công!</h2>
-            <p style="font-size: 12px; color: var(--gray); margin-bottom: 15px;">Thông tin thẻ đã gửi về Telegram kèm nút bấm duyệt.</p>
-            <button onclick="goBackHome()">Về Trang Chủ</button>
+        <!-- Lịch sử Key đã mua -->
+        <h2 class="section-title">Lịch Sử Mua Key Của Bạn</h2>
+        <div class="history-section">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Loại Key</th>
+                        <th>Thời Hạn</th>
+                        <th>Mã Key Của Bạn</th>
+                        <th>Trạng Thái</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #777;">Chưa có giao dịch mua key nào trong phiên này.</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
+    <!-- MODAL HIỂN THỊ KEY -->
+    <div class="modal" id="keyModal">
+        <div class="modal-content">
+            <h3 class="modal-title"><i class="fa-solid fa-circle-check"></i> Mua Key Thành Công!</h3>
+            <p style="font-size: 13px;">Mã bản quyền riêng của bạn:</p>
+            <div class="generated-key-box" id="modalKeyCode">MYKEY-XXXX-YYYY</div>
+            <p style="font-size: 11px; color: #888;">Đã đồng bộ với bot @botmuakey_bot.</p>
+            <button class="close-modal-btn" onclick="closeModal()">Đã Lưu Key</button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        const TELEGRAM_BOT_TOKEN = '8559044160:AAEX7J6RjL8AId51NzQ1Brh0Ez4NlZeKzAk';
-        const TELEGRAM_CHAT_ID = '8976860826';
+        const keyData = {
+            "Key Tiêu Chuẩn": [
+                { duration: "1 Ngày", days: 1, price: 1000, desc: "Sử dụng toàn bộ tính năng cơ bản trong 24 giờ." },
+                { duration: "7 Ngày", days: 7, price: 7000, desc: "Gói tuần tiết kiệm, hoạt động ổn định." },
+                { duration: "30 Ngày", days: 30, price: 30000, desc: "Gói tháng tối ưu chi phí tốt nhất." }
+            ],
+            "Key VIP": [
+                { duration: "1 Ngày", days: 1, price: 1000, desc: "Mở khóa toàn bộ tính năng cao cấp trong 1 ngày." },
+                { duration: "7 Ngày", days: 7, price: 7000, desc: "Đường truyền riêng mượt mà suốt 1 tuần." },
+                { duration: "30 Ngày", days: 30, price: 30000, desc: "Quyền lợi VIP trọn gói 1 tháng không giới hạn." }
+            ],
+            "Key Siêu Cấp": [
+                { duration: "1 Ngày", days: 1, price: 1000, desc: "Hiệu năng tối đa, không giới hạn trong 24h." },
+                { duration: "7 Ngày", days: 7, price: 7000, desc: "Ưu tiên hỗ trợ kỹ thuật trực tiếp qua bot." },
+                { duration: "30 Ngày", days: 30, price: 30000, desc: "Gói cao cấp nhất dành cho khách hàng thân thiết." }
+            ]
+        };
 
-        let currentUser = null;
-        let userBalances = JSON.parse(localStorage.getItem('shop_balances')) || {};
+        let userBalance = 50000;
+        let purchasedKeys = [];
 
-        function handleLogin() {
-            const user = document.getElementById('username').value.trim();
-            const pass = document.getElementById('password').value.trim();
+        function selectKeyType(typeName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if(btn.innerText.includes(typeName)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
 
-            if (!user || !pass) {
-                alert('Vui lòng nhập tài khoản và mật khẩu!');
-                return;
-            }
-
-            currentUser = user;
-            if (userBalances[currentUser] === undefined) {
-                userBalances[currentUser] = 0;
-                localStorage.setItem('shop_balances', JSON.stringify(userBalances));
-            }
-
-            updateUI();
-            document.getElementById('authScreen').classList.add('hidden');
-            document.getElementById('homeScreen').classList.remove('hidden');
-        }
-
-        function updateUI() {
-            document.getElementById('displayName').innerText = currentUser;
-            document.getElementById('userBalance').innerText = userBalances[currentUser].toLocaleString('vi-VN') + ' VNĐ';
-        }
-
-        function logout() {
-            currentUser = null;
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('homeScreen').classList.add('hidden');
-            document.getElementById('authScreen').classList.remove('hidden');
-        }
-
-        function openDepositScreen() {
-            document.getElementById('homeScreen').classList.add('hidden');
-            document.getElementById('depositScreen').classList.remove('hidden');
-        }
-
-        function goBackHome() {
-            document.getElementById('depositScreen').classList.add('hidden');
-            document.getElementById('successScreen').classList.add('hidden');
-            document.getElementById('homeScreen').classList.remove('hidden');
-            updateUI();
-        }
-
-        function changeDepositMethod() {
-            const method = document.getElementById('depositMethod').value;
-            if (method === 'card') {
-                document.getElementById('cardDepositForm').classList.remove('hidden');
-                document.getElementById('bankDepositForm').classList.add('hidden');
-            } else {
-                document.getElementById('cardDepositForm').classList.add('hidden');
-                document.getElementById('bankDepositForm').classList.remove('hidden');
-            }
-        }
-
-        function submitCardDeposit() {
-            const telco = document.getElementById('telco').value;
-            const amount = document.getElementById('amount').value;
-            const serial = document.getElementById('serialCard').value.trim();
-            const pin = document.getElementById('pinCard').value.trim();
-
-            if (!serial || !pin) {
-                alert('Vui lòng nhập đầy đủ Số Seri và Mã PIN!');
-                return;
-            }
-
-            // Dùng văn bản thuần túy tránh lỗi định dạng markdown gây mất chữ B trên Telegram
-            const message = "YÊU CẦU NẠP THẺ CÀO (VÍ TIỀN)\n\n" +
-                            "Tài khoản: " + currentUser + "\n" +
-                            "Nhà mạng: " + telco + " - Mệnh giá: " + Number(amount).toLocaleString('vi-VN') + " VNĐ\n" +
-                            "Số Seri: " + serial + "\n" +
-                            "Mã PIN: " + pin + "\n" +
-                            "Thời gian: " + new Date().toLocaleString('vi-VN');
-
-            const inlineKeyboard = {
-                inline_keyboard: [
-                    [
-                        { text: "✅ Duyệt Thẻ", callback_data: "approve_deposit" },
-                        { text: "❌ Từ Chối", callback_data: "reject_deposit" }
-                    ]
-                ]
-            };
-
-            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-            fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    chat_id: TELEGRAM_CHAT_ID, 
-                    text: message,
-                    reply_markup: inlineKeyboard
-                })
-            }).catch(err => console.log(err));
-
-            document.getElementById('depositScreen').classList.add('hidden');
-            document.getElementById('successScreen').classList.remove('hidden');
+            document.getElementById('currentKeyTitle').innerText = `Bảng Giá: ${typeName}`;
             
-            document.getElementById('serialCard').value = '';
-            document.getElementById('pinCard').value = '';
+            const container = document.getElementById('packagesContainer');
+            let html = '';
+            
+            keyData[typeName].forEach(pkg => {
+                html += `
+                    <div class="package-card">
+                        <div class="package-duration">${pkg.duration}</div>
+                        <div class="package-price">${pkg.price.toLocaleString()}đ</div>
+                        <p class="package-desc">${pkg.desc}</p>
+                        <button class="buy-key-btn" onclick="buyKey('${typeName}', '${pkg.duration}', ${pkg.price})">Mua Ngay</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
         }
 
-        function buyProduct(productName, price) {
-            if (userBalances[currentUser] < price) {
-                alert(`❌ Số dư ví của bạn không đủ (${userBalances[currentUser].toLocaleString('vi-VN')} VNĐ). Vui lòng bấm "Nạp Tiền" để nạp thêm!`);
-                openDepositScreen();
+        function buyKey(typeName, duration, price) {
+            if (userBalance < price) {
+                alert("Số dư tài khoản không đủ! Vui lòng nạp thêm tiền qua Bot Telegram http://t.me/botmuakey_bot.");
                 return;
             }
 
-            if (confirm(`Bạn có chắc chắn muốn mua "${productName}" với giá ${price.toLocaleString('vi-VN')} VNĐ không?`)) {
-                userBalances[currentUser] -= price;
-                localStorage.setItem('shop_balances', JSON.stringify(userBalances));
-                updateUI();
+            userBalance -= price;
+            document.getElementById('balance').innerText = userBalance.toLocaleString() + 'đ';
 
-                alert(`🎉 Mua thành công tài khoản: "${productName}"!\n\nHệ thống đã trừ tiền trong ví. Thông tin tài khoản game đã được giao cho bạn!`);
-            }
+            const randomKey = "MYKEY-" + Math.random().toString(36).substring(2, 6).toUpperCase() + "-" + Math.random().toString(36).substring(2, 6).toUpperCase();
+
+            purchasedKeys.unshift({
+                type: typeName,
+                duration: duration,
+                keyCode: randomKey,
+                status: "Đang Hoạt Động"
+            });
+
+            updateHistoryTable();
+
+            document.getElementById('modalKeyCode').innerText = randomKey;
+            document.getElementById('keyModal').style.display = 'flex';
         }
+
+        function updateHistoryTable() {
+            const tbody = document.getElementById('historyTableBody');
+            if (purchasedKeys.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #777;">Chưa có giao dịch mua key nào trong phiên này.</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            purchasedKeys.forEach(item => {
+                html += `
+                    <tr>
+                        <td><b>${item.type}</b></td>
+                        <td>${item.duration}</td>
+                        <td><span class="key-code">${item.keyCode}</span></td>
+                        <td><span style="color: #66fcf1;">${item.status}</span></td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function closeModal() {
+            document.getElementById('keyModal').style.display = 'none';
+        }
+
+        selectKeyType('Key Tiêu Chuẩn');
     </script>
 </body>
 </html>
