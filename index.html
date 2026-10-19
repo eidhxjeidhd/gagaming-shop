@@ -163,6 +163,34 @@
             border-color: var(--primary-color);
         }
 
+        /* KHU VỰC NHẬP TELEGRAM ID */
+        .input-group {
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(102, 252, 241, 0.2);
+        }
+
+        .input-group label {
+            font-size: 13px;
+            color: var(--text-white);
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 15px;
+            background: #0b0c10;
+            border: 1px solid var(--primary-color);
+            color: #fff;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
         /* PACKAGES GRID */
         .packages-grid {
             display: grid;
@@ -235,7 +263,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             flex-wrap: wrap;
             gap: 20px;
         }
@@ -367,7 +395,7 @@
     <!-- HERO -->
     <section class="hero">
         <h1>MUA KEY CÁ NHÂN <span>TỰ ĐỘNG 24/7</span></h1>
-        <p>Bảng giá chuẩn: 1 Ngày (1k) | 7 Ngày (7k) | 30 Ngày (30k). Nhận key của riêng bạn tức thì!</p>
+        <p>Bảng giá chuẩn: 1 Ngày (1k) | 7 Ngày (7k) | 30 Ngày (30k). Nạp thẻ cào qua bot nhận key tức thì!</p>
     </section>
 
     <!-- MAIN CONTAINER -->
@@ -375,10 +403,16 @@
         <!-- Banner Telegram Bot -->
         <div class="telegram-banner">
             <div class="telegram-info">
-                <h3><i class="fa-brands fa-telegram" style="color: var(--telegram-color);"></i> Kết nối Bot Telegram để nạp tiền tự động</h3>
-                <p>Bot @botmuakey_bot tích hợp token <code>8945467143:AAEGCtbTB9m1G4XUGaHxVc3tHf0VWM-zJeE</code> sẵn sàng xử lý tự động.</p>
+                <h3><i class="fa-brands fa-telegram" style="color: var(--telegram-color);"></i> Kết nối Bot @botmuakey_bot</h3>
+                <p>Nạp tiền qua thẻ cào, mua hàng tự động và nhận thông báo về Admin (ID: <code>8976860826</code>).</p>
             </div>
             <a href="http://t.me/botmuakey_bot" target="_blank" class="tele-support-btn" style="padding: 12px 20px;">Mở Bot Telegram Ngay</a>
+        </div>
+
+        <!-- Ô nhập Telegram ID của khách để nhận Script tự động -->
+        <div class="input-group">
+            <label for="customerTeleId"><i class="fa-brands fa-telegram"></i> Nhập Telegram Chat ID của bạn (Bắt buộc để bot gửi Key & Script tự động):</label>
+            <input type="text" id="customerTeleId" placeholder="Ví dụ: 123456789 (Lấy ID qua bot @userinfobot)">
         </div>
 
         <!-- Tab chọn Loại Key của bạn -->
@@ -421,7 +455,7 @@
             <h3 class="modal-title"><i class="fa-solid fa-circle-check"></i> Mua Key Thành Công!</h3>
             <p style="font-size: 13px;">Mã bản quyền riêng của bạn:</p>
             <div class="generated-key-box" id="modalKeyCode">MYKEY-XXXX-YYYY</div>
-            <p style="font-size: 11px; color: #888;">Đã đồng bộ với bot @botmuakey_bot.</p>
+            <p style="font-size: 11px; color: #888;">Bot đã tự động gửi Key và Link Script vào Telegram của bạn!</p>
             <button class="close-modal-btn" onclick="closeModal()">Đã Lưu Key</button>
         </div>
     </div>
@@ -476,28 +510,54 @@
             container.innerHTML = html;
         }
 
-        function buyKey(typeName, duration, price) {
-            if (userBalance < price) {
-                alert("Số dư tài khoản không đủ! Vui lòng nạp thêm tiền qua Bot Telegram http://t.me/botmuakey_bot.");
+        async function buyKey(typeName, duration, price) {
+            let teleId = document.getElementById('customerTeleId').value;
+            if (!teleId) {
+                alert("Vui lòng nhập Telegram Chat ID của bạn để bot tự động gửi key và script!");
+                document.getElementById('customerTeleId').focus();
                 return;
             }
 
-            userBalance -= price;
-            document.getElementById('balance').innerText = userBalance.toLocaleString() + 'đ';
+            if (userBalance < price) {
+                alert("Số dư tài khoản không đủ! Vui lòng nạp thẻ cào qua bot http://t.me/botmuakey_bot.");
+                return;
+            }
 
-            const randomKey = "MYKEY-" + Math.random().toString(36).substring(2, 6).toUpperCase() + "-" + Math.random().toString(36).substring(2, 6).toUpperCase();
+            try {
+                // Gọi API Flask backend để xử lý đồng bộ hóa với Telegram Bot
+                let response = await fetch('/api/buy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: typeName,
+                        duration: duration,
+                        price: price,
+                        telegram_id: teleId
+                    })
+                });
 
-            purchasedKeys.unshift({
-                type: typeName,
-                duration: duration,
-                keyCode: randomKey,
-                status: "Đang Hoạt Động"
-            });
+                let result = await response.json();
 
-            updateHistoryTable();
+                if (result.success) {
+                    userBalance -= price;
+                    document.getElementById('balance').innerText = userBalance.toLocaleString() + 'đ';
 
-            document.getElementById('modalKeyCode').innerText = randomKey;
-            document.getElementById('keyModal').style.display = 'flex';
+                    purchasedKeys.unshift({
+                        type: typeName,
+                        duration: duration,
+                        keyCode: result.key,
+                        status: "Đang Hoạt Động"
+                    });
+
+                    updateHistoryTable();
+
+                    document.getElementById('modalKeyCode').innerText = result.key;
+                    document.getElementById('keyModal').style.display = 'flex';
+                }
+            } catch (error) {
+                alert("Lỗi kết nối đến máy chủ thanh toán!");
+                console.error(error);
+            }
         }
 
         function updateHistoryTable() {
