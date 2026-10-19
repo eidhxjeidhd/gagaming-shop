@@ -163,34 +163,6 @@
             border-color: var(--primary-color);
         }
 
-        /* KHU VỰC NHẬP TELEGRAM ID */
-        .input-group {
-            background: var(--card-bg);
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(102, 252, 241, 0.2);
-        }
-
-        .input-group label {
-            font-size: 13px;
-            color: var(--text-white);
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 10px 15px;
-            background: #0b0c10;
-            border: 1px solid var(--primary-color);
-            color: #fff;
-            border-radius: 6px;
-            font-size: 14px;
-            outline: none;
-        }
-
         /* PACKAGES GRID */
         .packages-grid {
             display: grid;
@@ -247,6 +219,8 @@
             font-weight: 700;
             cursor: pointer;
             transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .buy-key-btn:hover {
@@ -263,7 +237,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             flex-wrap: wrap;
             gap: 20px;
         }
@@ -277,92 +251,6 @@
         .telegram-info p {
             font-size: 13px;
             color: var(--text-color);
-        }
-
-        /* LỊCH SỬ */
-        .history-section {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 13px;
-        }
-
-        .history-table th, .history-table td {
-            padding: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .history-table th {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--primary-color);
-        }
-
-        .key-code {
-            background: #0b0c10;
-            padding: 4px 8px;
-            border-radius: 4px;
-            color: #66fcf1;
-            font-family: monospace;
-            user-select: all;
-        }
-
-        /* MODAL */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            width: 400px;
-            padding: 25px;
-            border-radius: 10px;
-            border: 1px solid var(--primary-color);
-            text-align: center;
-        }
-
-        .modal-title {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-
-        .generated-key-box {
-            background: #0b0c10;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 15px;
-            color: #fff;
-            font-family: monospace;
-            margin: 15px 0;
-            border: 1px dashed var(--primary-color);
-        }
-
-        .close-modal-btn {
-            background: var(--primary-color);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: 700;
-            cursor: pointer;
-            color: #000;
-            margin-top: 10px;
         }
 
         footer {
@@ -382,11 +270,8 @@
         <div class="nav-container">
             <div class="logo"><i class="fa-solid fa-key"></i> MY PRIVATE KEY STORE</div>
             <div class="nav-right">
-                <div class="user-balance">
-                    <i class="fa-solid fa-wallet"></i> Số dư: <span id="balance">50,000đ</span>
-                </div>
                 <a href="http://t.me/botmuakey_bot" target="_blank" class="tele-support-btn">
-                    <i class="fa-brands fa-telegram"></i> Bot Telegram
+                    <i class="fa-brands fa-telegram"></i> Mở Bot Telegram
                 </a>
             </div>
         </div>
@@ -395,7 +280,7 @@
     <!-- HERO -->
     <section class="hero">
         <h1>MUA KEY CÁ NHÂN <span>TỰ ĐỘNG 24/7</span></h1>
-        <p>Bảng giá chuẩn: 1 Ngày (1k) | 7 Ngày (7k) | 30 Ngày (30k). Nạp thẻ cào qua bot nhận key tức thì!</p>
+        <p>Bảng giá chuẩn: 1 Ngày (1k) | 7 Ngày (7k) | 30 Ngày (30k). Nạp thẻ cào & nhận key tức thì qua bot!</p>
     </section>
 
     <!-- MAIN CONTAINER -->
@@ -403,16 +288,10 @@
         <!-- Banner Telegram Bot -->
         <div class="telegram-banner">
             <div class="telegram-info">
-                <h3><i class="fa-brands fa-telegram" style="color: var(--telegram-color);"></i> Kết nối Bot @botmuakey_bot</h3>
-                <p>Nạp tiền qua thẻ cào, mua hàng tự động và nhận thông báo về Admin (ID: <code>8976860826</code>).</p>
+                <h3><i class="fa-brands fa-telegram" style="color: var(--telegram-color);"></i> Hệ Thống Giao Dịch Tự Động Qua Bot</h3>
+                <p>Bấm vào nút bên cạnh để vào bot @botmuakey_bot nạp thẻ cào, mua key và nhận script tự động.</p>
             </div>
-            <a href="http://t.me/botmuakey_bot" target="_blank" class="tele-support-btn" style="padding: 12px 20px;">Mở Bot Telegram Ngay</a>
-        </div>
-
-        <!-- Ô nhập Telegram ID của khách để nhận Script tự động -->
-        <div class="input-group">
-            <label for="customerTeleId"><i class="fa-brands fa-telegram"></i> Nhập Telegram Chat ID của bạn (Bắt buộc để bot gửi Key & Script tự động):</label>
-            <input type="text" id="customerTeleId" placeholder="Ví dụ: 123456789 (Lấy ID qua bot @userinfobot)">
+            <a href="http://t.me/botmuakey_bot" target="_blank" class="tele-support-btn" style="padding: 12px 20px;">Vào Bot Telegram Ngay</a>
         </div>
 
         <!-- Tab chọn Loại Key của bạn -->
@@ -427,61 +306,31 @@
         <div class="packages-grid" id="packagesContainer">
             <!-- Render bằng JS -->
         </div>
-
-        <!-- Lịch sử Key đã mua -->
-        <h2 class="section-title">Lịch Sử Mua Key Của Bạn</h2>
-        <div class="history-section">
-            <table class="history-table">
-                <thead>
-                    <tr>
-                        <th>Loại Key</th>
-                        <th>Thời Hạn</th>
-                        <th>Mã Key Của Bạn</th>
-                        <th>Trạng Thái</th>
-                    </tr>
-                </thead>
-                <tbody id="historyTableBody">
-                    <tr>
-                        <td colspan="4" style="text-align: center; color: #777;">Chưa có giao dịch mua key nào trong phiên này.</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
     </div>
 
-    <!-- MODAL HIỂN THỊ KEY -->
-    <div class="modal" id="keyModal">
-        <div class="modal-content">
-            <h3 class="modal-title"><i class="fa-solid fa-circle-check"></i> Mua Key Thành Công!</h3>
-            <p style="font-size: 13px;">Mã bản quyền riêng của bạn:</p>
-            <div class="generated-key-box" id="modalKeyCode">MYKEY-XXXX-YYYY</div>
-            <p style="font-size: 11px; color: #888;">Bot đã tự động gửi Key và Link Script vào Telegram của bạn!</p>
-            <button class="close-modal-btn" onclick="closeModal()">Đã Lưu Key</button>
-        </div>
-    </div>
+    <footer>
+        <p>© 2026 My Private Key Store. Tích hợp trực tiếp với Bot Telegram @botmuakey_bot.</p>
+    </footer>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
         const keyData = {
             "Key Tiêu Chuẩn": [
-                { duration: "1 Ngày", days: 1, price: 1000, desc: "Sử dụng toàn bộ tính năng cơ bản trong 24 giờ." },
-                { duration: "7 Ngày", days: 7, price: 7000, desc: "Gói tuần tiết kiệm, hoạt động ổn định." },
-                { duration: "30 Ngày", days: 30, price: 30000, desc: "Gói tháng tối ưu chi phí tốt nhất." }
+                { duration: "1 Ngày", price: "1.000đ", desc: "Sử dụng toàn bộ tính năng cơ bản trong 24 giờ." },
+                { duration: "7 Ngày", price: "7.000đ", desc: "Gói tuần tiết kiệm, hoạt động ổn định." },
+                { duration: "30 Ngày", price: "30.000đ", desc: "Gói tháng tối ưu chi phí tốt nhất." }
             ],
             "Key VIP": [
-                { duration: "1 Ngày", days: 1, price: 1000, desc: "Mở khóa toàn bộ tính năng cao cấp trong 1 ngày." },
-                { duration: "7 Ngày", days: 7, price: 7000, desc: "Đường truyền riêng mượt mà suốt 1 tuần." },
-                { duration: "30 Ngày", days: 30, price: 30000, desc: "Quyền lợi VIP trọn gói 1 tháng không giới hạn." }
+                { duration: "1 Ngày", price: "1.000đ", desc: "Mở khóa toàn bộ tính năng cao cấp trong 1 ngày." },
+                { duration: "7 Ngày", price: "7.000đ", desc: "Đường truyền riêng mượt mà suốt 1 tuần." },
+                { duration: "30 Ngày", price: "30.000đ", desc: "Quyền lợi VIP trọn gói 1 tháng không giới hạn." }
             ],
             "Key Siêu Cấp": [
-                { duration: "1 Ngày", days: 1, price: 1000, desc: "Hiệu năng tối đa, không giới hạn trong 24h." },
-                { duration: "7 Ngày", days: 7, price: 7000, desc: "Ưu tiên hỗ trợ kỹ thuật trực tiếp qua bot." },
-                { duration: "30 Ngày", days: 30, price: 30000, desc: "Gói cao cấp nhất dành cho khách hàng thân thiết." }
+                { duration: "1 Ngày", price: "1.000đ", desc: "Hiệu năng tối đa, không giới hạn trong 24h." },
+                { duration: "7 Ngày", price: "7.000đ", desc: "Ưu tiên hỗ trợ kỹ thuật trực tiếp qua bot." },
+                { duration: "30 Ngày", price: "30.000đ", desc: "Gói cao cấp nhất dành cho khách hàng thân thiết." }
             ]
         };
-
-        let userBalance = 50000;
-        let purchasedKeys = [];
 
         function selectKeyType(typeName) {
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -501,88 +350,13 @@
                 html += `
                     <div class="package-card">
                         <div class="package-duration">${pkg.duration}</div>
-                        <div class="package-price">${pkg.price.toLocaleString()}đ</div>
+                        <div class="package-price">${pkg.price}</div>
                         <p class="package-desc">${pkg.desc}</p>
-                        <button class="buy-key-btn" onclick="buyKey('${typeName}', '${pkg.duration}', ${pkg.price})">Mua Ngay</button>
+                        <a href="http://t.me/botmuakey_bot" target="_blank" class="buy-key-btn">Mua Qua Bot</a>
                     </div>
                 `;
             });
             container.innerHTML = html;
-        }
-
-        async function buyKey(typeName, duration, price) {
-            let teleId = document.getElementById('customerTeleId').value;
-            if (!teleId) {
-                alert("Vui lòng nhập Telegram Chat ID của bạn để bot tự động gửi key và script!");
-                document.getElementById('customerTeleId').focus();
-                return;
-            }
-
-            if (userBalance < price) {
-                alert("Số dư tài khoản không đủ! Vui lòng nạp thẻ cào qua bot http://t.me/botmuakey_bot.");
-                return;
-            }
-
-            try {
-                // Gọi API Flask backend để xử lý đồng bộ hóa với Telegram Bot
-                let response = await fetch('/api/buy', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        type: typeName,
-                        duration: duration,
-                        price: price,
-                        telegram_id: teleId
-                    })
-                });
-
-                let result = await response.json();
-
-                if (result.success) {
-                    userBalance -= price;
-                    document.getElementById('balance').innerText = userBalance.toLocaleString() + 'đ';
-
-                    purchasedKeys.unshift({
-                        type: typeName,
-                        duration: duration,
-                        keyCode: result.key,
-                        status: "Đang Hoạt Động"
-                    });
-
-                    updateHistoryTable();
-
-                    document.getElementById('modalKeyCode').innerText = result.key;
-                    document.getElementById('keyModal').style.display = 'flex';
-                }
-            } catch (error) {
-                alert("Lỗi kết nối đến máy chủ thanh toán!");
-                console.error(error);
-            }
-        }
-
-        function updateHistoryTable() {
-            const tbody = document.getElementById('historyTableBody');
-            if (purchasedKeys.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #777;">Chưa có giao dịch mua key nào trong phiên này.</td></tr>`;
-                return;
-            }
-
-            let html = '';
-            purchasedKeys.forEach(item => {
-                html += `
-                    <tr>
-                        <td><b>${item.type}</b></td>
-                        <td>${item.duration}</td>
-                        <td><span class="key-code">${item.keyCode}</span></td>
-                        <td><span style="color: #66fcf1;">${item.status}</span></td>
-                    </tr>
-                `;
-            });
-            tbody.innerHTML = html;
-        }
-
-        function closeModal() {
-            document.getElementById('keyModal').style.display = 'none';
         }
 
         selectKeyType('Key Tiêu Chuẩn');
