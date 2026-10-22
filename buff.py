@@ -6,7 +6,7 @@ app.secret_key = 'shop_blox_fruit_full_pro_v22'
 # Cơ sở dữ liệu giả lập trong bộ nhớ
 users = {
     'admin': {
-        'password': '123',
+        'password': '080439',
         'role': 'admin',
         'balance': 500000,
         'total_deposited': 0,
