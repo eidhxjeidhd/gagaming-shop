@@ -1,12 +1,12 @@
-from flask import Flask, flash, redirect, render_template_string, request, session, url_for
+from flask import Flask, flash, jsonify, redirect, render_template_string, request, session, url_for
 
 app = Flask(__name__)
-app.secret_key = 'shop_blox_fruit_full_pro_v22'
+app.secret_key = 'shop_blox_fruit_smart_v24'
 
 # Cơ sở dữ liệu giả lập trong bộ nhớ
 users = {
     'admin': {
-        'password': '080439',
+        'password': '123',
         'role': 'admin',
         'balance': 500000,
         'total_deposited': 0,
@@ -48,7 +48,7 @@ BASE_HTML = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop Blox Fruits - Tự Động & Uy Tín</title>
+    <title>Shop Blox Fruits - Tự Động Thông Minh</title>
     <style>
         body { background-color: #121212; color: #fff; font-family: Arial, sans-serif; margin: 0; padding: 0; }
         header { background: #1e1e1e; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; flex-wrap: wrap; gap: 10px; }
@@ -62,9 +62,6 @@ BASE_HTML = """
         input, select { width: 100%; padding: 10px; margin: 8px 0; background: #2c2c2c; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box; }
         .alert { background: #ff4757; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; font-weight: bold; }
         .success-box { background: #1b2a1e; border: 1px solid #2ed573; padding: 15px; border-radius: 5px; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #444; padding: 10px; text-align: center; font-size: 14px; }
-        th { background: #222; }
         .top-user-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #333; font-size: 14px; }
         .chat-box { background: #1e1e1e; border: 1px solid #444; border-radius: 8px; padding: 10px; max-height: 180px; overflow-y: auto; margin-bottom: 10px; }
         .chat-msg { margin-bottom: 8px; font-size: 13px; }
@@ -74,7 +71,7 @@ BASE_HTML = """
 </head>
 <body>
     <header>
-        <a href="/" class="logo">🔥 SHOP BLOX FRUIT</a>
+        <a href="/" class="logo">⚡ SHOP BLOX FRUIT SMART</a>
         <div class="nav-buttons">
             {% if 'username' in session %}
                 <span>Số dư: <b style="color: #2ed573;">{{ "{:,.0f}".format(users[session['username']]['balance']) }}đ</b></span>
@@ -187,47 +184,41 @@ def index():
 
   nap_html = ''
   if 'username' in session and session['role'] != 'admin':
-    nap_html = """
-        <div class="card" style="border: 2px solid #ffa502;">
-            <h3 style="color: #ffa502; margin-top:0;">💳 NẠP TIỀN TỰ ĐỘNG (THẺ CÀO & QR CHUYỂN KHOẢN)</h3>
+    # Tạo nội dung cú pháp chuyển khoản thông minh riêng cho user đang đăng nhập
+    curr_username = session['username']
+    suggest_note = f'NAP {curr_username.upper()}'
+    nap_html = f"""
+        <div class="card" style="border: 2px solid #2ed573;">
+            <h3 style="color: #2ed573; margin-top:0;">⚡ NẠP TIỀN TỰ ĐỘNG 100% QUA QR</h3>
             
-            <form action="/nap-the" method="POST" style="margin-bottom: 20px; border-bottom: 1px dashed #444; padding-bottom: 15px;">
-                <h4 style="color: #ffa502; margin: 0 0 8px 0;">1. Nạp Thẻ Cào Tự Động</h4>
-                <label>Chọn nhà mạng:</label>
+            <div style="background: #111; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+                <p style="margin: 0 0 5px 0; color: #ffa502; font-weight: bold;">📝 Hướng dẫn nạp siêu tốc:</p>
+                <p style="margin: 0; font-size: 13px; color: #ddd;">Quét mã QR bên dưới và giữ nguyên nội dung chuyển khoản: <b style="color: #2ed573; font-size: 15px;">{suggest_note}</b>. Hệ thống sẽ tự động cộng tiền vào tài khoản của bạn sau 3 giây!</p>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 10px;">
+                <img src="https://i.ibb.co/0pvhCGz1/zlp-1792493518267.jpg" alt="QR Code" style="max-width: 180px; border-radius: 8px; border: 2px solid #fff;">
+                <p style="font-size: 12px; color: #aaa; margin: 5px 0;">Chủ TK: NGUYEN VAN DUONG</p>
+            </div>
+
+            <form action="/nap-the" method="POST" style="margin-top: 20px; border-top: 1px dashed #444; padding-top: 15px;">
+                <h4 style="color: #ffa502; margin: 0 0 8px 0;">Hoặc Nạp Thẻ Cào Thủ Công</h4>
+                <label>Nhà mạng:</label>
                 <select name="telco">
                     <option value="Viettel">Viettel</option>
                     <option value="Mobifone">Mobifone</option>
                     <option value="Vinaphone">Vinaphone</option>
-                    <option value="Vietnamobile">Vietnamobile</option>
-                    <option value="ZaloPay">ZaloPay</option>
-                    <option value="Gate">Gate</option>
-                    <option value="Vcoin">Vcoin</option>
                 </select>
-                <label>Chọn mệnh giá:</label>
+                <label>Mệnh giá:</label>
                 <select name="amount">
                     <option value="10000">10.000 đ</option>
                     <option value="20000">20.000 đ</option>
                     <option value="50000">50.000 đ</option>
                     <option value="100000">100.000 đ</option>
-                    <option value="200000">200.000 đ</option>
-                    <option value="300000">300.000 đ</option>
-                    <option value="500000">500.000 đ</option>
-                    <option value="1000000">1.000.000 đ</option>
                 </select>
                 <input type="text" name="code" placeholder="Mã thẻ cào" required>
                 <input type="text" name="serial" placeholder="Số Serial" required>
-                <button type="submit" class="btn" style="background: #ffa502; margin-top: 10px;">NẠP THẺ NGAY</button>
-            </form>
-
-            <form action="/nap-qr" method="POST">
-                <h4 style="color: #2ed573; margin: 0 0 8px 0;">2. Chuyển Khoản Ngân Hàng / Ví (Chủ TK: NGUYEN VAN DUONG)</h4>
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <img src="https://i.ibb.co/0pvhCGz1/zlp-1792493518267.jpg" alt="QR Code" style="max-width: 180px; border-radius: 8px; border: 2px solid #fff;">
-                    <p style="font-size: 12px; color: #aaa; margin: 5px 0;">Quét mã QR trên để chuyển khoản, sau đó điền thông tin bên dưới.</p>
-                </div>
-                <input type="number" name="amount" placeholder="Nhập số tiền đã chuyển (VNĐ)" required>
-                <input type="text" name="note" placeholder="Nội dung chuyển khoản hoặc Mã giao dịch" required>
-                <button type="submit" class="btn" style="background: #2ed573; margin-top: 10px;">TÔI ĐÃ CHUYỂN KHOẢN</button>
+                <button type="submit" class="btn" style="background: #ffa502; margin-top: 10px;">GỬI THẺ CHỜ DUYỆT</button>
             </form>
         </div>
         """
@@ -316,6 +307,40 @@ def logout():
   return redirect(url_for('index'))
 
 
+# API WEBHOOK TỰ ĐỘNG NHẬN BIẾN ĐỘNG SỐ DƯ NGÂN HÀNG (SEPAY / CASSO)
+@app.route('/webhook/bank', methods=['POST'])
+def bank_webhook():
+  data = request.json or request.form
+  # Lấy nội dung chuyển khoản và số tiền từ ngân hàng gửi về
+  content = str(
+      data.get('content', data.get('description', ''))
+  ).upper()
+  try:
+    amount = int(float(data.get('transferAmount', data.get('amount', 0))))
+  except:
+    amount = 0
+
+  if amount > 0:
+    # Quét xem trong nội dung chuyển khoản có chứa tên tài khoản nào không (Ví dụ: NAP USERNAME)
+    for uname in users:
+      if uname.upper() in content:
+        users[uname]['balance'] += amount
+        users[uname]['total_deposited'] = (
+            users[uname].get('total_deposited', 0) + amount
+        )
+        cards_queue.append({
+            'id': len(cards_queue) + 1,
+            'user': uname,
+            'type': 'Tự động QR Ngân hàng',
+            'info': f'Nội dung: {content}',
+            'amount': amount,
+            'status': 'Đã tự động cộng',
+        })
+        return jsonify({'success': True, 'message': f'Đã cộng {amount} cho {uname}'})
+
+  return jsonify({'success': False, 'message': 'Không khớp tài khoản'})
+
+
 @app.route('/nap-the', methods=['POST'])
 def nap_the():
   if 'username' not in session:
@@ -332,22 +357,6 @@ def nap_the():
       'status': 'Đang chờ duyệt',
   })
   flash('Gửi thẻ thành công! Vui lòng đợi Admin duyệt.')
-  return redirect(url_for('index'))
-
-
-@app.route('/nap-qr', methods=['POST'])
-def nap_qr():
-  if 'username' not in session:
-    return redirect(url_for('login'))
-  cards_queue.append({
-      'id': len(cards_queue) + 1,
-      'user': session['username'],
-      'type': 'Chuyển khoản QR',
-      'info': f"Nội dung/GD: {request.form['note']}",
-      'amount': int(request.form['amount']),
-      'status': 'Đang chờ duyệt',
-  })
-  flash('Gửi yêu cầu chuyển khoản QR thành công! Vui lòng chờ Admin duyệt.')
   return redirect(url_for('index'))
 
 
@@ -422,6 +431,43 @@ def send_message():
     )
     flash('Đã gửi tin nhắn cho Admin thành công!')
   return redirect(url_for('index'))
+
+
+@app.route('/duyet-nap/<int:card_id>', methods=['POST'])
+def duyet_nap(card_id):
+  if 'username' not in session or session.get('role') != 'admin':
+    return redirect(url_for('index'))
+
+  card = next((item for item in cards_queue if item['id'] == card_id), None)
+  if card and card['status'] == 'Đang chờ duyệt':
+    card['status'] = 'Đã duyệt'
+    target_user = card['user']
+    amount = card['amount']
+    if target_user in users:
+      users[target_user]['balance'] += amount
+      users[target_user]['total_deposited'] = (
+          users[target_user].get('total_deposited', 0) + amount
+      )
+      flash(f'Đã duyệt và cộng {amount:,}đ cho tài khoản "{target_user}"!')
+    else:
+      flash('Không tìm thấy tài khoản người dùng!')
+  else:
+    flash('Yêu cầu không tồn tại hoặc đã được xử lý trước đó!')
+  return redirect(url_for('admin'))
+
+
+@app.route('/tu-choi-nap/<int:card_id>', methods=['POST'])
+def tu_choi_nap(card_id):
+  if 'username' not in session or session.get('role') != 'admin':
+    return redirect(url_for('index'))
+
+  card = next((item for item in cards_queue if item['id'] == card_id), None)
+  if card and card['status'] == 'Đang chờ duyệt':
+    card['status'] = 'Đã từ chối'
+    flash(f'Đã từ chối yêu cầu nạp tiền của "{card["user"]}"!')
+  else:
+    flash('Yêu cầu không tồn tại hoặc đã được xử lý trước đó!')
+  return redirect(url_for('admin'))
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -504,9 +550,25 @@ def admin():
 
   cards_html = ''
   if not cards_queue:
-    cards_html = '<p>Không có yêu cầu nạp tiền nào đang chờ.</p>'
+    cards_html = '<p>Không có lịch sử nạp tiền nào.</p>'
   else:
     for c in cards_queue:
+      action_buttons = ''
+      if c['status'] == 'Đang chờ duyệt':
+        action_buttons = (
+            '<div style="display: flex; gap: 8px; margin-top: 10px;">'
+            '<form action="/duyet-nap/'
+            + str(c['id'])
+            + '" method="POST" style="flex: 1;"><button type="submit"'
+            ' class="btn" style="background: #2ed573; padding: 6px;'
+            ' font-size: 13px; width: 100%;">✅ DUYỆT</button></form>'
+            '<form action="/tu-choi-nap/'
+            + str(c['id'])
+            + '" method="POST" style="flex: 1;"><button type="submit"'
+            ' class="btn" style="background: #ff4757; padding: 6px;'
+            ' font-size: 13px; width: 100%;">❌ TỪ CHỐI</button></form>'
+            '</div>'
+        )
       cards_html += (
           '<div class="card"><p><b>User:</b> '
           + c['user']
@@ -516,13 +578,15 @@ def admin():
           + f"{c['amount']:,}"
           + 'đ</span></p><p><b>Thông tin:</b> '
           + c['info']
-          + '</p><p><b>Trạng thái:</b> '
+          + '</p><p><b>Trạng thái:</b> <span style="color: #2ed573;">'
           + c['status']
-          + '</p></div>'
+          + '</span></p>'
+          + action_buttons
+          + '</div>'
       )
 
   admin_content = (
-      '<h2>⚙️ TRANG QUẢN TRỊ ADMIN</h2>'
+      '<h2>⚙️ TRANG QUẢN TRỊ ADMIN (SMART SYSTEM)</h2>'
       '<div class="card"><h3 style="color: #ff4757;">📦 Thêm / Cập nhật Sản phẩm'
       ' Acc</h3><form method="POST"><input type="text" name="name"'
       ' placeholder="Tên danh mục / sản phẩm..." required><input type="number"'
@@ -541,8 +605,8 @@ def admin():
       ' trợ Khách hàng</h3>'
       + (chat_admin_html if chat_admin_html else '<p>Chưa có tin nhắn nào.</p>')
       + '</div>'
-      '<div class="card"><h3 style="color: #2ed573;">📋 Duyệt nạp thẻ / Chuyển'
-      ' khoản</h3>'
+      '<div class="card"><h3 style="color: #2ed573;">📋 Lịch sử / Duyệt nạp'
+      ' tiền</h3>'
       + cards_html
       + '</div>'
   )
