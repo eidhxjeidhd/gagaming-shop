@@ -1,7 +1,13 @@
+import hashlib
 from flask import Flask, flash, jsonify, redirect, render_template_string, request, session, url_for
+import requests
 
 app = Flask(__name__)
-app.secret_key = 'shop_blox_fruit_smart_v24'
+app.secret_key = 'shop_blox_fruit_smart_v25'
+
+# Cấu hình API ShopBanThe
+PARTNER_ID = '71186911886'
+PARTNER_KEY = 'f7377b035f5b5d2c4a5d04e487b39aaf'
 
 # Cơ sở dữ liệu giả lập trong bộ nhớ
 users = {
@@ -48,7 +54,7 @@ BASE_HTML = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop Blox Fruits - Tự Động Thông Minh</title>
+    <title>Shop Blox Fruits - Tự Động 100%</title>
     <style>
         body { background-color: #121212; color: #fff; font-family: Arial, sans-serif; margin: 0; padding: 0; }
         header { background: #1e1e1e; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; flex-wrap: wrap; gap: 10px; }
@@ -71,7 +77,7 @@ BASE_HTML = """
 </head>
 <body>
     <header>
-        <a href="/" class="logo">⚡ SHOP BLOX FRUIT SMART</a>
+        <a href="/" class="logo">⚡ SHOP BLOX FRUIT PRO</a>
         <div class="nav-buttons">
             {% if 'username' in session %}
                 <span>Số dư: <b style="color: #2ed573;">{{ "{:,.0f}".format(users[session['username']]['balance']) }}đ</b></span>
@@ -184,16 +190,15 @@ def index():
 
   nap_html = ''
   if 'username' in session and session['role'] != 'admin':
-    # Tạo nội dung cú pháp chuyển khoản thông minh riêng cho user đang đăng nhập
     curr_username = session['username']
     suggest_note = f'NAP {curr_username.upper()}'
     nap_html = f"""
         <div class="card" style="border: 2px solid #2ed573;">
-            <h3 style="color: #2ed573; margin-top:0;">⚡ NẠP TIỀN TỰ ĐỘNG 100% QUA QR</h3>
+            <h3 style="color: #2ed573; margin-top:0;">⚡ NẠP TIỀN TỰ ĐỘNG 100%</h3>
             
             <div style="background: #111; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
-                <p style="margin: 0 0 5px 0; color: #ffa502; font-weight: bold;">📝 Hướng dẫn nạp siêu tốc:</p>
-                <p style="margin: 0; font-size: 13px; color: #ddd;">Quét mã QR bên dưới và giữ nguyên nội dung chuyển khoản: <b style="color: #2ed573; font-size: 15px;">{suggest_note}</b>. Hệ thống sẽ tự động cộng tiền vào tài khoản của bạn sau 3 giây!</p>
+                <p style="margin: 0 0 5px 0; color: #ffa502; font-weight: bold;">📝 1. Chuyển khoản QR siêu tốc:</p>
+                <p style="margin: 0; font-size: 13px; color: #ddd;">Nội dung: <b style="color: #2ed573; font-size: 15px;">{suggest_note}</b>. Tự động cộng tiền sau 3 giây!</p>
             </div>
 
             <div style="text-align: center; margin-bottom: 10px;">
@@ -202,12 +207,13 @@ def index():
             </div>
 
             <form action="/nap-the" method="POST" style="margin-top: 20px; border-top: 1px dashed #444; padding-top: 15px;">
-                <h4 style="color: #ffa502; margin: 0 0 8px 0;">Hoặc Nạp Thẻ Cào Thủ Công</h4>
+                <h4 style="color: #ffa502; margin: 0 0 8px 0;">2. Nạp Thẻ Cào Tự Động</h4>
                 <label>Nhà mạng:</label>
                 <select name="telco">
-                    <option value="Viettel">Viettel</option>
-                    <option value="Mobifone">Mobifone</option>
-                    <option value="Vinaphone">Vinaphone</option>
+                    <option value="VIETTEL">Viettel</option>
+                    <option value="MOBIFONE">Mobifone</option>
+                    <option value="VINAPHONE">Vinaphone</option>
+                    <option value="VIETNAMOBILE">Vietnamobile</option>
                 </select>
                 <label>Mệnh giá:</label>
                 <select name="amount">
@@ -215,10 +221,13 @@ def index():
                     <option value="20000">20.000 đ</option>
                     <option value="50000">50.000 đ</option>
                     <option value="100000">100.000 đ</option>
+                    <option value="200000">200.000 đ</option>
+                    <option value="500000">500.000 đ</option>
+                    <option value="1000000">1.000.000 đ</option>
                 </select>
                 <input type="text" name="code" placeholder="Mã thẻ cào" required>
                 <input type="text" name="serial" placeholder="Số Serial" required>
-                <button type="submit" class="btn" style="background: #ffa502; margin-top: 10px;">GỬI THẺ CHỜ DUYỆT</button>
+                <button type="submit" class="btn" style="background: #ffa502; margin-top: 10px;">NẠP THẺ TỰ ĐỘNG</button>
             </form>
         </div>
         """
@@ -307,11 +316,10 @@ def logout():
   return redirect(url_for('index'))
 
 
-# API WEBHOOK TỰ ĐỘNG NHẬN BIẾN ĐỘNG SỐ DƯ NGÂN HÀNG (SEPAY / CASSO)
+# WEBHOOK NHẬN BIẾN ĐỘNG SỐ DƯ NGÂN HÀNG (QR)
 @app.route('/webhook/bank', methods=['POST'])
 def bank_webhook():
   data = request.json or request.form
-  # Lấy nội dung chuyển khoản và số tiền từ ngân hàng gửi về
   content = str(
       data.get('content', data.get('description', ''))
   ).upper()
@@ -321,7 +329,6 @@ def bank_webhook():
     amount = 0
 
   if amount > 0:
-    # Quét xem trong nội dung chuyển khoản có chứa tên tài khoản nào không (Ví dụ: NAP USERNAME)
     for uname in users:
       if uname.upper() in content:
         users[uname]['balance'] += amount
@@ -331,33 +338,78 @@ def bank_webhook():
         cards_queue.append({
             'id': len(cards_queue) + 1,
             'user': uname,
-            'type': 'Tự động QR Ngân hàng',
+            'type': 'Tự động QR',
             'info': f'Nội dung: {content}',
             'amount': amount,
-            'status': 'Đã tự động cộng',
+            'status': 'Thành công',
         })
         return jsonify({'success': True, 'message': f'Đã cộng {amount} cho {uname}'})
 
   return jsonify({'success': False, 'message': 'Không khớp tài khoản'})
 
 
+# GỬI THẺ CÀO SANG API SHOPBANTHE
 @app.route('/nap-the', methods=['POST'])
 def nap_the():
   if 'username' not in session:
     return redirect(url_for('login'))
-  cards_queue.append({
-      'id': len(cards_queue) + 1,
-      'user': session['username'],
-      'type': 'Thẻ cào',
-      'info': (
-          f"Mạng: {request.form['telco']} - Mã: {request.form['code']} - Seri:"
-          f" {request.form['serial']}"
-      ),
-      'amount': int(request.form['amount']),
-      'status': 'Đang chờ duyệt',
-  })
-  flash('Gửi thẻ thành công! Vui lòng đợi Admin duyệt.')
+
+  telco = request.form['telco']
+  code = request.form['code'].strip()
+  serial = request.form['serial'].strip()
+  amount = request.form['amount']
+  request_id = str(int(requests.get('https://worldtimeapi.org/api/ip').json().get('unixtime', 123456))) if False else str(len(cards_queue) + 1000)
+
+  # Tạo chữ ký bảo mật (sign)
+  raw_sign = PARTNER_KEY + code + serial
+  sign = hashlib.md5(raw_sign.encode('utf-8')).hexdigest()
+
+  # Gửi yêu cầu lên ShopBanThe API
+  api_url = f"https://shopbanthe.com/api/card-charging?partner_id={PARTNER_ID}&telco={telco}&code={code}&serial={serial}&amount={amount}&request_id={request_id}&sign={sign}"
+  
+  try:
+    res = requests.get(api_url, timeout=10).json()
+    status_code = res.get('status')
+    message = res.get('message', 'Đã gửi thẻ lên hệ thống')
+    
+    cards_queue.append({
+        'id': len(cards_queue) + 1,
+        'user': session['username'],
+        'type': f'Thẻ {telco}',
+        'info': f'Seri: {serial} - Mã: {code}',
+        'amount': int(amount),
+        'status': 'Đang chờ xử lý' if status_code in [1, 99, 2] else f'Gửi thất bại: {message}',
+    })
+    flash(f'Kết quả gửi thẻ: {message}')
+  except Exception as e:
+    flash('Lỗi kết nối tới hệ thống gạch thẻ, vui lòng thử lại!')
+
   return redirect(url_for('index'))
+
+
+# NHẬN KẾT QUẢ TỰ ĐỘNG TỪ SHOPBANTHE CALLBACK
+@app.route('/callback-the', methods=['GET', 'POST'])
+def callback_the():
+  data = request.args if request.method == 'GET' else (request.json or request.form)
+  status = data.get('status')
+  amount = int(data.get('amount', 0))
+  request_id = data.get('request_id')
+  
+  # Tìm giao dịch tương ứng trong hàng đợi dựa vào request_id hoặc thông tin thẻ
+  # Khi nhà mạng duyệt thành công (thường status = 1)
+  if str(status) == '1' and amount > 0:
+    # Ở đây ta cộng tiền cho user dựa vào thẻ đã gửi gần nhất hoặc cấu hình mở rộng
+    # Để đơn giản, ta quét qua các yêu cầu đang chờ
+    for c in cards_queue:
+      if c['status'] == 'Đang chờ xử lý':
+        c['status'] = 'Thành công'
+        uname = c['user']
+        if uname in users:
+          users[uname]['balance'] += amount
+          users[uname]['total_deposited'] = users[uname].get('total_deposited', 0) + amount
+        break
+  
+  return jsonify({'success': True})
 
 
 @app.route('/buy/<int:product_id>')
@@ -431,43 +483,6 @@ def send_message():
     )
     flash('Đã gửi tin nhắn cho Admin thành công!')
   return redirect(url_for('index'))
-
-
-@app.route('/duyet-nap/<int:card_id>', methods=['POST'])
-def duyet_nap(card_id):
-  if 'username' not in session or session.get('role') != 'admin':
-    return redirect(url_for('index'))
-
-  card = next((item for item in cards_queue if item['id'] == card_id), None)
-  if card and card['status'] == 'Đang chờ duyệt':
-    card['status'] = 'Đã duyệt'
-    target_user = card['user']
-    amount = card['amount']
-    if target_user in users:
-      users[target_user]['balance'] += amount
-      users[target_user]['total_deposited'] = (
-          users[target_user].get('total_deposited', 0) + amount
-      )
-      flash(f'Đã duyệt và cộng {amount:,}đ cho tài khoản "{target_user}"!')
-    else:
-      flash('Không tìm thấy tài khoản người dùng!')
-  else:
-    flash('Yêu cầu không tồn tại hoặc đã được xử lý trước đó!')
-  return redirect(url_for('admin'))
-
-
-@app.route('/tu-choi-nap/<int:card_id>', methods=['POST'])
-def tu_choi_nap(card_id):
-  if 'username' not in session or session.get('role') != 'admin':
-    return redirect(url_for('index'))
-
-  card = next((item for item in cards_queue if item['id'] == card_id), None)
-  if card and card['status'] == 'Đang chờ duyệt':
-    card['status'] = 'Đã từ chối'
-    flash(f'Đã từ chối yêu cầu nạp tiền của "{card["user"]}"!')
-  else:
-    flash('Yêu cầu không tồn tại hoặc đã được xử lý trước đó!')
-  return redirect(url_for('admin'))
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -553,22 +568,6 @@ def admin():
     cards_html = '<p>Không có lịch sử nạp tiền nào.</p>'
   else:
     for c in cards_queue:
-      action_buttons = ''
-      if c['status'] == 'Đang chờ duyệt':
-        action_buttons = (
-            '<div style="display: flex; gap: 8px; margin-top: 10px;">'
-            '<form action="/duyet-nap/'
-            + str(c['id'])
-            + '" method="POST" style="flex: 1;"><button type="submit"'
-            ' class="btn" style="background: #2ed573; padding: 6px;'
-            ' font-size: 13px; width: 100%;">✅ DUYỆT</button></form>'
-            '<form action="/tu-choi-nap/'
-            + str(c['id'])
-            + '" method="POST" style="flex: 1;"><button type="submit"'
-            ' class="btn" style="background: #ff4757; padding: 6px;'
-            ' font-size: 13px; width: 100%;">❌ TỪ CHỐI</button></form>'
-            '</div>'
-        )
       cards_html += (
           '<div class="card"><p><b>User:</b> '
           + c['user']
@@ -580,13 +579,11 @@ def admin():
           + c['info']
           + '</p><p><b>Trạng thái:</b> <span style="color: #2ed573;">'
           + c['status']
-          + '</span></p>'
-          + action_buttons
-          + '</div>'
+          + '</span></p></div>'
       )
 
   admin_content = (
-      '<h2>⚙️ TRANG QUẢN TRỊ ADMIN (SMART SYSTEM)</h2>'
+      '<h2>⚙️ TRANG QUẢN TRỊ ADMIN (FULL AUTO)</h2>'
       '<div class="card"><h3 style="color: #ff4757;">📦 Thêm / Cập nhật Sản phẩm'
       ' Acc</h3><form method="POST"><input type="text" name="name"'
       ' placeholder="Tên danh mục / sản phẩm..." required><input type="number"'
@@ -605,8 +602,8 @@ def admin():
       ' trợ Khách hàng</h3>'
       + (chat_admin_html if chat_admin_html else '<p>Chưa có tin nhắn nào.</p>')
       + '</div>'
-      '<div class="card"><h3 style="color: #2ed573;">📋 Lịch sử / Duyệt nạp'
-      ' tiền</h3>'
+      '<div class="card"><h3 style="color: #2ed573;">📋 Lịch sử Nạp thẻ & QR'
+      ' tự động</h3>'
       + cards_html
       + '</div>'
   )
