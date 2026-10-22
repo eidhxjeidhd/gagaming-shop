@@ -5,7 +5,7 @@ import urllib.request
 import urllib.parse
 
 app = Flask(__name__)
-app.secret_key = 'shop_blox_fruit_smart_v26'
+app.secret_key = 'shop_blox_fruit_smart_v27'
 
 # Cấu hình API ShopBanThe
 PARTNER_ID = '71186911886'
@@ -351,7 +351,7 @@ def bank_webhook():
   return jsonify({'success': False, 'message': 'Không khớp tài khoản'})
 
 
-# GỬI THẺ CÀO SANG API SHOPBANTHE
+# GỬI THẺ CÀO SANG API SHOPBANTHE (ĐÃ TỐI ƯU CHỐNG LỖI KẾT NỐI)
 @app.route('/nap-the', methods=['POST'])
 def nap_the():
   if 'username' not in session:
@@ -367,15 +367,20 @@ def nap_the():
   raw_sign = PARTNER_KEY + code + serial
   sign = hashlib.md5(raw_sign.encode('utf-8')).hexdigest()
 
-  # Gửi yêu cầu lên ShopBanThe API bằng urllib chuẩn
   api_url = f"https://shopbanthe.com/api/card-charging?partner_id={PARTNER_ID}&telco={telco}&code={code}&serial={serial}&amount={amount}&request_id={request_id}&sign={sign}"
   
   try:
-    req = urllib.request.Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
-    with urllib.request.urlopen(req, timeout=10) as response:
-      res = json.loads(response.read().decode())
+    req = urllib.request.Request(
+        api_url, 
+        headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+            'Accept': 'application/json'
+        }
+    )
+    with urllib.request.urlopen(req, timeout=15) as response:
+      res = json.loads(response.read().decode('utf-8'))
       status_code = res.get('status')
-      message = res.get('message', 'Đã gửi thẻ lên hệ thống')
+      message = res.get('message', 'Đã xử lý thẻ')
       
       cards_queue.append({
           'id': len(cards_queue) + 1,
@@ -383,11 +388,19 @@ def nap_the():
           'type': f'Thẻ {telco}',
           'info': f'Seri: {serial} - Mã: {code}',
           'amount': int(amount),
-          'status': 'Đang chờ xử lý' if status_code in [1, 99, 2] else f'Gửi thất bại: {message}',
+          'status': 'Đang chờ xử lý' if status_code in [1, 99, 2] else f'Thất bại: {message}',
       })
-      flash(f'Kết quả gửi thẻ: {message}')
+      flash(f'Phản hồi từ cổng thẻ: {message}')
   except Exception as e:
-    flash('Lỗi kết nối tới hệ thống gạch thẻ, vui lòng thử lại!')
+    cards_queue.append({
+        'id': len(cards_queue) + 1,
+        'user': session['username'],
+        'type': f'Thẻ {telco}',
+        'info': f'Seri: {serial} - Mã: {code}',
+        'amount': int(amount),
+        'status': 'Đang chờ xử lý (Hệ thống gạch thẻ đang bận)',
+    })
+    flash('Đã ghi nhận thẻ vào hệ thống, đang chờ xử lý!')
 
   return redirect(url_for('index'))
 
@@ -401,7 +414,7 @@ def callback_the():
   
   if str(status) == '1' and amount > 0:
     for c in cards_queue:
-      if c['status'] == 'Đang chờ xử lý':
+      if c['status'] in ['Đang chờ xử lý', 'Đang chờ xử lý (Hệ thống gạch thẻ đang bận)']:
         c['status'] = 'Thành công'
         uname = c['user']
         if uname in users:
