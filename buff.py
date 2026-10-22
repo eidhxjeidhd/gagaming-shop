@@ -191,7 +191,6 @@ def index():
         <div class="card" style="border: 2px solid #ffa502;">
             <h3 style="color: #ffa502; margin-top:0;">💳 NẠP TIỀN TỰ ĐỘNG (THẺ CÀO & QR CHUYỂN KHOẢN)</h3>
             
-            <!-- Nạp thẻ cào đa mạng/đa mệnh giá -->
             <form action="/nap-the" method="POST" style="margin-bottom: 20px; border-bottom: 1px dashed #444; padding-bottom: 15px;">
                 <h4 style="color: #ffa502; margin: 0 0 8px 0;">1. Nạp Thẻ Cào Tự Động</h4>
                 <label>Chọn nhà mạng:</label>
@@ -220,7 +219,6 @@ def index():
                 <button type="submit" class="btn" style="background: #ffa502; margin-top: 10px;">NẠP THẺ NGAY</button>
             </form>
 
-            <!-- Nạp QR Chuyển khoản ngân hàng/ví -->
             <form action="/nap-qr" method="POST">
                 <h4 style="color: #2ed573; margin: 0 0 8px 0;">2. Chuyển Khoản Ngân Hàng / Ví (Chủ TK: NGUYEN VAN DUONG)</h4>
                 <div style="text-align: center; margin-bottom: 10px;">
@@ -234,7 +232,6 @@ def index():
         </div>
         """
 
-  # Chèn đúng ảnh giao diện chuẩn vào banner đầu trang chủ
   banner_html = """
         <div class="card" style="text-align: center; padding: 10px; border: 2px solid #ff4757;">
             <img src="https://i.ibb.co/DHCWq65g/file-00000000414c821198dbb4fd0f8ab53e.png" alt="Giao diện Shop" style="width: 100%; max-height: 400px; object-fit: contain; border-radius: 6px;">
@@ -495,98 +492,61 @@ def admin():
         ' border-radius: 5px; max-height: 100px; overflow-y: auto; font-size:'
         ' 13px; margin-bottom: 8px;">'
         + history_render
-        + '</div><form method="POST"><input type="hidden" name="reply_msg"'
-        ' value="1"><input type="hidden" name="target_user" value="'
+        + '</div><form method="POST"><input type="hidden" name="target_user"'
+        ' value="'
         + cu
-        + '"><input type="text" name="reply_text" placeholder="Trả lời khách..."'
-        ' required style="margin: 0 0 5px 0;"><button type="submit"'
-        ' class="btn" style="background: #2ed573; padding: 5px; font-size:'
-        ' 12px;">GỬI PHẢN HỒI</button></form></div>'
+        + '"><input type="text" name="reply_text"'
+        ' placeholder="Nhập nội dung trả lời..." required style="margin:'
+        ' 0 0 5px 0;"><button type="submit" name="reply_msg" class="btn"'
+        ' style="padding: 5px; font-size: 12px; background:'
+        ' #2ed573;">GỬI PHẢN HỒI</button></form></div>'
     )
 
   cards_html = ''
   if not cards_queue:
-    cards_html = '<p style="color: #aaa;">Không có thẻ cào hoặc giao dịch nào đang chờ duyệt.</p>'
+    cards_html = '<p>Không có yêu cầu nạp tiền nào đang chờ.</p>'
   else:
     for c in cards_queue:
-      if c['status'] == 'Đang chờ duyệt':
-        cards_html += (
-            '<div class="card" style="background: #252525;"><p><b>ID:</b> #'
-            + str(c['id'])
-            + ' | <b>User:</b> '
-            + c['user']
-            + ' | <b>Loại:</b> '
-            + c['type']
-            + '</p><p><b>Thông tin:</b> '
-            + c['info']
-            + '</p><p><b>Mệnh giá/Tiền:</b> <span style="color: #ffa502;">'
-            + f"{c['amount']:,}"
-            + 'đ</span></p><div style="display: flex; gap: 10px; margin-top: 10px;"><a href="/admin/approve/'
-            + str(c['id'])
-            + '" class="btn" style="background: #2ed573; padding: 8px;">DUYỆT (CỘNG TIỀN)</a><a href="/admin/reject/'
-            + str(c['id'])
-            + '" class="btn" style="background: #ff4757; padding: 8px;">HỦY BỎ</a></div></div>'
-        )
-    if not cards_html:
-      cards_html = '<p style="color: #aaa;">Không có giao dịch nào đang chờ duyệt.</p>'
+      cards_html += (
+          '<div class="card"><p><b>User:</b> '
+          + c['user']
+          + ' | <b>Loại:</b> '
+          + c['type']
+          + ' | <b>Số tiền:</b> <span style="color: #ffa502;">'
+          + f"{c['amount']:,}"
+          + 'đ</span></p><p><b>Thông tin:</b> '
+          + c['info']
+          + '</p><p><b>Trạng thái:</b> '
+          + c['status']
+          + '</p></div>'
+      )
 
   admin_content = (
       '<h2>⚙️ TRANG QUẢN TRỊ ADMIN</h2>'
-      '<div class="card" style="border: 2px solid #2ed573;">'
-      '<h3>📦 Thêm / Cập Nhật Sản Phẩm Acc</h3>'
-      '<form method="POST">'
-      '<input type="hidden" name="add_product" value="1">'
-      '<input type="text" name="name" placeholder="Tên danh mục / Gói acc..." required>'
-      '<input type="number" name="price" placeholder="Giá tiền (VNĐ)..." required>'
-      '<input type="text" name="desc" placeholder="Mô tả ngắn..." required>'
-      '<input type="text" name="game_acc" placeholder="Thông tin Acc (email|pass)..." required>'
-      '<button type="submit" class="btn" style="background: #2ed573; margin-top: 10px;">THÊM VÀO KHO</button>'
-      '</form>'
-      '</div>'
-      '<div class="card" style="border: 2px solid #ffa502;">'
-      '<h3>💵 Cộng Tiền Cho Thành Viên</h3>'
-      '<form method="POST">'
-      '<input type="hidden" name="bonus_user" value="1">'
-      '<input type="text" name="target_username" placeholder="Tên tài khoản khách..." required>'
-      '<input type="number" name="bonus_amount" placeholder="Số tiền muốn cộng (VNĐ)..." required>'
-      '<button type="submit" class="btn" style="background: #ffa502; margin-top: 10px;">CỘNG TIỀN</button>'
-      '</form>'
-      '</div>'
-      '<div class="card"><h3>💳 Duyệt Nạp Tiền (Thẻ cào / QR)</h3>'
-      + cards_html
+      '<div class="card"><h3 style="color: #ff4757;">📦 Thêm / Cập nhật Sản phẩm'
+      ' Acc</h3><form method="POST"><input type="text" name="name"'
+      ' placeholder="Tên danh mục / sản phẩm..." required><input type="number"'
+      ' name="price" placeholder="Giá tiền (VNĐ)..." required><input type="text"'
+      ' name="desc" placeholder="Mô tả ngắn..." required><input type="text"'
+      ' name="game_acc" placeholder="Tài khoản | Mật khẩu game..."'
+      ' required><button type="submit" name="add_product" class="btn"'
+      ' style="margin-top: 10px; background: #2ed573;">THÊM VÀO KHO</button></form></div>'
+      '<div class="card"><h3 style="color: #ffa502;">💰 Cộng tiền cho Thành'
+      ' viên</h3><form method="POST"><input type="text" name="target_username"'
+      ' placeholder="Tên tài khoản khách..." required><input type="number"'
+      ' name="bonus_amount" placeholder="Số tiền cộng (VNĐ)..."'
+      ' required><button type="submit" name="bonus_user" class="btn"'
+      ' style="margin-top: 10px; background: #ffa502;">CỘNG TIỀN NGAY</button></form></div>'
+      '<div class="card"><h3 style="color: #70a1ff;">💬 Quản lý Tin nhắn Hỗ'
+      ' trợ Khách hàng</h3>'
+      + (chat_admin_html if chat_admin_html else '<p>Chưa có tin nhắn nào.</p>')
       + '</div>'
-      '<div class="card"><h3>💬 Hỗ Trợ Khách Hàng</h3>'
-      + chat_admin_html
+      '<div class="card"><h3 style="color: #2ed573;">📋 Duyệt nạp thẻ / Chuyển'
+      ' khoản</h3>'
+      + cards_html
       + '</div>'
   )
   return render_template_string(BASE_HTML, content=admin_content, users=users)
-
-
-@app.route('/admin/approve/<int:card_id>')
-def approve_card(card_id):
-  if 'username' not in session or session.get('role') != 'admin':
-    return redirect(url_for('index'))
-  card = next((c for c in cards_queue if c['id'] == card_id), None)
-  if card and card['status'] == 'Đang chờ duyệt':
-    card['status'] = 'Đã duyệt'
-    uname = card['user']
-    amt = card['amount']
-    if uname in users:
-      users[uname]['balance'] += amt
-      users[uname]['total_deposited'] = users[uname].get('total_deposited', 0) + amt
-      flash(f'Đã duyệt và cộng {amt:,}đ cho {uname}!')
-  return redirect(url_for('admin'))
-
-
-@app.route('/admin/reject/<int:card_id>')
-def reject_card(card_id):
-  if 'username' not in session or session.get('role') != 'admin':
-    return redirect(url_for('index'))
-  card = next((c for c in cards_queue if c['id'] == card_id), None)
-  if card and card['status'] == 'Đang chờ duyệt':
-    card['status'] = 'Đã hủy'
-    flash('Đã hủy giao dịch nạp tiền này.')
-  return redirect(url_for('admin'))
 
 
 if __name__ == '__main__':
