@@ -1,9 +1,11 @@
 import hashlib
+import json
 from flask import Flask, flash, jsonify, redirect, render_template_string, request, session, url_for
-import requests
+import urllib.request
+import urllib.parse
 
 app = Flask(__name__)
-app.secret_key = 'shop_blox_fruit_smart_v25'
+app.secret_key = 'shop_blox_fruit_smart_v26'
 
 # Cấu hình API ShopBanThe
 PARTNER_ID = '71186911886'
@@ -222,6 +224,7 @@ def index():
                     <option value="50000">50.000 đ</option>
                     <option value="100000">100.000 đ</option>
                     <option value="200000">200.000 đ</option>
+                    <option value="300000">300.000 đ</option>
                     <option value="500000">500.000 đ</option>
                     <option value="1000000">1.000.000 đ</option>
                 </select>
@@ -358,29 +361,31 @@ def nap_the():
   code = request.form['code'].strip()
   serial = request.form['serial'].strip()
   amount = request.form['amount']
-  request_id = str(int(requests.get('https://worldtimeapi.org/api/ip').json().get('unixtime', 123456))) if False else str(len(cards_queue) + 1000)
+  request_id = str(len(cards_queue) + 1000)
 
   # Tạo chữ ký bảo mật (sign)
   raw_sign = PARTNER_KEY + code + serial
   sign = hashlib.md5(raw_sign.encode('utf-8')).hexdigest()
 
-  # Gửi yêu cầu lên ShopBanThe API
+  # Gửi yêu cầu lên ShopBanThe API bằng urllib chuẩn
   api_url = f"https://shopbanthe.com/api/card-charging?partner_id={PARTNER_ID}&telco={telco}&code={code}&serial={serial}&amount={amount}&request_id={request_id}&sign={sign}"
   
   try:
-    res = requests.get(api_url, timeout=10).json()
-    status_code = res.get('status')
-    message = res.get('message', 'Đã gửi thẻ lên hệ thống')
-    
-    cards_queue.append({
-        'id': len(cards_queue) + 1,
-        'user': session['username'],
-        'type': f'Thẻ {telco}',
-        'info': f'Seri: {serial} - Mã: {code}',
-        'amount': int(amount),
-        'status': 'Đang chờ xử lý' if status_code in [1, 99, 2] else f'Gửi thất bại: {message}',
-    })
-    flash(f'Kết quả gửi thẻ: {message}')
+    req = urllib.request.Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
+    with urllib.request.urlopen(req, timeout=10) as response:
+      res = json.loads(response.read().decode())
+      status_code = res.get('status')
+      message = res.get('message', 'Đã gửi thẻ lên hệ thống')
+      
+      cards_queue.append({
+          'id': len(cards_queue) + 1,
+          'user': session['username'],
+          'type': f'Thẻ {telco}',
+          'info': f'Seri: {serial} - Mã: {code}',
+          'amount': int(amount),
+          'status': 'Đang chờ xử lý' if status_code in [1, 99, 2] else f'Gửi thất bại: {message}',
+      })
+      flash(f'Kết quả gửi thẻ: {message}')
   except Exception as e:
     flash('Lỗi kết nối tới hệ thống gạch thẻ, vui lòng thử lại!')
 
@@ -393,13 +398,8 @@ def callback_the():
   data = request.args if request.method == 'GET' else (request.json or request.form)
   status = data.get('status')
   amount = int(data.get('amount', 0))
-  request_id = data.get('request_id')
   
-  # Tìm giao dịch tương ứng trong hàng đợi dựa vào request_id hoặc thông tin thẻ
-  # Khi nhà mạng duyệt thành công (thường status = 1)
   if str(status) == '1' and amount > 0:
-    # Ở đây ta cộng tiền cho user dựa vào thẻ đã gửi gần nhất hoặc cấu hình mở rộng
-    # Để đơn giản, ta quét qua các yêu cầu đang chờ
     for c in cards_queue:
       if c['status'] == 'Đang chờ xử lý':
         c['status'] = 'Thành công'
