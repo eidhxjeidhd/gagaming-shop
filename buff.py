@@ -94,11 +94,13 @@ BASE_HTML = """
         .nav-buttons a { background: var(--primary); color: white; padding: 9px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,71,87,0.3); }
         .nav-buttons a:hover { background: var(--primary-hover); transform: translateY(-2px); }
         .container { padding: 30px 20px; max-width: 1100px; margin: auto; }
-        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); position: relative; }
         .product-title { color: var(--text-main); font-weight: 600; font-size: 16px; margin-bottom: 5px; }
         .price { color: var(--primary); font-size: 20px; font-weight: 700; margin: 10px 0; }
         .btn { background: linear-gradient(135deg, #ff4757, #ff6b81); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer; text-align: center; display: block; text-decoration: none; box-sizing: border-box; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,71,87,0.3); }
         .btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .btn-delete { background: rgba(255,71,87,0.2); border: 1px solid var(--primary); color: var(--primary-hover); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn-delete:hover { background: var(--primary); color: white; }
         input, select { width: 100%; padding: 12px 15px; margin: 10px 0; background: #12131c; border: 1px solid var(--border-color); color: white; border-radius: 8px; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 14px; }
         input:focus, select:focus { outline: none; border-color: var(--primary); }
         .alert { background: rgba(255,71,87,0.15); border: 1px solid var(--primary); color: #ff6b81; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-weight: 500; }
@@ -236,9 +238,16 @@ def index():
         else ''
     )
 
+    # Nút Xóa sản phẩm hiển thị khi là admin
+    delete_btn = ''
+    if session.get('role') == 'admin':
+      delete_btn = f'<div style="position: absolute; top: 15px; right: 15px;"><a href="/admin/delete/{p["id"]}" class="btn-delete" onclick="return confirm(\'Bạn có chắc chắn muốn xóa sản phẩm này không?\');">🗑️ XÓA</a></div>'
+
     products_html += (
         '<div class="card" style="display: flex; flex-direction: column;'
-        ' justify-content: space-between;"><div>'
+        ' justify-content: space-between;">'
+        + delete_btn
+        + '<div>'
         + img_tag
         + '<div style="color: var(--text-secondary); font-size: 12px; font-weight:'
         ' 600;">MÃ SỐ: #'
@@ -513,6 +522,18 @@ def register():
 @app.route('/logout')
 def logout():
   session.clear()
+  return redirect(url_for('index'))
+
+
+@app.route('/admin/delete/<int:product_id>')
+def delete_product(product_id):
+  if 'username' not in session or session.get('role') != 'admin':
+    flash('Bạn không có quyền thực hiện hành động này!')
+    return redirect(url_for('index'))
+  
+  global products
+  products = [p for p in products if p['id'] != product_id]
+  flash('Đã xóa sản phẩm thành công!')
   return redirect(url_for('index'))
 
 
