@@ -94,23 +94,21 @@ BASE_HTML = """
         .nav-buttons a { background: var(--primary); color: white; padding: 9px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,71,87,0.3); }
         .nav-buttons a:hover { background: var(--primary-hover); transform: translateY(-2px); }
         .container { padding: 30px 20px; max-width: 1100px; margin: auto; }
-        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); transition: transform 0.3s ease; }
-        .card:hover { border-color: rgba(255,71,87,0.3); }
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
         .product-title { color: var(--text-main); font-weight: 600; font-size: 16px; margin-bottom: 5px; }
         .price { color: var(--primary); font-size: 20px; font-weight: 700; margin: 10px 0; }
         .btn { background: linear-gradient(135deg, #ff4757, #ff6b81); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer; text-align: center; display: block; text-decoration: none; box-sizing: border-box; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,71,87,0.3); }
-        .btn:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,71,87,0.5); }
-        input, select { width: 100%; padding: 12px 15px; margin: 10px 0; background: #12131c; border: 1px solid var(--border-color); color: white; border-radius: 8px; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 14px; transition: border-color 0.3s; }
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        input, select { width: 100%; padding: 12px 15px; margin: 10px 0; background: #12131c; border: 1px solid var(--border-color); color: white; border-radius: 8px; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 14px; }
         input:focus, select:focus { outline: none; border-color: var(--primary); }
         .alert { background: rgba(255,71,87,0.15); border: 1px solid var(--primary); color: #ff6b81; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-weight: 500; }
         .success-box { background: rgba(46,213,115,0.1); border: 1px solid var(--success); padding: 20px; border-radius: 10px; margin-top: 15px; text-align: center; }
         .top-user-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 14px; align-items: center; }
-        .top-user-item:last-child { border-bottom: none; }
         .chat-box { background: #12131c; border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; max-height: 220px; overflow-y: auto; margin-bottom: 12px; }
         .chat-msg { margin-bottom: 10px; font-size: 13px; line-height: 1.4; }
         .chat-msg.user { color: #70a1ff; text-align: right; }
         .chat-msg.admin { color: var(--success); text-align: left; }
-        h2 { font-weight: 700; font-size: 22px; margin-bottom: 20px; letter-spacing: 0.5px; }
+        h2 { font-weight: 700; font-size: 22px; margin-bottom: 20px; }
         h3 { font-size: 18px; font-weight: 600; }
     </style>
 </head>
@@ -121,7 +119,7 @@ BASE_HTML = """
             {% if 'username' in session %}
                 <span style="background: rgba(46,213,115,0.15); border: 1px solid var(--success); color: var(--success); padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 13px;">Số dư: {{ "{:,.0f}".format(users[session['username']]['balance']) }}đ</span>
                 <a href="/lich-su" style="background: #3742fa;">📜 Lịch sử</a>
-                {% if session['role'] == 'admin' %}
+                {% if session.get('role') == 'admin' %}
                     <a href="/admin" style="background: var(--success); color: #000;">⚙️ Quản trị</a>
                 {% endif %}
                 <a href="/logout" style="background: #747d8c;">Thoát</a>
@@ -139,7 +137,6 @@ BASE_HTML = """
             {% endfor %}
           {% endif %}
         {% endwith %}
-
         {{ content | safe }}
     </div>
 </body>
@@ -178,7 +175,7 @@ def index():
     )
 
   chat_html = ''
-  if 'username' in session and session['role'] != 'admin':
+  if 'username' in session and session.get('role') != 'admin':
     curr_user = session['username']
     user_msgs = [m for m in messages_db if m['user'] == curr_user]
     msgs_render = ''
@@ -203,9 +200,8 @@ def index():
 
     chat_html = (
         '<div class="card" style="border: 1px solid var(--primary);"><h3'
-        ' style="color: var(--primary); margin-top: 0; display: flex;'
-        ' align-items: center; gap: 8px;">💬 Hỗ Trợ Trực Tuyến</h3><div'
-        ' class="chat-box">'
+        ' style="color: var(--primary); margin-top: 0;">💬 Hỗ Trợ Trực'
+        ' Tuyến</h3><div class="chat-box">'
         + msgs_render
         + '</div><form action="/send-message" method="POST"><input type="text"'
         ' name="message" placeholder="Nhập tin nhắn cho Admin..." required'
@@ -265,7 +261,7 @@ def index():
     )
 
   nap_html = ''
-  if 'username' in session and session['role'] != 'admin':
+  if 'username' in session and session.get('role') != 'admin':
     curr_username = session['username']
     suggest_note = f'NAP {curr_username.upper()}'
     nap_html = (
@@ -275,30 +271,30 @@ def index():
         ' 10px; margin-bottom: 20px; border: 1px solid var(--border-color);"><p'
         ' style="margin: 0 0 8px 0; color: var(--accent); font-weight:'
         ' 600;">📝 1. Chuyển khoản QR siêu tốc:</p><p style="margin: 0; font-size:'
-        ' 13px; color: var(--text-secondary);">Nội dung chuyển khoản: <b'
+        ' 13px; color: var(--text-secondary);">Nội dung: <b'
         f' style="color: var(--success); font-size: 15px;">{suggest_note}</b>.'
-        ' Hệ thống tự động cộng tiền sau 3 giây!</p></div><div'
-        ' style="text-align: center; margin-bottom: 15px;"><img'
+        ' Tự động cộng tiền sau 3 giây!</p></div><div style="text-align:'
+        ' center; margin-bottom: 15px;"><img'
         ' src="https://i.ibb.co/0pvhCGz1/zlp-1792493518267.jpg" alt="QR Code"'
         ' style="max-width: 190px; border-radius: 10px; border: 3px solid'
-        ' white; box-shadow: 0 5px 20px rgba(0,0,0,0.5);"><p style="font-size:'
-        ' 12px; color: var(--text-secondary); margin: 8px 0 0 0;">Chủ TK: NGUYEN'
-        ' VAN DUONG</p></div><form action="/nap-the" method="POST"'
-        ' style="margin-top: 20px; border-top: 1px dashed var(--border-color);'
-        ' padding-top: 20px;"><h4 style="color: var(--accent); margin: 0 0 12px'
-        ' 0; font-size: 15px;">2. Nạp Thẻ Cào Tự Động</h4><label style="font-size:'
-        ' 13px; color: var(--text-secondary);">Nhà mạng:</label><select'
-        ' name="telco"><option value="VIETTEL">Viettel</option><option'
+        ' white;"><p style="font-size: 12px; color: var(--text-secondary);'
+        ' margin: 8px 0 0 0;">Chủ TK: NGUYEN VAN DUONG</p></div><form'
+        ' action="/nap-the" method="POST" style="margin-top: 20px; border-top:'
+        ' 1px dashed var(--border-color); padding-top: 20px;"><h4 style="color:'
+        ' var(--accent); margin: 0 0 12px 0; font-size: 15px;">2. Nạp Thẻ Cào Tự'
+        ' Động</h4><label style="font-size: 13px; color:'
+        ' var(--text-secondary);">Nhà mạng:</label><select name="telco"><option'
+        ' value="VIETTEL">Viettel</option><option'
         ' value="MOBIFONE">Mobifone</option><option'
         ' value="VINAPHONE">Vinaphone</option><option'
         ' value="VIETNAMOBILE">Vietnamobile</option></select><label'
-        ' style="font-size: 13px; color:'
-        ' var(--text-secondary);">Mệnh giá:</label><select name="amount"><option'
-        ' value="10000">10.000 đ</option><option value="20000">20.000'
-        ' đ</option><option value="50000">50.000 đ</option><option'
-        ' value="100000">100.000 đ</option><option value="200000">200.000'
-        ' đ</option><option value="300000">300.000 đ</option><option'
-        ' value="500000">500.000 đ</option><option value="1000000">1.000.000'
+        ' style="font-size: 13px; color: var(--text-secondary);">Mệnh'
+        ' giá:</label><select name="amount"><option value="10000">10.000'
+        ' đ</option><option value="20000">20.000 đ</option><option'
+        ' value="50000">50.000 đ</option><option value="100000">100.000'
+        ' đ</option><option value="200000">200.000 đ</option><option'
+        ' value="300000">300.000 đ</option><option value="500000">500.000'
+        ' đ</option><option value="1000000">1.000.000'
         ' đ</option></select><input type="text" name="code" placeholder="Mã thẻ'
         ' cào" required><input type="text" name="serial" placeholder="Số Serial"'
         ' required><button type="submit" class="btn" style="background:'
@@ -373,24 +369,24 @@ def tui_mu(product_id):
       ' trang chủ</a></div><script>let currentDiscount = 0;function'
       ' applyCoupon(basePrice) {let code ='
       ' document.getElementById(\'coupon_code\').value;fetch(\'/api/check-coupon\','
-      ' {method: \'POST\', headers: {''Content-Type'': ''application/json''},'
+      ' {method: \'POST\', headers: {\'Content-Type\': \'application/json\'},'
       ' body: JSON.stringify({code: code})}).then(res => res.json()).then(data'
       ' => {let msg = document.getElementById(\'coupon_msg\');if(data.success)'
       ' {currentDiscount = data.discount;let final = Math.max(0, basePrice -'
-      ' currentDiscount);msg.style.color = ''var(--success)'';msg.innerText ='
+      ' currentDiscount);msg.style.color = \'var(--success)\';msg.innerText ='
       ' "Áp mã thành công! Giảm " + data.discount.toLocaleString() +'
       ' "đ";document.getElementById(\'final_price_display\').innerText = "Tổng'
       ' thanh toán: " + final.toLocaleString() + "đ";} else'
-      ' {currentDiscount = 0;msg.style.color = ''var(--primary)'';msg.innerText'
+      ' {currentDiscount = 0;msg.style.color = \'var(--primary)\';msg.innerText'
       ' = data.message;document.getElementById(\'final_price_display\').innerText'
       ' = "Tổng thanh toán: " + basePrice.toLocaleString() + "đ";}});}'
       'function xeTui(productId) {let code ='
       ' document.getElementById(\'coupon_code\').value;fetch(\'/api/buy-random/\''
-      ' + productId, {method: ''POST'', headers: {''Content-Type'':'' '
-      ' ''application/json''}, body: JSON.stringify({coupon_code: code})}).then(res'
+      ' + productId, {method: \'POST\', headers: {\'Content-Type\':'
+      ' \'application/json\'}, body: JSON.stringify({coupon_code: code})}).then(res'
       ' => res.json()).then(data => {if(data.success) {alert("🎉 Xé túi thành'
       ' công! Tài khoản của bạn:\\n" + data.account_info);window.location.href'
-      ' = ''/lich-su'';} else {alert(data.message);}});}</script>'
+      ' = \'/lich-su\';} else {alert(data.message);}});}</script>'
   )
   return render_template_string(BASE_HTML, content=content, users=users)
 
@@ -656,7 +652,7 @@ def buy(product_id):
       ' var(--border-color);">'
       + acc_info
       + '</h3><p style="font-size: 13px; color: var(--primary); margin: 8px 0 0'
-      ' 0;">⚠️ Hãy đổi mật khẩu ngay lập tức để bảo mật!</p></div><a href="/""'
+      ' 0;">⚠️ Hãy đổi mật khẩu ngay lập tức để bảo mật!</p></div><a href="/"'
       ' class="btn" style="margin-top: 25px;">VỀ TRANG CHỦ</a></div>'
   )
   return render_template_string(BASE_HTML, content=content, users=users)
@@ -908,7 +904,7 @@ def admin():
 
 @app.route('/admin/coupon/toggle/<int:coupon_id>', methods=['POST'])
 def toggle_coupon(coupon_id):
-  if 'username' not in session or session.get('role'] != 'admin':
+  if 'username' not in session or session.get('role') != 'admin':
     return redirect(url_for('index'))
   for c in coupons_db:
     if c['id'] == coupon_id:
