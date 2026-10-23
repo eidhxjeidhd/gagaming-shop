@@ -104,21 +104,29 @@ BASE_HTML = """
 def index():
   p_html = ''
   for p in products:
-    btn = (
-        f'<a href="/tui-mu/{p["id"]}" class="btn"'
-        ' style="background:#ffa502;">⚡ XÉ TÚI NGAY</a>'
-        if p.get('category') == 'random'
-        else f'<a href="/buy/{p["id"]}" class="btn">🛒 MUA NGAY</a>'
-    )
+    if p.get('category') == 'random':
+      btn = (
+          '<a href="/tui-mu/'
+          + str(p['id'])
+          + '" class="btn" style="background:#ffa502;">⚡ XÉ TÚI NGAY</a>'
+      )
+    else:
+      btn = '<a href="/buy/' + str(p['id']) + '" class="btn">🛒 MUA NGAY</a>'
+
     p_html += (
-        '<div class="card">'
-        f"<h3>{p['name']}</h3>"
-        f"<p>{p['desc']}</p>"
-        f'<p>Giá: <b style="color:#ff4757;">{p["price"]:,}đ</b> | Kho:'
-        f" {len(p['game_accs'])}</p>"
-        f'{btn}'
-        '</div>'
+        '<div class="card"><h3>'
+        + p['name']
+        + '</h3><p>'
+        + p['desc']
+        + '</p><p>Giá: <b style="color:#ff4757;">'
+        + f"{p['price']:,}"
+        + 'đ</b> | Kho: '
+        + str(len(p['game_accs']))
+        + '</p>'
+        + btn
+        + '</div>'
     )
+
   content = (
       '<h2>DANH MỤC SẢN PHẨM</h2>'
       + p_html
@@ -136,33 +144,13 @@ def tui_mu(product_id):
     return redirect(url_for('index'))
 
   content = (
-      '<div class="card" style="text-align: center;">'
-      f"<h2>⚡ MỞ TÚI MÙ: {p['name']}</h2>"
-      f"<p>Giá: {p['price']:,}đ</p>"
-      '<input type="text" id="coupon" placeholder="Nhập mã giảm giá...">'
-      f'<button onclick="xeTui({p[\'id\']})" class="btn"'
-      ' style="background: #ffa502; margin-top: 10px;">XÉ TÚI NGAY</button>'
-      '<br><a href="/" style="color: #aaa;">← Quay lại</a>'
-      '</div>'
-      '<script>'
-      'function xeTui(id) {'
-      "let code = document.getElementById('coupon').value;"
-      "fetch('/api/buy-random/' + id, {"
-      "method: 'POST',"
-      "headers: {'Content-Type': 'application/json'},"
-      "body: JSON.stringify({coupon_code: code})"
-      '})'
-      '.then(res => res.json())'
-      '.then(data => {'
-      'if(data.success) {'
-      'alert("Thành công! Acc: " + data.account_info);'
-      "window.location.href = '/lich-su';"
-      '} else {'
-      'alert(data.message);'
-      '}'
-      '});'
-      '}'
-      '</script>'
+      '<div class="card" style="text-align: center;"><h2>⚡ MỞ TÚI MÙ: '
+      + p['name']
+      + '</h2><p>Giá: '
+      + f"{p['price']:,}"
+      + 'đ</p><input type="text" id="coupon" placeholder="Nhập mã giảm giá..."><button onclick="xeTui('
+      + str(p['id'])
+      + ')" class="btn" style="background: #ffa502; margin-top: 10px;">XÉ TÚI NGAY</button><br><a href="/" style="color: #aaa;">← Quay lại</a></div><script>function xeTui(id) {let code = document.getElementById(\'coupon\').value;fetch(\'/api/buy-random/\' + id, {method: \'POST\', headers: {\'Content-Type\': \'application/json\'}, body: JSON.stringify({coupon_code: code})}).then(res => res.json()).then(data => {if(data.success) {alert("Thành công! Acc: " + data.account_info);window.location.href = \'/lich-su\';} else {alert(data.message);}});}</script>'
   )
   return render_template_string(BASE_HTML, content=content, users=users)
 
@@ -219,11 +207,10 @@ def buy(product_id):
       {'user': uname, 'product_name': p['name'], 'account_details': acc}
   )
   content = (
-      '<div class="card" style="text-align: center;">'
-      '<h2 style="color: #2ed573;">MUA THÀNH CÔNG!</h2>'
-      f'<p>Thông tin: <b>{acc}</b></p>'
-      '<a href="/" class="btn">VỀ TRANG CHỦ</a>'
-      '</div>'
+      '<div class="card" style="text-align: center;"><h2'
+      ' style="color: #2ed573;">MUA THÀNH CÔNG!</h2><p>Thông tin: <b>'
+      + acc
+      + '</b></p><a href="/" class="btn">VỀ TRANG CHỦ</a></div>'
   )
   return render_template_string(BASE_HTML, content=content, users=users)
 
@@ -236,10 +223,11 @@ def lich_su():
   h_html = '<h2>Lịch sử mua hàng</h2>'
   for h in hist:
     h_html += (
-        '<div class="card">'
-        f'<p>{h["product_name"]}</p><b'
-        f' style="color:#2ed573;">{h["account_details"]}</b>'
-        '</div>'
+        '<div class="card"><p>'
+        + h['product_name']
+        + '</p><b style="color:#2ed573;">'
+        + h['account_details']
+        + '</b></div>'
     )
   if not hist:
     h_html += '<p>Chưa có lịch sử.</p>'
@@ -301,35 +289,37 @@ def admin():
       flash('Đã thêm mã giảm giá!')
     return redirect(url_for('admin'))
 
-  c_html = ''.join([
-      f'<div>{c["code"]} (-{c["discount_amount"]}đ) - {"Hoạt động" if c["is_active"] else "Tắt"}</div>'
-      for c in coupons_db
-  ])
+  c_html = ''
+  for c in coupons_db:
+    c_html += (
+        '<div>'
+        + c['code']
+        + ' (-'
+        + str(c['discount_amount'])
+        + 'đ) - '
+        + ('Hoạt động' if c['is_active'] else 'Tắt')
+        + '</div>'
+    )
 
-  content = f"""
-    <h2>TRANG QUẢN TRỊ ADMIN</h2>
-    <div class="card">
-        <h3>Thêm sản phẩm</h3>
-        <form method="POST">
-            <input type="text" name="name" placeholder="Tên sản phẩm" required>
-            <select name="category"><option value="tuichon">Tự chọn</option><option value="random">Random</option></select>
-            <input type="number" name="price" placeholder="Giá" required>
-            <input type="text" name="desc" placeholder="Mô tả">
-            <input type="text" name="game_acc" placeholder="Tài khoản | Mật khẩu" required>
-            <button type="submit" name="add_product" class="btn" style="background:#2ed573;">Thêm sản phẩm</button>
-        </form>
-    </div>
-    <div class="card">
-        <h3>Thêm mã giảm giá</h3>
-        <form method="POST">
-            <input type="text" name="code" placeholder="Mã (VD: GIAM5K)" required>
-            <input type="number" name="discount" placeholder="Số tiền giảm" required>
-            <button type="submit" name="add_coupon" class="btn" style="background:#ffa502;">Thêm mã</button>
-        </form>
-        <div style="margin-top: 10px;">{c_html}</div>
-    </div>
-    <a href="/" style="color: #ff4757;">← Về trang chủ</a>
-    """
+  content = (
+      '<h2>TRANG QUẢN TRỊ ADMIN</h2><div class="card"><h3>Thêm'
+      ' sản phẩm</h3><form method="POST"><input type="text" name="name"'
+      ' placeholder="Tên sản phẩm" required><select name="category"><option'
+      ' value="tuichon">Tự chọn</option><option'
+      ' value="random">Random</option></select><input type="number"'
+      ' name="price" placeholder="Giá" required><input type="text" name="desc"'
+      ' placeholder="Mô tả"><input type="text" name="game_acc" placeholder="Tài'
+      ' khoản | Mật khẩu" required><button type="submit" name="add_product"'
+      ' class="btn" style="background:#2ed573;">Thêm sản'
+      ' phẩm</button></form></div><div class="card"><h3>Thêm mã giảm'
+      ' giá</h3><form method="POST"><input type="text" name="code" placeholder="Mã'
+      ' (VD: GIAM5K)" required><input type="number" name="discount"'
+      ' placeholder="Số tiền giảm" required><button type="submit"'
+      ' name="add_coupon" class="btn" style="background:#ffa502;">Thêm'
+      ' mã</button></form><div style="margin-top: 10px;">'
+      + c_html
+      + '</div></div><a href="/" style="color: #ff4757;">← Về trang chủ</a>'
+  )
   return render_template_string(BASE_HTML, content=content, users=users)
 
 
