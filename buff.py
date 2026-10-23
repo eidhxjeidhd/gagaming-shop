@@ -8,11 +8,9 @@ import urllib.parse
 app = Flask(__name__)
 app.secret_key = 'shop_blox_fruit_smart_v27'
 
-# Cấu hình API ShopBanThe
 PARTNER_ID = '71186911886'
 PARTNER_KEY = 'f7377b035f5b5d2c4a5d04e487b39aaf'
 
-# Cơ sở dữ liệu giả lập trong bộ nhớ
 users = {
     'admin': {
         'password': '123',
@@ -28,7 +26,6 @@ users = {
     },
 }
 
-# Sản phẩm được phân loại: 'tuichon' hoặc 'random'
 products = [
     {
         'id': 1276,
@@ -56,7 +53,6 @@ products = [
     },
 ]
 
-# Quản lý mã giảm giá
 coupons_db = [
     {'id': 1, 'code': 'GIAM5K', 'discount_amount': 5000, 'is_active': True}
 ]
