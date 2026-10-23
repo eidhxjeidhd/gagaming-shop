@@ -12,7 +12,7 @@ app.secret_key = 'shop_blox_fruit_smart_v27'
 PARTNER_ID = '71186911886'
 PARTNER_KEY = 'f7377b035f5b5d2c4a5d04e487b39aaf'
 
-# Cơ sở dữ liệu giả lập trong bộ nhớ (Bổ sung thêm kho coupon)
+# Cơ sở dữ liệu giả lập trong bộ nhớ
 users = {
     'admin': {
         'password': '123',
@@ -28,7 +28,7 @@ users = {
     },
 }
 
-# Sản phẩm được phân loại: 'tuichon' (có ảnh chi tiết) hoặc 'random' (xé túi hên xui)
+# Sản phẩm được phân loại: 'tuichon' hoặc 'random'
 products = [
     {
         'id': 1276,
@@ -56,7 +56,7 @@ products = [
     },
 ]
 
-# Quản lý mã giảm giá (Admin có thể chủ động thêm và bật/tắt hết hạn ngay lập tức)
+# Quản lý mã giảm giá
 coupons_db = [
     {'id': 1, 'code': 'GIAM5K', 'discount_amount': 5000, 'is_active': True}
 ]
@@ -195,7 +195,6 @@ def index():
   products_html = ''
   for p in products:
     stock_count = len(p['game_accs'])
-    # Phân biệt nút mua cho Tự Chọn (có ảnh) và Random (Xé túi)
     if p.get('category') == 'random':
       action_btn = (
           '<a href="/tui-mu/'
@@ -307,7 +306,6 @@ def index():
   return render_template_string(BASE_HTML, content=content, users=users)
 
 
-# GIAO DIỆN XÉ TÚI MÙ (RANDOM) KÈM NHẬP MÃ GIẢM GIÁ
 @app.route('/tui-mu/<int:product_id>')
 def tui_mu(product_id):
   if 'username' not in session:
@@ -328,7 +326,7 @@ def tui_mu(product_id):
         <div style="margin: 20px 0; text-align: left;">
             <label>Nhập mã giảm giá:</label>
             <input type="text" id="coupon_code" placeholder="Nhập mã (VD: GIAM5K)">
-            <button type="click" onclick="applyCoupon({product['price']})" class="btn" style="background: #3742fa; margin-top: 5px;">Áp mã</button>
+            <button type="button" onclick="applyCoupon({product['price']})" class="btn" style="background: #3742fa; margin-top: 5px;">Áp mã</button>
             <p id="coupon_msg" style="font-size: 13px; margin-top: 5px;"></p>
         </div>
 
@@ -387,7 +385,6 @@ def tui_mu(product_id):
   return render_template_string(BASE_HTML, content=content, users=users)
 
 
-# API KIỂM TRA MÃ GIẢM GIÁ
 @app.route('/api/check-coupon', methods=['POST'])
 def check_coupon():
   data = request.json or {}
@@ -404,7 +401,6 @@ def check_coupon():
   )
 
 
-# API XỬ LÝ XÉ TÚI RANDOM VÀ TRỪ TIỀN
 @app.route('/api/buy-random/<int:product_id>', methods=['POST'])
 def api_buy_random(product_id):
   if 'username' not in session:
@@ -512,7 +508,6 @@ def logout():
   return redirect(url_for('index'))
 
 
-# WEBHOOK NHẬN BIẾN ĐỘNG SỐ DƯ NGÂN HÀNG (QR)
 @app.route('/webhook/bank', methods=['POST'])
 def bank_webhook():
   data = request.json or request.form
@@ -544,7 +539,6 @@ def bank_webhook():
   return jsonify({'success': False, 'message': 'Không khớp tài khoản'})
 
 
-# GỬI THẺ CÀO SANG API SHOPBANTHE
 @app.route('/nap-the', methods=['POST'])
 def nap_the():
   if 'username' not in session:
@@ -687,14 +681,12 @@ def send_message():
   return redirect(url_for('index'))
 
 
-# ==================== KHU VỰC ADMIN (QUẢN TRỊ TOÀN DIỆN + QUẢN LÝ MÃ GIẢM GIÁ) ====================
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
   if 'username' not in session or session.get('role') != 'admin':
     flash('Bạn không có quyền truy cập trang quản trị!')
     return redirect(url_for('index'))
 
-  # Xử lý thêm sản phẩm (Có chọn loại: Tự chọn hay Random)
   if request.method == 'POST' and 'add_product' in request.form:
     name = request.form['name']
     price = int(request.form['price'])
@@ -721,7 +713,6 @@ def admin():
       flash('Đã tạo danh mục sản phẩm mới thành công!')
     return redirect(url_for('admin'))
 
-  # Xử lý thêm mã giảm giá mới
   if request.method == 'POST' and 'add_coupon' in request.form:
     code = request.form['coupon_code'].strip().upper()
     discount = float(request.form['discount_amount'])
@@ -736,7 +727,6 @@ def admin():
       flash(f'Đã thêm mã giảm giá "{code}" thành công!')
     return redirect(url_for('admin'))
 
-  # Xử lý cộng tiền user
   if request.method == 'POST' and 'bonus_user' in request.form:
     target_username = request.form['target_username'].strip()
     bonus_amount = int(request.form['bonus_amount'])
@@ -750,7 +740,6 @@ def admin():
       flash(f'Không tìm thấy tài khoản "{target_username}"!')
     return redirect(url_for('admin'))
 
-  # Xử lý trả lời tin nhắn
   if request.method == 'POST' and 'reply_msg' in request.form:
     target_user = request.form['target_user']
     reply_text = request.form['reply_text'].strip()
@@ -761,7 +750,6 @@ def admin():
       flash(f'Đã gửi phản hồi đến "{target_user}"!')
     return redirect(url_for('admin'))
 
-  # Render danh sách mã giảm giá trong admin
   coupons_html = ''
   for c in coupons_db:
     status_text = (
@@ -881,7 +869,6 @@ def admin():
   return render_template_string(BASE_HTML, content=admin_content, users=users)
 
 
-# Route Bật/Tắt (Hết hạn) nhanh mã giảm giá
 @app.route('/admin/coupon/toggle/<int:coupon_id>', methods=['POST'])
 def toggle_coupon(coupon_id):
   if 'username' not in session or session.get('role') != 'admin':
