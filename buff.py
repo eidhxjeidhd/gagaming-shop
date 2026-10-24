@@ -6,7 +6,7 @@ import urllib.request
 import urllib.parse
 
 app = Flask(__name__)
-app.secret_key = 'shop_blox_fruit_smart_v29'
+app.secret_key = 'shop_blox_fruit_smart_v30'
 
 PARTNER_ID = '71186911886'
 PARTNER_KEY = 'f7377b035f5b5d2c4a5d04e487b39aaf'
@@ -82,7 +82,7 @@ cay_thue_services = [
     }
 ]
 
-# Trạng thái cày thuê: is_ready (True: Sẵn sàng nhận đơn, False: Đang bận cày cho khách khác)
+# Trạng thái cày thuê
 cay_thue_status = {
     'is_ready': True,
     'current_task': 'Đang trống, sẵn sàng nhận đơn mới!'
@@ -1195,7 +1195,7 @@ def admin():
 
 @app.route('/admin/coupon/toggle/<int:coupon_id>', methods=['POST'])
 def toggle_coupon(coupon_id):
-  if 'username' not in session or session.get('role'] != 'admin':
+  if 'username' not in session or session.get('role') != 'admin':
     return redirect(url_for('index'))
   for c in coupons_db:
     if c['id'] == coupon_id:
