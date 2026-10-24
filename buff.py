@@ -11,7 +11,7 @@ app.secret_key = 'shop_blox_fruit_smart_v27'
 PARTNER_ID = '71186911886'
 PARTNER_KEY = 'f7377b035f5b5d2c4a5d04e487b39aaf'
 
-# --- CẤU HÌNH TELEGRAM BOT (Đã điền sẵn Chat ID của ông) ---
+# --- CẤU HÌNH TELEGRAM BOT ---
 TELEGRAM_BOT_TOKEN = '8976860826:AAHJplBXPNwNWafOV0SvyC-LqM805MD6FFA'
 TELEGRAM_CHAT_ID = '8976860826'
 
@@ -953,7 +953,7 @@ def admin():
 
 @app.route('/admin/coupon/toggle/<int:coupon_id>', methods=['POST'])
 def toggle_coupon(coupon_id):
-  if 'username' not in session or session.get('role'] != 'admin':
+  if 'username' not in session or session.get('role') != 'admin':
     return redirect(url_for('index'))
   for c in coupons_db:
     if c['id'] == coupon_id:
