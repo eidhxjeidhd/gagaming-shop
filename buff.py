@@ -6,7 +6,7 @@ import urllib.request
 import urllib.parse
 
 app = Flask(__name__)
-app.secret_key = 'shop_blox_fruit_smart_v27'
+app.secret_key = 'shop_blox_fruit_smart_v28'
 
 PARTNER_ID = '71186911886'
 PARTNER_KEY = 'f7377b035f5b5d2c4a5d04e487b39aaf'
@@ -72,8 +72,17 @@ products = [
     },
 ]
 
+# Cấu trúc mã giảm giá nâng cao: có hạn dùng (timestamp) và giới hạn số lượt
 coupons_db = [
-    {'id': 1, 'code': 'GIAM5K', 'discount_amount': 5000, 'is_active': True}
+    {
+        'id': 1, 
+        'code': 'GIAM5K', 
+        'discount_amount': 5000, 
+        'expiry_date': datetime.now().timestamp() + (7 * 86400), # Hạn 7 ngày
+        'max_uses': 10,
+        'used_count': 0,
+        'is_active': True
+    }
 ]
 
 cards_queue = []
@@ -160,15 +169,12 @@ BASE_HTML = """
         .logo { font-size: 22px; font-weight: 700; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; text-shadow: 0 0 15px rgba(255,71,87,0.4); }
         .nav-buttons { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .nav-buttons a { background: var(--primary); color: white; padding: 9px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,71,87,0.3); }
-        .nav-buttons a:hover { background: var(--primary-hover); transform: translateY(-2px); }
         .container { padding: 30px 20px; max-width: 1100px; margin: auto; }
         .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); position: relative; }
         .product-title { color: var(--text-main); font-weight: 600; font-size: 16px; margin-bottom: 5px; }
         .price { color: var(--primary); font-size: 20px; font-weight: 700; margin: 10px 0; }
         .btn { background: linear-gradient(135deg, #ff4757, #ff6b81); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer; text-align: center; display: block; text-decoration: none; box-sizing: border-box; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,71,87,0.3); }
-        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
         .btn-delete { background: rgba(255,71,87,0.2); border: 1px solid var(--primary); color: var(--primary-hover); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s; }
-        .btn-delete:hover { background: var(--primary); color: white; }
         input, select { width: 100%; padding: 12px 15px; margin: 10px 0; background: #12131c; border: 1px solid var(--border-color); color: white; border-radius: 8px; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 14px; }
         input:focus, select:focus { outline: none; border-color: var(--primary); }
         .alert { background: rgba(255,71,87,0.15); border: 1px solid var(--primary); color: #ff6b81; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-weight: 500; }
@@ -326,7 +332,7 @@ def index():
         + '<div>'
         + img_tag
         + '<div style="color: var(--text-secondary); font-size: 12px; font-weight:'
-        ' 600;">MÃ SỐ: #'
+        ' 600;">MÃ SÓ: #'
         + str(p['id'])
         + '</div><div class="product-title">'
         + p['name']
@@ -515,16 +521,20 @@ def tui_mu(product_id):
 def check_coupon():
   data = request.json or {}
   code = data.get('code', '').strip().upper()
-  coupon = next(
-      (c for c in coupons_db if c['code'] == code and c['is_active']), None
-  )
-  if coupon:
-    return jsonify(
-        {'success': True, 'discount': coupon['discount_amount']}
-    )
-  return jsonify(
-      {'success': False, 'message': 'Mã giảm giá không hợp lệ hoặc đã hết hạn!'}
-  )
+  now_ts = datetime.now().timestamp()
+  
+  coupon = next((c for c in coupons_db if c['code'] == code), None)
+  
+  if not coupon or not coupon['is_active']:
+    return jsonify({'success': False, 'message': 'Mã giảm giá không tồn tại hoặc đã bị khóa!'})
+    
+  if now_ts > coupon.get('expiry_date', 0):
+    return jsonify({'success': False, 'message': 'Mã giảm giá đã hết hạn sử dụng!'})
+    
+  if coupon.get('max_uses', 0) > 0 and coupon.get('used_count', 0) >= coupon.get('max_uses', 0):
+    return jsonify({'success': False, 'message': 'Mã giảm giá đã hết lượt sử dụng!'})
+    
+  return jsonify({'success': True, 'discount': coupon['discount_amount']})
 
 
 @app.route('/api/buy-random/<int:product_id>', methods=['POST'])
@@ -543,18 +553,15 @@ def api_buy_random(product_id):
   data = request.json or {}
   coupon_code = data.get('coupon_code', '').strip().upper()
   final_price = product['price']
+  now_ts = datetime.now().timestamp()
 
   if coupon_code:
-    coupon = next(
-        (c for c in coupons_db if c['code'] == coupon_code and c['is_active']),
-        None,
-    )
-    if coupon:
-      final_price = max(0, product['price'] - coupon['discount_amount'])
-    else:
-      return jsonify(
-          {'success': False, 'message': 'Mã giảm giá không hợp lệ hoặc đã hết hạn!'}
-      )
+    coupon = next((c for c in coupons_db if c['code'] == coupon_code), None)
+    if not coupon or not coupon['is_active'] or now_ts > coupon.get('expiry_date', 0) or (coupon.get('max_uses', 0) > 0 and coupon.get('used_count', 0) >= coupon.get('max_uses', 0)):
+      return jsonify({'success': False, 'message': 'Mã giảm giá không hợp lệ, đã hết hạn hoặc hết lượt!'})
+    
+    final_price = max(0, product['price'] - coupon['discount_amount'])
+    coupon['used_count'] = coupon.get('used_count', 0) + 1
 
   if users[username]['balance'] < final_price:
     return jsonify({'success': False, 'message': 'Số dư tài khoản không đủ!'})
@@ -869,18 +876,27 @@ def admin():
       flash('Đã tạo danh mục sản phẩm mới thành công!')
     return redirect(url_for('admin'))
 
+  # Xử lý thêm mã giảm giá nâng cao (có ngày hạn + giới hạn lượt)
   if request.method == 'POST' and 'add_coupon' in request.form:
     code = request.form['coupon_code'].strip().upper()
     discount = float(request.form['discount_amount'])
+    days = int(request.form.get('expires_in_days', 3))
+    max_uses = int(request.form.get('max_uses', 10))
+    
+    expiry_date = datetime.now().timestamp() + (days * 86400)
+    
     if code:
       new_id = coupons_db[-1]['id'] + 1 if coupons_db else 1
       coupons_db.append({
           'id': new_id,
           'code': code,
           'discount_amount': discount,
+          'expiry_date': expiry_date,
+          'max_uses': max_uses,
+          'used_count': 0,
           'is_active': True,
       })
-      flash(f'Đã thêm mã giảm giá "{code}" thành công!')
+      flash(f'Đã thêm mã "{code}" (Hạn: {days} ngày, Giới hạn: {max_uses} lượt) thành công!')
     return redirect(url_for('admin'))
 
   if request.method == 'POST' and 'bonus_user' in request.form:
@@ -914,21 +930,23 @@ def admin():
       visitors_html += f'<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border-color); font-size: 13px;"><span>🌐 IP: <b style="color: #70a1ff;">{v["ip"]}</b></span><span style="color: var(--accent);">{v["time"]}</span></div>'
 
   coupons_html = ''
+  now_ts = datetime.now().timestamp()
   for c in coupons_db:
-    status_text = (
-        '<span style="color: var(--success);">Đang hoạt động</span>'
-        if c['is_active']
-        else '<span style="color: var(--primary);">Đã tắt / Hết hạn</span>'
-    )
+    remaining_days = max(0, int((c.get('expiry_date', 0) - now_ts) / 86400))
+    used_info = f"Đã dùng: {c.get('used_count', 0)}/{c.get('max_uses', 10)}"
+    is_expired = now_ts > c.get('expiry_date', 0)
+    
+    status_text = '<span style="color: var(--success);">Đang hoạt động</span>' if (c['is_active'] and not is_expired) else '<span style="color: var(--primary);">Hết hạn / Đã tắt</span>'
     btn_text = 'Tắt' if c['is_active'] else 'Bật lại'
+    
     coupons_html += (
         '<div style="display: flex; justify-content: space-between;'
         ' align-items: center; border-bottom: 1px solid var(--border-color);'
-        ' padding: 10px 0; font-size: 14px;"><span><b>'
+        ' padding: 10px 0; font-size: 13px;"><span><b>'
         + c['code']
         + '</b> (-'
         + f"{c['discount_amount']:,.0f}"
-        + 'đ) - '
+        + f'đ)<br><small style="color: var(--text-secondary);">Hạn còn: {remaining_days} ngày | {used_info}</small><br>'
         + status_text
         + '</span><form action="/admin/coupon/toggle/'
         + str(c['id'])
@@ -998,7 +1016,7 @@ def admin():
       + visitors_html
       + '</div></div>'
       '<div class="card rgb-box" style="border: 1px solid var(--primary);"><h3 class="rgb-text" style="margin-top: 0;">📦 Thêm Sản Phẩm Mới</h3><form method="POST"><label style="font-size: 13px; color: var(--text-secondary);">Tên sản phẩm:</label><input type="text" name="name" placeholder="VD: Acc V4 Full..." required><label style="font-size: 13px; color: var(--text-secondary);">Phân loại:</label><select name="category"><option value="tuichon">Acc Tự Chọn (Cần link ảnh minh họa)</option><option value="random">Acc Random / Túi Mù (Không cần ảnh)</option></select><label style="font-size: 13px; color: var(--text-secondary);">Giá tiền (VNĐ):</label><input type="number" name="price" placeholder="VD: 30000" required><label style="font-size: 13px; color: var(--text-secondary);">Link ảnh minh họa (Chỉ dùng cho Tự chọn):</label><input type="text" name="image" placeholder="Link ảnh dạng https://i.ibb.co/..."><label style="font-size: 13px; color: var(--text-secondary);">Mô tả ngắn:</label><input type="text" name="desc" placeholder="Mô tả tài khoản..." required><label style="font-size: 13px; color: var(--text-secondary);">Tài khoản game:</label><input type="text" name="game_acc" placeholder="username | password" required><button type="submit" name="add_product" class="btn rgb-btn" style="margin-top: 15px;">THÊM VÀO KHO</button></form></div>'
-      '<div class="card rgb-box" style="border: 1px solid var(--accent);"><h3 class="rgb-text" style="margin-top: 0;">🎟️ Quản Lý Mã Giảm Giá</h3><form method="POST" style="margin-bottom: 15px;"><input type="text" name="coupon_code" placeholder="Mã (VD: GIAM5K)" required><input type="number" name="discount_amount" placeholder="Số tiền giảm (VNĐ)" required><button type="submit" name="add_coupon" class="btn rgb-btn" style="margin-top: 8px;">THÊM MÃ GIẢM GIÁ</button></form><div style="background: #12131c; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">'
+      '<div class="card rgb-box" style="border: 1px solid var(--accent);"><h3 class="rgb-text" style="margin-top: 0;">🎟️ Quản Lý Mã Giảm Giá Nâng Cao</h3><form method="POST" style="margin-bottom: 15px;"><input type="text" name="coupon_code" placeholder="Mã (VD: GIAM5K)" required><input type="number" name="discount_amount" placeholder="Số tiền giảm (VNĐ)" required><input type="number" name="expires_in_days" placeholder="Thời hạn (Số ngày sử dụng, VD: 3)" required><input type="number" name="max_uses" placeholder="Giới hạn số lượt dùng (VD: 10)" required><button type="submit" name="add_coupon" class="btn rgb-btn" style="margin-top: 8px;">THÊM MÃ GIẢM GIÁ</button></form><div style="background: #12131c; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">'
       + (coupons_html if coupons_html else '<p>Chưa có mã giảm giá nào.</p>')
       + '</div></div>'
       '<div class="card rgb-box" style="border: 1px solid var(--accent);"><h3 class="rgb-text" style="margin-top: 0;">💰 Cộng tiền cho Thành viên</h3><form method="POST"><input type="text" name="target_username" placeholder="Tên tài khoản khách..." required><input type="number" name="bonus_amount" placeholder="Số tiền cộng (VNĐ)..." required><button type="submit" name="bonus_user" class="btn rgb-btn" style="margin-top: 15px;">CỘNG TIỀN NGAY</button></form></div>'
