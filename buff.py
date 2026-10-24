@@ -78,7 +78,7 @@ coupons_db = [
 
 cards_queue = []
 purchase_history = []
-visitors_history = []  # <--- Danh sách lưu lịch sử người truy cập web
+visitors_history = []
 messages_db = [
     {
         'user': 'player1',
@@ -107,6 +107,54 @@ BASE_HTML = """
             --text-main: #ffffff;
             --text-secondary: #a4b0be;
         }
+        
+        /* --- HIỆU ỨNG 7 MÀU GAMING (RGB) --- */
+        @keyframes rgb-rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        @keyframes rgb-border {
+            0% { border-color: #ff0000; box-shadow: 0 0 10px rgba(255,0,0,0.4); }
+            20% { border-color: #ff8800; box-shadow: 0 0 10px rgba(255,136,0,0.4); }
+            40% { border-color: #ffff00; box-shadow: 0 0 10px rgba(255,255,0,0.4); }
+            60% { border-color: #00ff00; box-shadow: 0 0 10px rgba(0,255,0,0.4); }
+            80% { border-color: #00ffff; box-shadow: 0 0 10px rgba(0,255,255,0.4); }
+            100% { border-color: #ff00ff; box-shadow: 0 0 10px rgba(255,0,255,0.4); }
+        }
+
+        @keyframes rgb-anim {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .rgb-box {
+            border: 2px solid #ff0000 !important;
+            animation: rgb-border 6s infinite;
+        }
+
+        .rgb-btn {
+            background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000) !important;
+            background-size: 400% !important;
+            animation: rgb-anim 8s linear infinite !important;
+            color: white !important;
+            transition: 0.3s;
+        }
+
+        .rgb-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6) !important;
+        }
+
+        .rgb-text {
+            background: linear-gradient(to right, #ff4757, #ffa502, #2ed573, #1e90ff, #70a1ff, #ff6b81);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rgb-rainbow 6s linear infinite;
+            font-weight: 700;
+        }
+
         body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
         header { background: rgba(24, 26, 37, 0.95); backdrop-filter: blur(10px); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; gap: 15px; }
         .logo { font-size: 22px; font-weight: 700; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; text-shadow: 0 0 15px rgba(255,71,87,0.4); }
@@ -136,18 +184,19 @@ BASE_HTML = """
 </head>
 <body>
     <header>
-        <a href="/" class="logo">⚡ BLOX FRUIT STORE</a>
+        <a href="/" class="logo rgb-text">⚡ BLOX FRUIT STORE</a>
         <div class="nav-buttons">
             {% if 'username' in session %}
                 <span style="background: rgba(46,213,115,0.15); border: 1px solid var(--success); color: var(--success); padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 13px;">Số dư: {{ "{:,.0f}".format(users[session['username']]['balance']) }}đ</span>
-                <a href="/lich-su" style="background: #3742fa;">📜 Lịch sử</a>
+                <a href="/lich-su" class="rgb-btn" style="padding: 9px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px;">📜 Lịch sử</a>
+                <a href="/doi-mat-khau" class="rgb-btn" style="padding: 9px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px;">🔒 Đổi MK</a>
                 {% if session.get('role') == 'admin' %}
-                    <a href="/admin" style="background: var(--success); color: #000;">⚙️ Quản trị</a>
+                    <a href="/admin" class="rgb-btn" style="padding: 9px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px;">⚙️ Quản trị</a>
                 {% endif %}
                 <a href="/logout" style="background: #747d8c;">Thoát</a>
             {% else %}
-                <a href="/login">Đăng nhập</a>
-                <a href="/register" style="background: #3742fa;">Đăng ký</a>
+                <a href="/login" class="rgb-btn">Đăng nhập</a>
+                <a href="/register" class="rgb-btn">Đăng ký</a>
             {% endif %}
         </div>
     </header>
@@ -171,9 +220,8 @@ def index():
   visitor_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
   current_time = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
   
-  # Lưu lại lịch sử truy cập vào danh sách để xem trong trang quản trị admin
   visitors_history.insert(0, {'ip': visitor_ip, 'time': current_time})
-  if len(visitors_history) > 50:  # Giữ tối đa 50 lượt truy cập gần nhất
+  if len(visitors_history) > 50:
     visitors_history.pop()
 
   send_telegram_notification(f"🔔 <b>Có lượt truy cập mới vào Web!</b>\n🌐 IP: {visitor_ip}")
@@ -231,13 +279,13 @@ def index():
         )
 
     chat_html = (
-        '<div class="card" style="border: 1px solid var(--primary);"><h3'
+        '<div class="card rgb-box" style="border: 1px solid var(--primary);"><h3'
         ' style="color: var(--primary); margin-top: 0;">💬 Hỗ Trợ Trực'
         ' Tuyến</h3><div class="chat-box">'
         + msgs_render
         + '</div><form action="/send-message" method="POST"><input type="text"'
         ' name="message" placeholder="Nhập tin nhắn cho Admin..." required'
-        ' style="margin: 0 0 10px 0;"><button type="submit" class="btn"'
+        ' style="margin: 0 0 10px 0;"><button type="submit" class="btn rgb-btn"'
         ' style="padding: 8px; font-size: 13px;">GỬI TIN NHẮN</button></form></div>'
     )
 
@@ -248,14 +296,13 @@ def index():
       action_btn = (
           '<a href="/tui-mu/'
           + str(p['id'])
-          + '" class="btn" style="background: linear-gradient(135deg,'
-          ' #ffa502, #ff7f50); margin-top: 15px;">⚡ XÉ TÚI NGAY</a>'
+          + '" class="btn rgb-btn" style="margin-top: 15px;">⚡ XÉ TÚI NGAY</a>'
       )
     else:
       action_btn = (
           '<a href="/buy/'
           + str(p['id'])
-          + '" class="btn" style="margin-top: 15px;">🛒 MUA NGAY</a>'
+          + '" class="btn rgb-btn" style="margin-top: 15px;">🛒 MUA NGAY</a>'
       )
 
     img_tag = (
@@ -273,7 +320,7 @@ def index():
       delete_btn = f'<div style="position: absolute; top: 15px; right: 15px;"><a href="/admin/delete/{p["id"]}" class="btn-delete" onclick="return confirm(\'Bạn có chắc chắn muốn xóa sản phẩm này không?\');">🗑️ XÓA</a></div>'
 
     products_html += (
-        '<div class="card" style="display: flex; flex-direction: column;'
+        '<div class="card rgb-box" style="display: flex; flex-direction: column;'
         ' justify-content: space-between;">'
         + delete_btn
         + '<div>'
@@ -303,8 +350,8 @@ def index():
     curr_username = session['username']
     suggest_note = f'NAP {curr_username.upper()}'
     nap_html = (
-        '<div class="card" style="border: 1px solid var(--success);"><h3'
-        ' style="color: var(--success); margin-top:0;">⚡ NẠP TIỀN TỰ ĐỘNG'
+        '<div class="card rgb-box" style="border: 1px solid var(--success);"><h3'
+        ' class="rgb-text" style="margin-top:0;">⚡ NẠP TIỀN TỰ ĐỘNG'
         ' 100%</h3><div style="background: #12131c; padding: 15px; border-radius:'
         ' 10px; margin-bottom: 20px; border: 1px solid var(--border-color);"><p'
         ' style="margin: 0 0 8px 0; color: var(--accent); font-weight:'
@@ -335,13 +382,12 @@ def index():
         ' đ</option><option value="1000000">1.000.000'
         ' đ</option></select><input type="text" name="code" placeholder="Mã thẻ'
         ' cào" required><input type="text" name="serial" placeholder="Số Serial"'
-        ' required><button type="submit" class="btn" style="background:'
-        ' linear-gradient(135deg, #ffa502, #ff7f50); margin-top:'
+        ' required><button type="submit" class="btn rgb-btn" style="margin-top:'
         ' 12px;">NẠP THẺ TỰ ĐỘNG</button></form></div>'
     )
 
   banner_html = """
-        <div class="card" style="text-align: center; padding: 15px; border: 1px solid var(--primary); background: linear-gradient(180deg, rgba(255,71,87,0.05), var(--card-bg));">
+        <div class="card rgb-box" style="text-align: center; padding: 15px; border: 1px solid var(--primary); background: linear-gradient(180deg, rgba(255,71,87,0.05), var(--card-bg));">
             <img src="https://i.ibb.co/DHCWq65g/file-00000000414c821198dbb4fd0f8ab53e.png" alt="Banner" style="width: 100%; max-height: 380px; object-fit: cover; border-radius: 10px;">
         </div>
         """
@@ -350,18 +396,56 @@ def index():
       banner_html
       + nap_html
       + '<div style="display: grid; grid-template-columns: 2fr 1fr; gap:'
-      ' 20px;"><div><h2>🔥 DANH MỤC TÀI KHOẢN & TÚI MÙ</h2><div'
+      ' 20px;"><div><h2 class="rgb-text">🔥 DANH MỤC TÀI KHOẢN & TÚI MÙ</h2><div'
       ' style="display: grid; grid-template-columns: 1fr 1fr; gap:'
       ' 20px;">'
       + products_html
-      + '</div></div><div><div class="card" style="border: 1px solid'
-      ' var(--accent); margin-bottom: 20px;"><h3 style="color: var(--accent);'
+      + '</div></div><div><div class="card rgb-box" style="border: 1px solid'
+      ' var(--accent); margin-bottom: 20px;"><h3 class="rgb-text" style="'
       ' text-align: center; margin-top: 0;">🏆 TOP NẠP TIỀN</h3>'
       + top_html
       + '</div>'
       + chat_html
       + '</div></div>'
   )
+  return render_template_string(BASE_HTML, content=content, users=users)
+
+
+@app.route('/doi-mat-khau', methods=['GET', 'POST'])
+def doi_mat_khau():
+  if 'username' not in session:
+    return redirect(url_for('login'))
+  
+  if request.method == 'POST':
+    username = session['username']
+    old_pass = request.form.get('old_password', '').strip()
+    new_pass = request.form.get('new_password', '').strip()
+    
+    if users[username]['password'] != old_pass:
+      flash('Mật khẩu cũ không chính xác!')
+    elif len(new_pass) < 3:
+      flash('Mật khẩu mới quá ngắn!')
+    else:
+      users[username]['password'] = new_pass
+      flash('Đổi mật khẩu thành công! Hãy nhớ mật khẩu mới.')
+      send_telegram_notification(f"🔒 <b>User đổi mật khẩu!</b>\n👤 User: {username}")
+      return redirect(url_for('index'))
+      
+  content = """
+    <div class="card rgb-box" style="max-width: 420px; margin: auto;">
+        <h2 class="rgb-text" style="text-align: center;">ĐỔI MẬT KHẨU</h2>
+        <form method="POST">
+            <label style="font-size: 13px; color: var(--text-secondary);">Mật khẩu cũ:</label>
+            <input type="password" name="old_password" placeholder="Nhập mật khẩu hiện tại..." required>
+            <label style="font-size: 13px; color: var(--text-secondary);">Mật khẩu mới:</label>
+            <input type="password" name="new_password" placeholder="Nhập mật khẩu mới..." required>
+            <button type="submit" class="btn rgb-btn" style="margin-top: 15px;">XÁC NHẬN ĐỔI</button>
+        </form>
+        <div style="text-align: center; margin-top: 15px;">
+            <a href="/" style="color: var(--text-secondary); text-decoration: none; font-size: 13px;">← Quay lại trang chủ</a>
+        </div>
+    </div>
+    """
   return render_template_string(BASE_HTML, content=content, users=users)
 
 
@@ -376,9 +460,8 @@ def tui_mu(product_id):
     return redirect(url_for('index'))
 
   content = (
-      '<div class="card" style="max-width: 500px; margin: auto; text-align:'
-      ' center; border: 1px solid var(--accent);"><h2 style="color:'
-      ' var(--accent);">⚡ MỞ TÚI MÙ: '
+      '<div class="card rgb-box" style="max-width: 500px; margin: auto; text-align:'
+      ' center; border: 1px solid var(--accent);"><h2 class="rgb-text">⚡ MỞ TÚI MÙ: '
       + product['name']
       + '</h2><p style="color: var(--text-secondary);">'
       + product['desc']
@@ -393,15 +476,14 @@ def tui_mu(product_id):
       ' id="coupon_code" placeholder="Nhập mã (VD: GIAM5K)"><button'
       ' type="button" onclick="applyCoupon('
       + str(product['price'])
-      + ')" class="btn" style="background: #3742fa; margin-top:'
+      + ')" class="btn rgb-btn" style="margin-top:'
       ' 8px;">Áp dụng mã</button><p id="coupon_msg" style="font-size: 13px;'
       ' margin-top: 8px;"></p></div><h3 id="final_price_display" style="margin:'
       ' 15px 0; color: var(--success);">Tổng thanh toán: '
       + f"{product['price']:,}"
       + 'đ</h3><button onclick="xeTui('
       + str(product['id'])
-      + ')" class="btn" style="background: linear-gradient(135deg, #ffa502,'
-      ' #ff7f50); font-size: 16px; padding: 14px;">🔥 XÉ TÚI NGAY</button><br><a'
+      + ')" class="btn rgb-btn" style="font-size: 16px; padding: 14px;">🔥 XÉ TÚI NGAY</button><br><a'
       ' href="/" style="color: var(--text-secondary); text-decoration: none;'
       ' font-size: 13px; display: inline-block; margin-top: 15px;">← Quay về'
       ' trang chủ</a></div><script>let currentDiscount = 0;function'
@@ -503,14 +585,14 @@ def login():
       return redirect(url_for('index'))
     flash('Sai tài khoản hoặc mật khẩu!')
   content = """
-    <div class="card" style="max-width: 420px; margin: auto; border: 1px solid var(--primary);">
-        <h2 style="text-align: center; color: var(--primary);">ĐĂNG NHẬP</h2>
+    <div class="card rgb-box" style="max-width: 420px; margin: auto; border: 1px solid var(--primary);">
+        <h2 class="rgb-text" style="text-align: center;">ĐĂNG NHẬP</h2>
         <form method="POST">
             <label style="font-size: 13px; color: var(--text-secondary);">Tài khoản:</label>
             <input type="text" name="username" placeholder="Nhập tài khoản..." required>
             <label style="font-size: 13px; color: var(--text-secondary);">Mật khẩu:</label>
             <input type="password" name="password" placeholder="Nhập mật khẩu..." required>
-            <button type="submit" class="btn" style="margin-top: 15px;">ĐĂNG NHẬP NGAY</button>
+            <button type="submit" class="btn rgb-btn" style="margin-top: 15px;">ĐĂNG NHẬP NGAY</button>
         </form>
     </div>
     """
@@ -536,14 +618,14 @@ def register():
       flash('Đăng ký thành công! Hãy đăng nhập.')
       return redirect(url_for('login'))
   content = """
-    <div class="card" style="max-width: 420px; margin: auto; border: 1px solid #3742fa;">
-        <h2 style="text-align: center; color: #70a1ff;">ĐĂNG KÝ TÀI KHOẢN</h2>
+    <div class="card rgb-box" style="max-width: 420px; margin: auto; border: 1px solid #3742fa;">
+        <h2 class="rgb-text" style="text-align: center;">ĐĂNG KÝ TÀI KHOẢN</h2>
         <form method="POST">
             <label style="font-size: 13px; color: var(--text-secondary);">Tài khoản mới:</label>
             <input type="text" name="username" placeholder="Tên tài khoản..." required>
             <label style="font-size: 13px; color: var(--text-secondary);">Mật khẩu:</label>
             <input type="password" name="password" placeholder="Mật khẩu bảo mật..." required>
-            <button type="submit" class="btn" style="background: #3742fa; margin-top: 15px;">ĐĂNG KÝ NGAY</button>
+            <button type="submit" class="btn rgb-btn" style="margin-top: 15px;">ĐĂNG KÝ NGAY</button>
         </form>
     </div>
     """
@@ -696,9 +778,8 @@ def buy(product_id):
   send_telegram_notification(f"🛒 <b>Có khách mua tài khoản!</b>\n👤 User: {username}\n📦 Sản phẩm: {product['name']}\n🔑 Acc: {acc_info}")
 
   content = (
-      '<div class="card" style="max-width: 600px; margin: auto; text-align:'
-      ' center; border: 1px solid var(--success);"><h2 style="color:'
-      ' var(--success);">🎉 MUA TÀI KHOẢN THÀNH CÔNG!</h2><p>Sản phẩm: <b'
+      '<div class="card rgb-box" style="max-width: 600px; margin: auto; text-align:'
+      ' center; border: 1px solid var(--success);"><h2 class="rgb-text">🎉 MUA TÀI KHOẢN THÀNH CÔNG!</h2><p>Sản phẩm: <b'
       ' style="color: white;">'
       + product['name']
       + '</b></p><div class="success-box"><p style="margin: 0 0 8px 0; color:'
@@ -709,7 +790,7 @@ def buy(product_id):
       + acc_info
       + '</h3><p style="font-size: 13px; color: var(--primary); margin: 8px 0 0'
       ' 0;">⚠️ Hãy đổi mật khẩu ngay lập tức để bảo mật!</p></div><a href="/"'
-      ' class="btn" style="margin-top: 25px;">VỀ TRANG CHỦ</a></div>'
+      ' class="btn rgb-btn" style="margin-top: 25px;">VỀ TRANG CHỦ</a></div>'
   )
   return render_template_string(BASE_HTML, content=content, users=users)
 
@@ -721,16 +802,16 @@ def lich_su():
   user_history = [
       h for h in purchase_history if h['user'] == session['username']
   ]
-  history_html = '<h2>📜 LỊCH SỬ MUA TÀI KHOẢN</h2>'
+  history_html = '<h2 class="rgb-text">📜 LỊCH SỬ MUA TÀI KHOẢN</h2>'
   if not user_history:
     history_html += (
-        '<div class="card" style="text-align: center; color:'
+        '<div class="card rgb-box" style="text-align: center; color:'
         ' var(--text-secondary);"><p>Bạn chưa mua tài khoản nào.</p></div>'
     )
   else:
     for h in user_history:
       history_html += (
-          '<div class="card"><p style="margin: 0 0 5px 0; color:'
+          '<div class="card rgb-box"><p style="margin: 0 0 5px 0; color:'
           ' var(--text-secondary);"><b>Sản phẩm:</b> <span style="color:'
           ' white;">'
           + h['product_name']
@@ -825,7 +906,6 @@ def admin():
       flash(f'Đã gửi phản hồi đến "{target_user}"!')
     return redirect(url_for('admin'))
 
-  # Render danh sách lịch sử truy cập trên trang Admin
   visitors_html = ''
   if not visitors_history:
     visitors_html = '<p style="color: var(--text-secondary); font-size: 13px;">Chưa có lượt truy cập nào.</p>'
@@ -841,7 +921,6 @@ def admin():
         else '<span style="color: var(--primary);">Đã tắt / Hết hạn</span>'
     )
     btn_text = 'Tắt' if c['is_active'] else 'Bật lại'
-    btn_color = 'var(--primary)' if c['is_active'] else 'var(--success)'
     coupons_html += (
         '<div style="display: flex; justify-content: space-between;'
         ' align-items: center; border-bottom: 1px solid var(--border-color);'
@@ -854,9 +933,7 @@ def admin():
         + '</span><form action="/admin/coupon/toggle/'
         + str(c['id'])
         + '" method="POST" style="margin: 0;"><button type="submit"'
-        ' style="background: '
-        + btn_color
-        + '; color: white; border: none; padding: 6px 14px; border-radius:'
+        ' class="rgb-btn" style="border: none; padding: 6px 14px; border-radius:'
         ' 6px; cursor: pointer; font-weight: 600;">'
         + btn_text
         + '</button></form></div>'
@@ -873,7 +950,7 @@ def admin():
           '<div><b>' + sender_label + ':</b> ' + m['message'] + '</div>'
       )
     chat_admin_html += (
-        '<div class="card" style="background: #12131c; margin-bottom:'
+        '<div class="card rgb-box" style="background: #12131c; margin-bottom:'
         ' 12px;"><p style="margin: 0 0 8px 0;"><b>Khách hàng: <span'
         ' style="color: #70a1ff;">'
         + cu
@@ -887,9 +964,8 @@ def admin():
         + cu
         + '"><input type="text" name="reply_text"'
         ' placeholder="Nhập nội dung trả lời..." required style="margin:'
-        ' 0 0 8px 0;"><button type="submit" name="reply_msg" class="btn"'
-        ' style="padding: 6px; font-size: 12px; background:'
-        ' var(--success);">GỬI PHẢN HỒI</button></form></div>'
+        ' 0 0 8px 0;"><button type="submit" name="reply_msg" class="btn rgb-btn"'
+        ' style="padding: 6px; font-size: 12px;">GỬI PHẢN HỒI</button></form></div>'
     )
 
   cards_html = ''
@@ -901,7 +977,7 @@ def admin():
   else:
     for c in cards_queue:
       cards_html += (
-          '<div class="card" style="margin-bottom: 10px;"><p'
+          '<div class="card rgb-box" style="margin-bottom: 10px;"><p'
           ' style="margin: 0 0 5px 0;"><b>User:</b> '
           + c['user']
           + ' | <b>Loại:</b> '
@@ -917,19 +993,19 @@ def admin():
       )
 
   admin_content = (
-      '<h2>⚙️ TRANG QUẢN TRỊ ADMIN</h2>'
-      '<div class="card" style="border: 1px solid #70a1ff;"><h3 style="color: #70a1ff; margin-top: 0;">🌐 Lịch Sử Truy Cập Gần Đây</h3><div style="background: #12131c; padding: 12px; border-radius: 8px; max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color);">'
+      '<h2 class="rgb-text">⚙️ TRANG QUẢN TRỊ ADMIN</h2>'
+      '<div class="card rgb-box" style="border: 1px solid #70a1ff;"><h3 class="rgb-text" style="margin-top: 0;">🌐 Lịch Sử Truy Cập Gần Đây</h3><div style="background: #12131c; padding: 12px; border-radius: 8px; max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color);">'
       + visitors_html
       + '</div></div>'
-      '<div class="card" style="border: 1px solid var(--primary);"><h3 style="color: var(--primary); margin-top: 0;">📦 Thêm Sản Phẩm Mới</h3><form method="POST"><label style="font-size: 13px; color: var(--text-secondary);">Tên sản phẩm:</label><input type="text" name="name" placeholder="VD: Acc V4 Full..." required><label style="font-size: 13px; color: var(--text-secondary);">Phân loại:</label><select name="category"><option value="tuichon">Acc Tự Chọn (Cần link ảnh minh họa)</option><option value="random">Acc Random / Túi Mù (Không cần ảnh)</option></select><label style="font-size: 13px; color: var(--text-secondary);">Giá tiền (VNĐ):</label><input type="number" name="price" placeholder="VD: 30000" required><label style="font-size: 13px; color: var(--text-secondary);">Link ảnh minh họa (Chỉ dùng cho Tự chọn):</label><input type="text" name="image" placeholder="Link ảnh dạng https://i.ibb.co/..."><label style="font-size: 13px; color: var(--text-secondary);">Mô tả ngắn:</label><input type="text" name="desc" placeholder="Mô tả tài khoản..." required><label style="font-size: 13px; color: var(--text-secondary);">Tài khoản game:</label><input type="text" name="game_acc" placeholder="username | password" required><button type="submit" name="add_product" class="btn" style="margin-top: 15px; background: var(--success);">THÊM VÀO KHO</button></form></div>'
-      '<div class="card" style="border: 1px solid var(--accent);"><h3 style="color: var(--accent); margin-top: 0;">🎟️ Quản Lý Mã Giảm Giá</h3><form method="POST" style="margin-bottom: 15px;"><input type="text" name="coupon_code" placeholder="Mã (VD: GIAM5K)" required><input type="number" name="discount_amount" placeholder="Số tiền giảm (VNĐ)" required><button type="submit" name="add_coupon" class="btn" style="background: var(--accent); margin-top: 8px;">THÊM MÃ GIẢM GIÁ</button></form><div style="background: #12131c; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">'
+      '<div class="card rgb-box" style="border: 1px solid var(--primary);"><h3 class="rgb-text" style="margin-top: 0;">📦 Thêm Sản Phẩm Mới</h3><form method="POST"><label style="font-size: 13px; color: var(--text-secondary);">Tên sản phẩm:</label><input type="text" name="name" placeholder="VD: Acc V4 Full..." required><label style="font-size: 13px; color: var(--text-secondary);">Phân loại:</label><select name="category"><option value="tuichon">Acc Tự Chọn (Cần link ảnh minh họa)</option><option value="random">Acc Random / Túi Mù (Không cần ảnh)</option></select><label style="font-size: 13px; color: var(--text-secondary);">Giá tiền (VNĐ):</label><input type="number" name="price" placeholder="VD: 30000" required><label style="font-size: 13px; color: var(--text-secondary);">Link ảnh minh họa (Chỉ dùng cho Tự chọn):</label><input type="text" name="image" placeholder="Link ảnh dạng https://i.ibb.co/..."><label style="font-size: 13px; color: var(--text-secondary);">Mô tả ngắn:</label><input type="text" name="desc" placeholder="Mô tả tài khoản..." required><label style="font-size: 13px; color: var(--text-secondary);">Tài khoản game:</label><input type="text" name="game_acc" placeholder="username | password" required><button type="submit" name="add_product" class="btn rgb-btn" style="margin-top: 15px;">THÊM VÀO KHO</button></form></div>'
+      '<div class="card rgb-box" style="border: 1px solid var(--accent);"><h3 class="rgb-text" style="margin-top: 0;">🎟️ Quản Lý Mã Giảm Giá</h3><form method="POST" style="margin-bottom: 15px;"><input type="text" name="coupon_code" placeholder="Mã (VD: GIAM5K)" required><input type="number" name="discount_amount" placeholder="Số tiền giảm (VNĐ)" required><button type="submit" name="add_coupon" class="btn rgb-btn" style="margin-top: 8px;">THÊM MÃ GIẢM GIÁ</button></form><div style="background: #12131c; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">'
       + (coupons_html if coupons_html else '<p>Chưa có mã giảm giá nào.</p>')
       + '</div></div>'
-      '<div class="card" style="border: 1px solid var(--accent);"><h3 style="color: var(--accent); margin-top: 0;">💰 Cộng tiền cho Thành viên</h3><form method="POST"><input type="text" name="target_username" placeholder="Tên tài khoản khách..." required><input type="number" name="bonus_amount" placeholder="Số tiền cộng (VNĐ)..." required><button type="submit" name="bonus_user" class="btn" style="margin-top: 15px; background: var(--accent);">CỘNG TIỀN NGAY</button></form></div>'
-      '<div class="card" style="border: 1px solid #70a1ff;"><h3 style="color: #70a1ff; margin-top: 0;">💬 Tin Nhắn Hỗ Trợ Khách Hàng</h3>'
+      '<div class="card rgb-box" style="border: 1px solid var(--accent);"><h3 class="rgb-text" style="margin-top: 0;">💰 Cộng tiền cho Thành viên</h3><form method="POST"><input type="text" name="target_username" placeholder="Tên tài khoản khách..." required><input type="number" name="bonus_amount" placeholder="Số tiền cộng (VNĐ)..." required><button type="submit" name="bonus_user" class="btn rgb-btn" style="margin-top: 15px;">CỘNG TIỀN NGAY</button></form></div>'
+      '<div class="card rgb-box" style="border: 1px solid #70a1ff;"><h3 class="rgb-text" style="margin-top: 0;">💬 Tin Nhắn Hỗ Trợ Khách Hàng</h3>'
       + (chat_admin_html if chat_admin_html else '<p>Chưa có tin nhắn nào.</p>')
       + '</div>'
-      '<div class="card" style="border: 1px solid var(--success);"><h3 style="color: var(--success); margin-top: 0;">📋 Lịch Sử Nạp Tiền</h3>'
+      '<div class="card rgb-box" style="border: 1px solid var(--success);"><h3 class="rgb-text" style="margin-top: 0;">📋 Lịch Sử Nạp Tiền</h3>'
       + cards_html
       + '</div>'
   )
