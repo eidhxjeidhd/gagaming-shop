@@ -11,7 +11,7 @@ app.secret_key = 'shop_blox_fruit_smart_v27'
 PARTNER_ID = '71186911886'
 PARTNER_KEY = 'f7377b035f5b5d2c4a5d04e487b39aaf'
 
-# --- CẤU HÌNH TELEGRAM BOT MỚI CHÍNH CHỦ ---
+# --- CẤU HÌNH TELEGRAM BOT CHÍNH CHỦ ---
 TELEGRAM_BOT_TOKEN = '8818555905:AAGFfnQhNpSQ0jC20X5IsZ0WVAVQImJVkM4'
 TELEGRAM_CHAT_ID = '8976860826'
 
@@ -78,6 +78,7 @@ coupons_db = [
 
 cards_queue = []
 purchase_history = []
+visitors_history = []  # <--- Danh sách lưu lịch sử người truy cập web
 messages_db = [
     {
         'user': 'player1',
@@ -168,6 +169,13 @@ BASE_HTML = """
 @app.route('/')
 def index():
   visitor_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+  current_time = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+  
+  # Lưu lại lịch sử truy cập vào danh sách để xem trong trang quản trị admin
+  visitors_history.insert(0, {'ip': visitor_ip, 'time': current_time})
+  if len(visitors_history) > 50:  # Giữ tối đa 50 lượt truy cập gần nhất
+    visitors_history.pop()
+
   send_telegram_notification(f"🔔 <b>Có lượt truy cập mới vào Web!</b>\n🌐 IP: {visitor_ip}")
 
   sorted_users = sorted(
@@ -817,6 +825,14 @@ def admin():
       flash(f'Đã gửi phản hồi đến "{target_user}"!')
     return redirect(url_for('admin'))
 
+  # Render danh sách lịch sử truy cập trên trang Admin
+  visitors_html = ''
+  if not visitors_history:
+    visitors_html = '<p style="color: var(--text-secondary); font-size: 13px;">Chưa có lượt truy cập nào.</p>'
+  else:
+    for v in visitors_history:
+      visitors_html += f'<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border-color); font-size: 13px;"><span>🌐 IP: <b style="color: #70a1ff;">{v["ip"]}</b></span><span style="color: var(--accent);">{v["time"]}</span></div>'
+
   coupons_html = ''
   for c in coupons_db:
     status_text = (
@@ -901,50 +917,19 @@ def admin():
       )
 
   admin_content = (
-      '<h2>⚙️ TRANG QUẢN TRỊ ADMIN</h2><div class="card" style="border: 1px solid'
-      ' var(--primary);"><h3 style="color: var(--primary); margin-top:'
-      ' 0;">📦 Thêm Sản Phẩm Mới</h3><form method="POST"><label style="font-size:'
-      ' 13px; color: var(--text-secondary);">Tên sản phẩm:</label><input'
-      ' type="text" name="name" placeholder="VD: Acc V4 Full..."'
-      ' required><label style="font-size: 13px; color:'
-      ' var(--text-secondary);">Phân loại:</label><select'
-      ' name="category"><option value="tuichon">Acc Tự Chọn (Cần link ảnh'
-      ' minh họa)</option><option value="random">Acc Random / Túi Mù (Không'
-      ' cần ảnh)</option></select><label style="font-size: 13px; color:'
-      ' var(--text-secondary);">Giá tiền (VNĐ):</label><input type="number"'
-      ' name="price" placeholder="VD: 30000" required><label style="font-size:'
-      ' 13px; color: var(--text-secondary);">Link ảnh minh họa (Chỉ dùng cho Tự'
-      ' chọn):</label><input type="text" name="image" placeholder="Link ảnh dạng'
-      ' https://i.ibb.co/..."><label style="font-size: 13px; color:'
-      ' var(--text-secondary);">Mô tả ngắn:</label><input type="text" name="desc"'
-      ' placeholder="Mô tả tài khoản..." required><label style="font-size:'
-      ' 13px; color: var(--text-secondary);">Tài khoản game:</label><input'
-      ' type="text" name="game_acc" placeholder="username | password"'
-      ' required><button type="submit" name="add_product" class="btn"'
-      ' style="margin-top: 15px; background:'
-      ' var(--success);">THÊM VÀO KHO</button></form></div><div class="card"'
-      ' style="border: 1px solid var(--accent);"><h3 style="color:'
-      ' var(--accent); margin-top: 0;">🎟️ Quản Lý Mã Giảm Giá</h3><form'
-      ' method="POST" style="margin-bottom: 15px;"><input type="text"'
-      ' name="coupon_code" placeholder="Mã (VD: GIAM5K)" required><input'
-      ' type="number" name="discount_amount" placeholder="Số tiền giảm (VNĐ)"'
-      ' required><button type="submit" name="add_coupon" class="btn"'
-      ' style="background: var(--accent); margin-top: 8px;">THÊM MÃ GIẢM'
-      ' GIÁ</button></form><div style="background: #12131c; padding: 12px;'
-      ' border-radius: 8px; border: 1px solid var(--border-color);">'
+      '<h2>⚙️ TRANG QUẢN TRỊ ADMIN</h2>'
+      '<div class="card" style="border: 1px solid #70a1ff;"><h3 style="color: #70a1ff; margin-top: 0;">🌐 Lịch Sử Truy Cập Gần Đây</h3><div style="background: #12131c; padding: 12px; border-radius: 8px; max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color);">'
+      + visitors_html
+      + '</div></div>'
+      '<div class="card" style="border: 1px solid var(--primary);"><h3 style="color: var(--primary); margin-top: 0;">📦 Thêm Sản Phẩm Mới</h3><form method="POST"><label style="font-size: 13px; color: var(--text-secondary);">Tên sản phẩm:</label><input type="text" name="name" placeholder="VD: Acc V4 Full..." required><label style="font-size: 13px; color: var(--text-secondary);">Phân loại:</label><select name="category"><option value="tuichon">Acc Tự Chọn (Cần link ảnh minh họa)</option><option value="random">Acc Random / Túi Mù (Không cần ảnh)</option></select><label style="font-size: 13px; color: var(--text-secondary);">Giá tiền (VNĐ):</label><input type="number" name="price" placeholder="VD: 30000" required><label style="font-size: 13px; color: var(--text-secondary);">Link ảnh minh họa (Chỉ dùng cho Tự chọn):</label><input type="text" name="image" placeholder="Link ảnh dạng https://i.ibb.co/..."><label style="font-size: 13px; color: var(--text-secondary);">Mô tả ngắn:</label><input type="text" name="desc" placeholder="Mô tả tài khoản..." required><label style="font-size: 13px; color: var(--text-secondary);">Tài khoản game:</label><input type="text" name="game_acc" placeholder="username | password" required><button type="submit" name="add_product" class="btn" style="margin-top: 15px; background: var(--success);">THÊM VÀO KHO</button></form></div>'
+      '<div class="card" style="border: 1px solid var(--accent);"><h3 style="color: var(--accent); margin-top: 0;">🎟️ Quản Lý Mã Giảm Giá</h3><form method="POST" style="margin-bottom: 15px;"><input type="text" name="coupon_code" placeholder="Mã (VD: GIAM5K)" required><input type="number" name="discount_amount" placeholder="Số tiền giảm (VNĐ)" required><button type="submit" name="add_coupon" class="btn" style="background: var(--accent); margin-top: 8px;">THÊM MÃ GIẢM GIÁ</button></form><div style="background: #12131c; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">'
       + (coupons_html if coupons_html else '<p>Chưa có mã giảm giá nào.</p>')
-      + '</div></div><div class="card" style="border: 1px solid var(--accent);"><h3'
-      ' style="color: var(--accent); margin-top: 0;">💰 Cộng tiền cho Thành'
-      ' viên</h3><form method="POST"><input type="text" name="target_username"'
-      ' placeholder="Tên tài khoản khách..." required><input type="number"'
-      ' name="bonus_amount" placeholder="Số tiền cộng (VNĐ)..." required><button'
-      ' type="submit" name="bonus_user" class="btn" style="margin-top: 15px;'
-      ' background: var(--accent);">CỘNG TIỀN NGAY</button></form></div><div'
-      ' class="card" style="border: 1px solid #70a1ff;"><h3 style="color:'
-      ' #70a1ff; margin-top: 0;">💬 Tin Nhắn Hỗ Trợ Khách Hàng</h3>'
+      + '</div></div>'
+      '<div class="card" style="border: 1px solid var(--accent);"><h3 style="color: var(--accent); margin-top: 0;">💰 Cộng tiền cho Thành viên</h3><form method="POST"><input type="text" name="target_username" placeholder="Tên tài khoản khách..." required><input type="number" name="bonus_amount" placeholder="Số tiền cộng (VNĐ)..." required><button type="submit" name="bonus_user" class="btn" style="margin-top: 15px; background: var(--accent);">CỘNG TIỀN NGAY</button></form></div>'
+      '<div class="card" style="border: 1px solid #70a1ff;"><h3 style="color: #70a1ff; margin-top: 0;">💬 Tin Nhắn Hỗ Trợ Khách Hàng</h3>'
       + (chat_admin_html if chat_admin_html else '<p>Chưa có tin nhắn nào.</p>')
-      + '</div><div class="card" style="border: 1px solid var(--success);"><h3'
-      ' style="color: var(--success); margin-top: 0;">📋 Lịch Sử Nạp Tiền</h3>'
+      + '</div>'
+      '<div class="card" style="border: 1px solid var(--success);"><h3 style="color: var(--success); margin-top: 0;">📋 Lịch Sử Nạp Tiền</h3>'
       + cards_html
       + '</div>'
   )
