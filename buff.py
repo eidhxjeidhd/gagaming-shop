@@ -11,9 +11,9 @@ app.secret_key = 'shop_blox_fruit_smart_v27'
 PARTNER_ID = '71186911886'
 PARTNER_KEY = 'f7377b035f5b5d2c4a5d04e487b39aaf'
 
-# --- CẤU HÌNH TELEGRAM BOT ---
+# --- CẤU HÌNH TELEGRAM BOT (Đã điền sẵn Chat ID của ông) ---
 TELEGRAM_BOT_TOKEN = '8976860826:AAHJplBXPNwNWafOV0SvyC-LqM805MD6FFA'
-TELEGRAM_CHAT_ID = 'NHẬP_CHAT_ID_TELEGRAM_CỦA_ÔNG_VÀO_ĐÂY'  # Ví dụ: '8976860826'
+TELEGRAM_CHAT_ID = '8976860826'
 
 def send_telegram_notification(message):
     try:
@@ -167,7 +167,6 @@ BASE_HTML = """
 
 @app.route('/')
 def index():
-  # Tự động bắn thông báo về Telegram khi có người truy cập (hoặc UptimeRobot ping)
   visitor_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
   send_telegram_notification(f"🔔 <b>Có lượt truy cập mới vào Web!</b>\n🌐 IP: {visitor_ip}")
 
@@ -479,7 +478,6 @@ def api_buy_random(product_id):
       'account_details': acc_info,
   })
 
-  # Bắn thông báo mua túi mù về Telegram
   send_telegram_notification(f"🔥 <b>Có khách mua túi mù!</b>\n👤 User: {username}\n📦 Sản phẩm: {product['name']}\n💰 Giá: {final_price:,}đ")
 
   return jsonify({'success': True, 'account_info': acc_info})
@@ -588,7 +586,6 @@ def bank_webhook():
             'amount': amount,
             'status': 'Thành công',
         })
-        # Bắn thông báo nạp tiền thành công về Telegram
         send_telegram_notification(f"💵 <b>Nạp tiền QR thành công!</b>\n👤 User: {uname}\n💰 Số tiền: {amount:,}đ")
         return jsonify({'success': True, 'message': f'Đã cộng {amount} cho {uname}'})
 
@@ -688,7 +685,6 @@ def buy(product_id):
       'account_details': acc_info,
   })
 
-  # Bắn thông báo mua hàng thành công về Telegram
   send_telegram_notification(f"🛒 <b>Có khách mua tài khoản!</b>\n👤 User: {username}\n📦 Sản phẩm: {product['name']}\n🔑 Acc: {acc_info}")
 
   content = (
@@ -957,7 +953,7 @@ def admin():
 
 @app.route('/admin/coupon/toggle/<int:coupon_id>', methods=['POST'])
 def toggle_coupon(coupon_id):
-  if 'username' not in session or session.get('role') != 'admin':
+  if 'username' not in session or session.get('role'] != 'admin':
     return redirect(url_for('index'))
   for c in coupons_db:
     if c['id'] == coupon_id:
