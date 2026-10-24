@@ -6,7 +6,7 @@ import urllib.request
 import urllib.parse
 
 app = Flask(__name__)
-app.secret_key = 'shop_blox_fruit_smart_v28'
+app.secret_key = 'shop_blox_fruit_smart_v29'
 
 PARTNER_ID = '71186911886'
 PARTNER_KEY = 'f7377b035f5b5d2c4a5d04e487b39aaf'
@@ -72,13 +72,28 @@ products = [
     },
 ]
 
-# Cấu trúc mã giảm giá nâng cao: có hạn dùng (timestamp) và giới hạn số lượt
+# --- QUẢN LÝ DỊCH VỤ CÀY THUÊ ---
+cay_thue_services = [
+    {
+        'id': 1,
+        'name': 'Cày Max Level (Level 1 -> Max)',
+        'price': 50000,
+        'desc': 'Cày nhanh gọn, an toàn, không dùng tool bẩn nguy hiểm.'
+    }
+]
+
+# Trạng thái cày thuê: is_ready (True: Sẵn sàng nhận đơn, False: Đang bận cày cho khách khác)
+cay_thue_status = {
+    'is_ready': True,
+    'current_task': 'Đang trống, sẵn sàng nhận đơn mới!'
+}
+
 coupons_db = [
     {
         'id': 1, 
         'code': 'GIAM5K', 
         'discount_amount': 5000, 
-        'expiry_date': datetime.now().timestamp() + (7 * 86400), # Hạn 7 ngày
+        'expiry_date': datetime.now().timestamp() + (7 * 86400),
         'max_uses': 10,
         'used_count': 0,
         'is_active': True
@@ -117,7 +132,6 @@ BASE_HTML = """
             --text-secondary: #a4b0be;
         }
         
-        /* --- HIỆU ỨNG 7 MÀU GAMING (RGB) --- */
         @keyframes rgb-rainbow {
             0% { filter: hue-rotate(0deg); }
             100% { filter: hue-rotate(360deg); }
@@ -175,8 +189,8 @@ BASE_HTML = """
         .price { color: var(--primary); font-size: 20px; font-weight: 700; margin: 10px 0; }
         .btn { background: linear-gradient(135deg, #ff4757, #ff6b81); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer; text-align: center; display: block; text-decoration: none; box-sizing: border-box; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,71,87,0.3); }
         .btn-delete { background: rgba(255,71,87,0.2); border: 1px solid var(--primary); color: var(--primary-hover); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s; }
-        input, select { width: 100%; padding: 12px 15px; margin: 10px 0; background: #12131c; border: 1px solid var(--border-color); color: white; border-radius: 8px; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 14px; }
-        input:focus, select:focus { outline: none; border-color: var(--primary); }
+        input, select, textarea { width: 100%; padding: 12px 15px; margin: 10px 0; background: #12131c; border: 1px solid var(--border-color); color: white; border-radius: 8px; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 14px; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
         .alert { background: rgba(255,71,87,0.15); border: 1px solid var(--primary); color: #ff6b81; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-weight: 500; }
         .success-box { background: rgba(46,213,115,0.1); border: 1px solid var(--success); padding: 20px; border-radius: 10px; margin-top: 15px; text-align: center; }
         .top-user-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 14px; align-items: center; }
@@ -220,7 +234,6 @@ BASE_HTML = """
 </html>
 """
 
-
 @app.route('/')
 def index():
   visitor_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
@@ -229,8 +242,6 @@ def index():
   visitors_history.insert(0, {'ip': visitor_ip, 'time': current_time})
   if len(visitors_history) > 50:
     visitors_history.pop()
-
-  send_telegram_notification(f"🔔 <b>Có lượt truy cập mới vào Web!</b>\n🌐 IP: {visitor_ip}")
 
   sorted_users = sorted(
       users.items(), key=lambda x: x[1].get('total_deposited', 0), reverse=True
@@ -351,6 +362,33 @@ def index():
         + '</div></div>'
     )
 
+  # --- RENDER PHẦN CÀY THUÊ RA TRANG CHỦ ---
+  status_badge = '<span style="color: var(--success); font-weight: bold;">🟢 Đang sẵn sàng nhận đơn</span>' if cay_thue_status['is_ready'] else '<span style="color: var(--primary); font-weight: bold;">🔴 Đang bận (Vui lòng đợi)</span>'
+  status_note_box = f'<div style="background: #12131c; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; border: 1px solid var(--border-color);">Trạng thái hiện tại: {status_badge}<br><span style="color: var(--text-secondary);">Thông báo: <b>{cay_thue_status["current_task"]}</b></span></div>'
+
+  cay_thue_html = ''
+  for ct in cay_thue_services:
+    if cay_thue_status['is_ready']:
+      btn_cay = f'<a href="/dat-cay-thue/{ct["id"]}" class="btn rgb-btn" style="margin-top: 12px;">⚡ ĐẶT DỊCH VỤ</a>'
+    else:
+      btn_cay = f'<button class="btn" style="background: #475569; cursor: not-allowed; margin-top: 12px;" disabled>Đang bận cày cho khách, vui lòng đợi!</button>'
+
+    delete_ct_btn = ''
+    if session.get('role') == 'admin':
+      delete_ct_btn = f'<div style="position: absolute; top: 15px; right: 15px;"><a href="/admin/delete-cay-thue/{ct["id"]}" class="btn-delete" onclick="return confirm(\'Xóa dịch vụ cày thuê này?\');">🗑️ XÓA</a></div>'
+
+    cay_thue_html += (
+        '<div class="card rgb-box" style="position: relative;">'
+        + delete_ct_btn
+        + f'<div class="product-title">{ct["name"]}</div>'
+        + f'<p style="color: var(--text-secondary); font-size: 13px;">{ct["desc"]}</p>'
+        + f'<div class="price">{ct["price"]:,}đ</div>'
+        + btn_cay
+        + '</div>'
+    )
+  if not cay_thue_html:
+    cay_thue_html = '<p style="color: var(--text-secondary); font-size: 13px;">Chưa có gói cày thuê nào được tạo.</p>'
+
   nap_html = ''
   if 'username' in session and session.get('role') != 'admin':
     curr_username = session['username']
@@ -406,6 +444,10 @@ def index():
       ' style="display: grid; grid-template-columns: 1fr 1fr; gap:'
       ' 20px;">'
       + products_html
+      + '</div><h2 class="rgb-text" style="margin-top: 30px;">⚔️ DỊCH VỤ CÀY THUÊ UY TÍN</h2>'
+      + status_note_box
+      + '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">'
+      + cay_thue_html
       + '</div></div><div><div class="card rgb-box" style="border: 1px solid'
       ' var(--accent); margin-bottom: 20px;"><h3 class="rgb-text" style="'
       ' text-align: center; margin-top: 0;">🏆 TOP NẠP TIỀN</h3>'
@@ -414,6 +456,65 @@ def index():
       + chat_html
       + '</div></div>'
   )
+  return render_template_string(BASE_HTML, content=content, users=users)
+
+
+@app.route('/dat-cay-thue/<int:ct_id>', methods=['GET', 'POST'])
+def dat_cay_thue(ct_id):
+  if 'username' not in session:
+    flash('Vui lòng đăng nhập để đặt dịch vụ cày thuê!')
+    return redirect(url_for('login'))
+  
+  if not cay_thue_status['is_ready']:
+    flash('Hiện tại shop đang bận cày cho khách khác, vui lòng đợi!')
+    return redirect(url_for('index'))
+
+  service = next((s for s in cay_thue_services if s['id'] == ct_id), None)
+  if not service:
+    flash('Không tìm thấy gói cày thuê!')
+    return redirect(url_for('index'))
+
+  username = session['username']
+
+  if request.method == 'POST':
+    username_game = request.form.get('username_game', '').strip()
+    password_game = request.form.get('password_game', '').strip()
+    note_game = request.form.get('note_game', '').strip()
+
+    if not username_game or not password_game:
+      flash('Vui lòng điền đầy đủ tài khoản và mật khẩu game!')
+    elif users[username]['balance'] < service['price']:
+      flash('Số dư tài khoản không đủ để thanh toán gói cày này!')
+    else:
+      users[username]['balance'] -= service['price']
+      purchase_history.append({
+          'user': username,
+          'product_name': f"Cày thuê: {service['name']}",
+          'account_details': f"TK: {username_game} | Pass: {password_game} | Ghi chú: {note_game}"
+      })
+      send_telegram_notification(f"⚔️ <b>Có khách đặt cày thuê!</b>\n👤 User web: {username}\n📦 Gói: {service['name']}\n🎮 TK Game: {username_game}\n🔑 Pass: {password_game}\n📝 Ghi chú: {note_game}")
+      flash('Đặt cày thuê thành công! Admin sẽ liên hệ và tiến hành cày sớm nhất.')
+      return redirect(url_for('lich_su'))
+
+  content = f"""
+    <div class="card rgb-box" style="max-width: 500px; margin: auto; border: 1px solid var(--accent);">
+        <h2 class="rgb-text" style="text-align: center;">ĐẶT CÀY THUÊ</h2>
+        <p style="color: var(--text-secondary); text-align: center;">Gói: <b>{service['name']}</b></p>
+        <p class="price" style="text-align: center;">Giá: {service['price']:,}đ</p>
+        <form method="POST">
+            <label style="font-size: 13px; color: var(--text-secondary);">Tài khoản Roblox / Email:</label>
+            <input type="text" name="username_game" placeholder="Nhập tài khoản game..." required>
+            <label style="font-size: 13px; color: var(--text-secondary);">Mật khẩu game:</label>
+            <input type="password" name="password_game" placeholder="Nhập mật khẩu game..." required>
+            <label style="font-size: 13px; color: var(--text-secondary);">Yêu cầu / Ghi chú thêm (nếu có):</label>
+            <textarea name="note_game" placeholder="VD: Nhớ giữ lại trái ác quỷ trong rương..." rows="3"></textarea>
+            <button type="submit" class="btn rgb-btn" style="margin-top: 15px;">XÁC NHẬN THANH TOÁN & ĐẶT ĐƠN</button>
+        </form>
+        <div style="text-align: center; margin-top: 15px;">
+            <a href="/" style="color: var(--text-secondary); text-decoration: none; font-size: 13px;">← Quay lại trang chủ</a>
+        </div>
+    </div>
+    """
   return render_template_string(BASE_HTML, content=content, users=users)
 
 
@@ -433,7 +534,7 @@ def doi_mat_khau():
       flash('Mật khẩu mới quá ngắn!')
     else:
       users[username]['password'] = new_pass
-      flash('Đổi mật khẩu thành công! Hãy nhớ mật khẩu mới.')
+      flash('Đổi mật khẩu thành công!')
       send_telegram_notification(f"🔒 <b>User đổi mật khẩu!</b>\n👤 User: {username}")
       return redirect(url_for('index'))
       
@@ -657,6 +758,18 @@ def delete_product(product_id):
   return redirect(url_for('index'))
 
 
+@app.route('/admin/delete-cay-thue/<int:ct_id>')
+def delete_cay_thue(ct_id):
+  if 'username' not in session or session.get('role') != 'admin':
+    flash('Bạn không có quyền thực hiện hành động này!')
+    return redirect(url_for('index'))
+  
+  global cay_thue_services
+  cay_thue_services = [s for s in cay_thue_services if s['id'] != ct_id]
+  flash('Đã xóa dịch vụ cày thuê thành công!')
+  return redirect(url_for('admin'))
+
+
 @app.route('/webhook/bank', methods=['POST'])
 def bank_webhook():
   data = request.json or request.form
@@ -809,20 +922,20 @@ def lich_su():
   user_history = [
       h for h in purchase_history if h['user'] == session['username']
   ]
-  history_html = '<h2 class="rgb-text">📜 LỊCH SỬ MUA TÀI KHOẢN</h2>'
+  history_html = '<h2 class="rgb-text">📜 LỊCH SỬ GIAO DỊCH & CÀY THUÊ</h2>'
   if not user_history:
     history_html += (
         '<div class="card rgb-box" style="text-align: center; color:'
-        ' var(--text-secondary);"><p>Bạn chưa mua tài khoản nào.</p></div>'
+        ' var(--text-secondary);"><p>Bạn chưa có lịch sử giao dịch nào.</p></div>'
     )
   else:
     for h in user_history:
       history_html += (
           '<div class="card rgb-box"><p style="margin: 0 0 5px 0; color:'
-          ' var(--text-secondary);"><b>Sản phẩm:</b> <span style="color:'
+          ' var(--text-secondary);"><b>Gói / Sản phẩm:</b> <span style="color:'
           ' white;">'
           + h['product_name']
-          + '</span></p><p style="margin: 0;"><b>Tài khoản:</b> <span'
+          + '</span></p><p style="margin: 0;"><b>Chi tiết / Thông tin:</b> <span'
           ' style="color: var(--success); font-weight: 600;">'
           + h['account_details']
           + '</span></p></div>'
@@ -876,7 +989,30 @@ def admin():
       flash('Đã tạo danh mục sản phẩm mới thành công!')
     return redirect(url_for('admin'))
 
-  # Xử lý thêm mã giảm giá nâng cao (có ngày hạn + giới hạn lượt)
+  # --- XỬ LÝ THÊM GÓI CÀY THUÊ TỪ ADMIN ---
+  if request.method == 'POST' and 'add_cay_thue' in request.form:
+    name = request.form['ct_name'].strip()
+    price = int(request.form['ct_price'])
+    desc = request.form['ct_desc'].strip()
+    if name:
+      new_id = cay_thue_services[-1]['id'] + 1 if cay_thue_services else 1
+      cay_thue_services.append({
+          'id': new_id,
+          'name': name,
+          'price': price,
+          'desc': desc
+      })
+      flash(f'Đã thêm gói cày thuê "{name}" thành công!')
+    return redirect(url_for('admin'))
+
+  # --- XỬ LÝ CẬP NHẬT TRẠNG THÁI CÀY THUÊ ---
+  if request.method == 'POST' and 'update_cay_thue_status' in request.form:
+    ready_val = request.form.get('is_ready')
+    cay_thue_status['is_ready'] = True if ready_val == 'on' else False
+    cay_thue_status['current_task'] = request.form.get('current_task', '').strip()
+    flash('Đã cập nhật trạng thái cày thuê thành công!')
+    return redirect(url_for('admin'))
+
   if request.method == 'POST' and 'add_coupon' in request.form:
     code = request.form['coupon_code'].strip().upper()
     discount = float(request.form['discount_amount'])
@@ -896,7 +1032,7 @@ def admin():
           'used_count': 0,
           'is_active': True,
       })
-      flash(f'Đã thêm mã "{code}" (Hạn: {days} ngày, Giới hạn: {max_uses} lượt) thành công!')
+      flash(f'Đã thêm mã "{code}" thành công!')
     return redirect(url_for('admin'))
 
   if request.method == 'POST' and 'bonus_user' in request.form:
@@ -935,7 +1071,6 @@ def admin():
     remaining_days = max(0, int((c.get('expiry_date', 0) - now_ts) / 86400))
     used_info = f"Đã dùng: {c.get('used_count', 0)}/{c.get('max_uses', 10)}"
     is_expired = now_ts > c.get('expiry_date', 0)
-    
     status_text = '<span style="color: var(--success);">Đang hoạt động</span>' if (c['is_active'] and not is_expired) else '<span style="color: var(--primary);">Hết hạn / Đã tắt</span>'
     btn_text = 'Tắt' if c['is_active'] else 'Bật lại'
     
@@ -988,10 +1123,7 @@ def admin():
 
   cards_html = ''
   if not cards_queue:
-    cards_html = (
-        '<p style="color: var(--text-secondary); font-size: 13px;">Không có lịch'
-        ' sử nạp tiền nào.</p>'
-    )
+    cards_html = '<p style="color: var(--text-secondary); font-size: 13px;">Không có lịch sử nạp tiền nào.</p>'
   else:
     for c in cards_queue:
       cards_html += (
@@ -1010,8 +1142,39 @@ def admin():
           + '</span></p></div>'
       )
 
+  checked_attr = 'checked' if cay_thue_status['is_ready'] else ''
+
   admin_content = (
       '<h2 class="rgb-text">⚙️ TRANG QUẢN TRỊ ADMIN</h2>'
+      
+      # --- KHUNG QUẢN LÝ TRẠNG THÁI CÀY THUÊ ---
+      '<div class="card rgb-box" style="border: 1px solid var(--success);">'
+      '<h3 class="rgb-text" style="margin-top: 0;">⚡ Quản Lý Trạng Thái Cày Thuê</h3>'
+      '<form method="POST">'
+      '<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">'
+      f'<input type="checkbox" name="is_ready" {checked_attr} style="width: 20px; height: 20px; accent-color: var(--success);">'
+      '<label style="font-size: 14px; font-weight: 600; color: white; margin: 0;">Sẵn sàng nhận đơn cày thuê (Bỏ tích nếu đang bận)</label>'
+      '</div>'
+      '<label style="font-size: 13px; color: var(--text-secondary);">Ghi chú / Thông báo trạng thái cho khách (VD: Đang cày dở acc cho bạn A, vui lòng đợi):</label>'
+      f'<input type="text" name="current_task" value="{cay_thue_status["current_task"]}" placeholder="Để trống nếu rảnh...">'
+      '<button type="submit" name="update_cay_thue_status" class="btn rgb-btn" style="margin-top: 10px;">CẬP NHẬT TRẠNG THÁI</button>'
+      '</form>'
+      '</div>'
+
+      # --- KHUNG THÊM GÓI CÀY THUÊ ---
+      '<div class="card rgb-box" style="border: 1px solid var(--primary);">'
+      '<h3 class="rgb-text" style="margin-top: 0;">⚔️ Thêm Gói Cày Thuê Mới</h3>'
+      '<form method="POST">'
+      '<label style="font-size: 13px; color: var(--text-secondary);">Tên gói cày thuê:</label>'
+      '<input type="text" name="ct_name" placeholder="VD: Cày Đảo Bánh, Săn Katakuri..." required>'
+      '<label style="font-size: 13px; color: var(--text-secondary);">Giá tiền (VNĐ):</label>'
+      '<input type="number" name="ct_price" placeholder="VD: 50000" required>'
+      '<label style="font-size: 13px; color: var(--text-secondary);">Mô tả chi tiết gói:</label>'
+      '<input type="text" name="ct_desc" placeholder="Mô tả công việc thực hiện..." required>'
+      '<button type="submit" name="add_cay_thue" class="btn rgb-btn" style="margin-top: 15px;">THÊM GÓI CÀY THUÊ</button>'
+      '</form>'
+      '</div>'
+
       '<div class="card rgb-box" style="border: 1px solid #70a1ff;"><h3 class="rgb-text" style="margin-top: 0;">🌐 Lịch Sử Truy Cập Gần Đây</h3><div style="background: #12131c; padding: 12px; border-radius: 8px; max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color);">'
       + visitors_html
       + '</div></div>'
@@ -1032,7 +1195,7 @@ def admin():
 
 @app.route('/admin/coupon/toggle/<int:coupon_id>', methods=['POST'])
 def toggle_coupon(coupon_id):
-  if 'username' not in session or session.get('role') != 'admin':
+  if 'username' not in session or session.get('role'] != 'admin':
     return redirect(url_for('index'))
   for c in coupons_db:
     if c['id'] == coupon_id:
