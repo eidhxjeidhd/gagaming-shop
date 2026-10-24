@@ -11,6 +11,25 @@ app.secret_key = 'shop_blox_fruit_smart_v27'
 PARTNER_ID = '71186911886'
 PARTNER_KEY = 'f7377b035f5b5d2c4a5d04e487b39aaf'
 
+# --- CẤU HÌNH TELEGRAM BOT ---
+TELEGRAM_BOT_TOKEN = '8976860826:AAHJplBXPNwNWafOV0SvyC-LqM805MD6FFA'
+TELEGRAM_CHAT_ID = 'NHẬP_CHAT_ID_TELEGRAM_CỦA_ÔNG_VÀO_ĐÂY'  # Ví dụ: '8976860826'
+
+def send_telegram_notification(message):
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        payload = {
+            'chat_id': TELEGRAM_CHAT_ID,
+            'text': message,
+            'parse_mode': 'HTML'
+        }
+        data = urllib.parse.urlencode(payload).encode('utf-8')
+        req = urllib.request.Request(url, data=data, method='POST')
+        with urllib.request.urlopen(req, timeout=5) as response:
+            pass
+    except Exception as e:
+        print(f"Lỗi gửi Telegram: {e}")
+
 users = {
     'admin': {
         'password': '123',
@@ -148,6 +167,10 @@ BASE_HTML = """
 
 @app.route('/')
 def index():
+  # Tự động bắn thông báo về Telegram khi có người truy cập (hoặc UptimeRobot ping)
+  visitor_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+  send_telegram_notification(f"🔔 <b>Có lượt truy cập mới vào Web!</b>\n🌐 IP: {visitor_ip}")
+
   sorted_users = sorted(
       users.items(), key=lambda x: x[1].get('total_deposited', 0), reverse=True
   )
@@ -238,7 +261,6 @@ def index():
         else ''
     )
 
-    # Nút Xóa sản phẩm hiển thị khi là admin
     delete_btn = ''
     if session.get('role') == 'admin':
       delete_btn = f'<div style="position: absolute; top: 15px; right: 15px;"><a href="/admin/delete/{p["id"]}" class="btn-delete" onclick="return confirm(\'Bạn có chắc chắn muốn xóa sản phẩm này không?\');">🗑️ XÓA</a></div>'
@@ -457,6 +479,9 @@ def api_buy_random(product_id):
       'account_details': acc_info,
   })
 
+  # Bắn thông báo mua túi mù về Telegram
+  send_telegram_notification(f"🔥 <b>Có khách mua túi mù!</b>\n👤 User: {username}\n📦 Sản phẩm: {product['name']}\n💰 Giá: {final_price:,}đ")
+
   return jsonify({'success': True, 'account_info': acc_info})
 
 
@@ -563,6 +588,8 @@ def bank_webhook():
             'amount': amount,
             'status': 'Thành công',
         })
+        # Bắn thông báo nạp tiền thành công về Telegram
+        send_telegram_notification(f"💵 <b>Nạp tiền QR thành công!</b>\n👤 User: {uname}\n💰 Số tiền: {amount:,}đ")
         return jsonify({'success': True, 'message': f'Đã cộng {amount} cho {uname}'})
 
   return jsonify({'success': False, 'message': 'Không khớp tài khoản'})
@@ -634,6 +661,7 @@ def callback_the():
           users[uname]['total_deposited'] = (
               users[uname].get('total_deposited', 0) + amount
           )
+          send_telegram_notification(f"💳 <b>Gạch thẻ thành công!</b>\n👤 User: {uname}\n💰 Số tiền: {amount:,}đ")
         break
   return jsonify({'success': True})
 
@@ -659,6 +687,9 @@ def buy(product_id):
       'product_name': product['name'],
       'account_details': acc_info,
   })
+
+  # Bắn thông báo mua hàng thành công về Telegram
+  send_telegram_notification(f"🛒 <b>Có khách mua tài khoản!</b>\n👤 User: {username}\n📦 Sản phẩm: {product['name']}\n🔑 Acc: {acc_info}")
 
   content = (
       '<div class="card" style="max-width: 600px; margin: auto; text-align:'
@@ -717,6 +748,7 @@ def send_message():
         {'user': session['username'], 'sender': session['username'], 'message': msg}
     )
     flash('Đã gửi tin nhắn cho Admin thành công!')
+    send_telegram_notification(f"💬 <b>Có tin nhắn hỗ trợ mới!</b>\n👤 Từ user: {session['username']}\n📝 Nội dung: {msg}")
   return redirect(url_for('index'))
 
 
