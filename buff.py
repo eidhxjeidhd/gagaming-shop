@@ -231,20 +231,27 @@ def dat_cay_thue(ct_id):
     if request.method == 'POST':
         username_game = request.form.get('username_game', '').strip()
         password_game = request.form.get('password_game', '').strip()
+        note_game = request.form.get('note_game', '').strip()
         users[session['username']]['balance'] -= service['price']
-        purchase_history.append({'user': session['username'], 'product_name': f"Cày: {service['name']}", 'account_details': f"TK: {username_game} | Pass: {password_game}"})
+        purchase_history.append({'user': session['username'], 'product_name': f"Cày: {service['name']}", 'account_details': f"TK: {username_game} | Pass: {password_game} | Ghi chú: {note_game}"})
+        send_telegram_notification(f"⚔️ <b>Khách đặt cày thuê!</b>\nUser: {session['username']}\nGói: {service['name']}\nTK: {username_game}")
         flash('Đặt cày thuê thành công!')
         return redirect(url_for('lich_su'))
-    content = f'<div class="card rgb-box" style="max-width: 500px; margin: auto;"><h2 class="rgb-text" style="text-align: center;">ĐẶT CÀY THUÊ</h2><form method="POST"><input type="text" name="username_game" placeholder="Tài khoản game" required><input type="password" name="password_game" placeholder="Mật khẩu game" required><button type="submit" class="btn rgb-btn" style="margin-top: 15px;">THANH TOÁN</button></form></div>'
+    content = f'<div class="card rgb-box" style="max-width: 500px; margin: auto;"><h2 class="rgb-text" style="text-align: center;">ĐẶT CÀY THUÊ</h2><form method="POST"><input type="text" name="username_game" placeholder="Tài khoản game" required><input type="password" name="password_game" placeholder="Mật khẩu game" required><textarea name="note_game" placeholder="Yêu cầu thêm..." rows="2"></textarea><button type="submit" class="btn rgb-btn" style="margin-top: 15px;">THANH TOÁN</button></form></div>'
     return render_template_string(BASE_HTML, content=content, users=users)
 
 @app.route('/doi-mat-khau', methods=['GET', 'POST'])
 def doi_mat_khau():
     if 'username' not in session: return redirect(url_for('login'))
     if request.method == 'POST':
-        users[session['username']]['password'] = request.form.get('new_password')
-        flash('Đổi mật khẩu thành công!')
-        return redirect(url_for('index'))
+        old_pass = request.form.get('old_password', '').strip()
+        new_pass = request.form.get('new_password', '').strip()
+        if users[session['username']]['password'] != old_pass:
+            flash('Mật khẩu cũ không đúng!')
+        else:
+            users[session['username']]['password'] = new_pass
+            flash('Đổi mật khẩu thành công!')
+            return redirect(url_for('index'))
     content = '<div class="card rgb-box" style="max-width: 420px; margin: auto;"><h2 class="rgb-text" style="text-align: center;">ĐỔI MK</h2><form method="POST"><input type="password" name="old_password" placeholder="MK cũ" required><input type="password" name="new_password" placeholder="MK mới" required><button type="submit" class="btn rgb-btn" style="margin-top: 15px;">ĐỔI</button></form></div>'
     return render_template_string(BASE_HTML, content=content, users=users)
 
@@ -252,17 +259,38 @@ def doi_mat_khau():
 def tui_mu(product_id):
     if 'username' not in session: return redirect(url_for('login'))
     product = next((p for p in products if p['id'] == product_id), None)
-    content = f'<div class="card rgb-box" style="max-width: 500px; margin: auto; text-align: center;"><h2 class="rgb-text">⚡ MỞ TÚI MÙ</h2><p class="price">{product["price"]:,}đ</p><button onclick="xeTui({product[\"id\"]})" class="btn rgb-btn">🔥 XÉ TÚI</button></div><script>function xeTui(id){fetch("/api/buy-random/"+id, {method:"POST"}).then(res=>res.json()).then(d=>{if(d.success){alert("Thành công: "+d.account_info);location.href="/lich-su"}else{alert(d.message)}})}</script>'
+    content = f'<div class="card rgb-box" style="max-width: 500px; margin: auto; text-align: center;"><h2 class="rgb-text">⚡ MỞ TÚI MÙ</h2><p class="price">{product["price"]:,}đ</p><input type="text" id="coupon_code" placeholder="Mã giảm giá"><button type="button" onclick="applyCoupon({product[\"price\"]})" class="btn" style="background:#007bff; margin-top:5px;">Áp dụng</button><p id="coupon_msg"></p><button onclick="xeTui({product[\"id\"]})" class="btn rgb-btn" style="margin-top:15px;">🔥 XÉ TÚI</button></div><script>function applyCoupon(p){let c=document.getElementById("coupon_code").value;fetch("/api/check-coupon",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:c})}).then(r=>r.json()).then(d=>{document.getElementById("coupon_msg").innerText=d.success?"Giảm "+d.discount+"đ":d.message})}function xeTui(id){let c=document.getElementById("coupon_code").value;fetch("/api/buy-random/"+id,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({coupon_code:c})}).then(res=>res.json()).then(d=>{if(d.success){alert("Thành công: "+d.account_info);location.href="/lich-su"}else{alert(d.message)}})}</script>'
     return render_template_string(BASE_HTML, content=content, users=users)
+
+@app.route('/api/check-coupon', methods=['POST'])
+def check_coupon():
+    data = request.json or {}
+    code = data.get('code', '').strip().upper()
+    coupon = next((c for c in coupons_db if c['code'] == code and c['is_active']), None)
+    if not coupon: return jsonify({'success': False, 'message': 'Mã không tồn tại!'})
+    return jsonify({'success': True, 'discount': coupon['discount_amount']})
 
 @app.route('/api/buy-random/<int:product_id>', methods=['POST'])
 def api_buy_random(product_id):
     if 'username' not in session: return jsonify({'success': False, 'message': 'Đăng nhập đi!'})
     product = next((p for p in products if p['id'] == product_id), None)
     if not product or not product['game_accs']: return jsonify({'success': False, 'message': 'Hết hàng!'})
+    
+    data = request.json or {}
+    coupon_code = data.get('coupon_code', '').strip().upper()
+    final_price = product['price']
+    if coupon_code:
+        coupon = next((c for c in coupons_db if c['code'] == coupon_code and c['is_active']), None)
+        if coupon: final_price = max(0, final_price - coupon['discount_amount'])
+
+    if users[session['username']]['balance'] < final_price:
+        return jsonify({'success': False, 'message': 'Không đủ tiền!'})
+
     acc_info = product['game_accs'].pop(0)
-    users[session['username']]['balance'] -= product['price']
+    users[session['username']]['balance'] -= final_price
+    users[session['username']]['total_deposited'] = users[session['username']].get('total_deposited', 0)
     purchase_history.append({'user': session['username'], 'product_name': product['name'], 'account_details': acc_info})
+    send_telegram_notification(f"🔥 <b>Khách mua túi mù!</b>\nUser: {session['username']}\nSản phẩm: {product['name']}")
     return jsonify({'success': True, 'account_info': acc_info})
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -309,6 +337,27 @@ def delete_cay_thue(ct_id):
     cay_thue_services = [s for s in cay_thue_services if s['id'] != ct_id]
     return redirect(url_for('admin'))
 
+@app.route('/webhook/bank', methods=['POST'])
+def bank_webhook():
+    data = request.json or request.form
+    content = str(data.get('content', data.get('description', ''))).upper()
+    try: amount = int(float(data.get('transferAmount', data.get('amount', 0))))
+    except: amount = 0
+    if amount > 0:
+        for uname in users:
+            if uname.upper() in content:
+                users[uname]['balance'] += amount
+                users[uname]['total_deposited'] = users[uname].get('total_deposited', 0) + amount
+                send_telegram_notification(f"💵 <b>Nạp QR thành công!</b>\nUser: {uname}\nTiền: {amount:,}đ")
+                return jsonify({'success': True})
+    return jsonify({'success': False})
+
+@app.route('/nap-the', methods=['POST'])
+def nap_the():
+    if 'username' not in session: return redirect(url_for('login'))
+    flash('Đã ghi nhận thẻ cào, đang chờ duyệt!')
+    return redirect(url_for('index'))
+
 @app.route('/buy/<int:product_id>')
 def buy(product_id):
     if 'username' not in session: return redirect(url_for('login'))
@@ -317,6 +366,7 @@ def buy(product_id):
     acc_info = product['game_accs'].pop(0)
     users[session['username']]['balance'] -= product['price']
     purchase_history.append({'user': session['username'], 'product_name': product['name'], 'account_details': acc_info})
+    send_telegram_notification(f"🛒 <b>Khách mua acc!</b>\nUser: {session['username']}\nAcc: {acc_info}")
     content = f'<div class="card rgb-box" style="max-width: 600px; margin: auto; text-align: center;"><h2 class="rgb-text">🎉 MUA THÀNH CÔNG</h2><div class="success-box"><h3>{acc_info}</h3></div><a href="/" class="btn rgb-btn" style="margin-top: 25px;">VỀ TRANG CHỦ</a></div>'
     return render_template_string(BASE_HTML, content=content, users=users)
 
@@ -342,8 +392,7 @@ def admin():
 
     if request.method == 'POST':
         if 'add_product' in request.form:
-            name, price, cat = request.form['name'], int(request.form['price']), request.form['category']
-            products.append({'id': len(products)+1000, 'name': name, 'category': cat, 'desc': request.form['desc'], 'price': price, 'image': request.form.get('image', ''), 'game_accs': [request.form['game_acc'].strip()]})
+            products.append({'id': len(products)+1000, 'name': request.form['name'], 'category': request.form['category'], 'desc': request.form['desc'], 'price': int(request.form['price']), 'image': request.form.get('image', ''), 'game_accs': [request.form['game_acc'].strip()]})
         elif 'add_private_acc' in request.form:
             private_cai_cuoc_db.append({'id': len(private_cai_cuoc_db)+1, 'account': request.form['private_account'].strip(), 'note': request.form['private_note'].strip()})
         elif 'add_cay_thue' in request.form:
@@ -351,10 +400,25 @@ def admin():
         elif 'update_cay_thue_status' in request.form:
             cay_thue_status['is_ready'] = True if request.form.get('is_ready') == 'on' else False
             cay_thue_status['current_task'] = request.form.get('current_task', '').strip()
+        elif 'bonus_user' in request.form:
+            target = request.form['target_username'].strip()
+            amount = int(request.form['bonus_amount'])
+            if target in users: users[target]['balance'] += amount
+        elif 'reply_msg' in request.form:
+            target_user = request.form['target_user']
+            reply_text = request.form['reply_text'].strip()
+            if reply_text: messages_db.append({'user': target_user, 'sender': 'admin', 'message': reply_text})
         return redirect(url_for('admin'))
 
     private_accs_html = ''.join([f'<div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 10px 0; font-size: 13px;"><div><b style="color: var(--success);">🎮 {acc["account"]}</b><br><span style="color: var(--accent);">📝 {acc["note"]}</span></div><a href="/admin/delete-private-acc/{acc["id"]}" class="btn-delete">🗑️ XÓA</a></div>' for acc in private_cai_cuoc_db]) or '<p>Trống.</p>'
     checked_attr = 'checked' if cay_thue_status['is_ready'] else ''
+
+    chat_users = sorted(list(set([m['user'] for m in messages_db])))
+    chat_admin_html = ''
+    for cu in chat_users:
+        user_chat_history = [m for m in messages_db if m['user'] == cu]
+        history_render = ''.join([f'<div><b>{"Khách" if m["sender"]==cu else "Admin"}:</b> {m["message"]}</div>' for m in user_chat_history])
+        chat_admin_html += f'<div class="card rgb-box" style="background: #12131c;"><p><b>Khách: <span style="color: #70a1ff;">{cu}</span></b></p><div style="background: #181a25; padding: 10px; border-radius: 8px; max-height: 120px; overflow-y: auto;">{history_render}</div><form method="POST"><input type="hidden" name="target_user" value="{cu}"><input type="text" name="reply_text" placeholder="Trả lời..." required style="margin: 5px 0;"><button type="submit" name="reply_msg" class="btn rgb-btn" style="padding: 6px;">GỬI</button></form></div>'
 
     admin_content = f"""
     <h2 class="rgb-text">⚙️ TRANG QUẢN TRỊ ADMIN</h2>
@@ -392,6 +456,20 @@ def admin():
             <input type="text" name="current_task" value="{cay_thue_status["current_task"]}" placeholder="Thông báo...">
             <button type="submit" name="update_cay_thue_status" class="btn rgb-btn" style="margin-top: 10px;">CẬP NHẬT</button>
         </form>
+    </div>
+
+    <div class="card rgb-box" style="border: 1px solid var(--accent);">
+        <h3 class="rgb-text" style="margin-top: 0;">💰 Cộng Tiền Thành Viên</h3>
+        <form method="POST">
+            <input type="text" name="target_username" placeholder="Tên tài khoản khách..." required>
+            <input type="number" name="bonus_amount" placeholder="Số tiền cộng (VNĐ)..." required>
+            <button type="submit" name="bonus_user" class="btn rgb-btn" style="margin-top: 10px;">CỘNG TIỀN</button>
+        </form>
+    </div>
+
+    <div class="card rgb-box" style="border: 1px solid #70a1ff;">
+        <h3 class="rgb-text" style="margin-top: 0;">💬 Tin Nhắn Hỗ Trợ Khách Hàng</h3>
+        {chat_admin_html if chat_admin_html else '<p>Chưa có tin nhắn.</p>'}
     </div>
     """
     return render_template_string(BASE_HTML, content=admin_content, users=users)
