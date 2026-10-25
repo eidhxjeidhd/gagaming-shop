@@ -45,6 +45,7 @@ users = {
     },
 }
 
+# Mỗi acc trong game_accs lưu dạng dict: {'account': '...', 'note': '...'}
 products = [
     {
         'id': 1276,
@@ -54,8 +55,8 @@ products = [
         'price': 30000,
         'image': 'https://i.ibb.co/DHCWq65g/file-00000000414c821198dbb4fd0f8ab53e.png',
         'game_accs': [
-            'bloxfruit_1276_1@gmail.com | Pass123',
-            'bloxfruit_1276_2@gmail.com | Pass456',
+            {'account': 'bloxfruit_1276_1@gmail.com | Pass123', 'note': 'Đang cày dở đảo bánh'},
+            {'account': 'bloxfruit_1276_2@gmail.com | Pass456', 'note': 'Đã max level sẵn'}
         ],
     },
     {
@@ -66,8 +67,8 @@ products = [
         'price': 5000,
         'image': '',
         'game_accs': [
-            'random_acc_1@gmail.com | Pass111',
-            'random_acc_2@gmail.com | Pass222',
+            {'account': 'random_acc_1@gmail.com | Pass111', 'note': 'Acc clone phụ'},
+            {'account': 'random_acc_2@gmail.com | Pass222', 'note': 'Acc phụ VIP'}
         ],
     },
 ]
@@ -82,7 +83,6 @@ cay_thue_services = [
     }
 ]
 
-# Trạng thái cày thuê
 cay_thue_status = {
     'is_ready': True,
     'current_task': 'Đang trống, sẵn sàng nhận đơn mới!'
@@ -182,7 +182,6 @@ BASE_HTML = """
         header { background: rgba(24, 26, 37, 0.95); backdrop-filter: blur(10px); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; gap: 15px; }
         .logo { font-size: 22px; font-weight: 700; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; text-shadow: 0 0 15px rgba(255,71,87,0.4); }
         .nav-buttons { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .nav-buttons a { background: var(--primary); color: white; padding: 9px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,71,87,0.3); }
         .container { padding: 30px 20px; max-width: 1100px; margin: auto; }
         .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); position: relative; }
         .product-title { color: var(--text-main); font-weight: 600; font-size: 16px; margin-bottom: 5px; }
@@ -213,7 +212,7 @@ BASE_HTML = """
                 {% if session.get('role') == 'admin' %}
                     <a href="/admin" class="rgb-btn" style="padding: 9px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px;">⚙️ Quản trị</a>
                 {% endif %}
-                <a href="/logout" style="background: #747d8c;">Thoát</a>
+                <a href="/logout" style="background: #747d8c; padding: 9px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px; color: white;">Thoát</a>
             {% else %}
                 <a href="/login" class="rgb-btn">Đăng nhập</a>
                 <a href="/register" class="rgb-btn">Đăng ký</a>
@@ -362,7 +361,6 @@ def index():
         + '</div></div>'
     )
 
-  # --- RENDER PHẦN CÀY THUÊ RA TRANG CHỦ ---
   status_badge = '<span style="color: var(--success); font-weight: bold;">🟢 Đang sẵn sàng nhận đơn</span>' if cay_thue_status['is_ready'] else '<span style="color: var(--primary); font-weight: bold;">🔴 Đang bận (Vui lòng đợi)</span>'
   status_note_box = f'<div style="background: #12131c; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; border: 1px solid var(--border-color);">Trạng thái hiện tại: {status_badge}<br><span style="color: var(--text-secondary);">Thông báo: <b>{cay_thue_status["current_task"]}</b></span></div>'
 
@@ -668,7 +666,8 @@ def api_buy_random(product_id):
     return jsonify({'success': False, 'message': 'Số dư tài khoản không đủ!'})
 
   users[username]['balance'] -= final_price
-  acc_info = product['game_accs'].pop(0)
+  acc_obj = product['game_accs'].pop(0)
+  acc_info = acc_obj['account'] if isinstance(acc_obj, dict) else acc_obj
 
   purchase_history.append({
       'user': username,
@@ -888,7 +887,9 @@ def buy(product_id):
     return redirect(url_for('index'))
 
   users[username]['balance'] -= product['price']
-  acc_info = product['game_accs'].pop(0)
+  acc_obj = product['game_accs'].pop(0)
+  acc_info = acc_obj['account'] if isinstance(acc_obj, dict) else acc_obj
+
   purchase_history.append({
       'user': username,
       'product_name': product['name'],
@@ -970,11 +971,14 @@ def admin():
     desc = request.form['desc']
     image = request.form.get('image', '').strip() if category == 'tuichon' else ''
     game_acc = request.form['game_acc'].strip()
+    acc_note = request.form.get('acc_note', '').strip() # Lấy ghi chú nội bộ nick
+
+    new_acc_item = {'account': game_acc, 'note': acc_note}
 
     existing_product = next((p for p in products if p['name'] == name), None)
     if existing_product:
-      existing_product['game_accs'].append(game_acc)
-      flash('Đã thêm tài khoản vào kho sản phẩm có sẵn!')
+      existing_product['game_accs'].append(new_acc_item)
+      flash('Đã thêm tài khoản và ghi chú vào kho sản phẩm có sẵn!')
     else:
       new_id = products[-1]['id'] + 1 if products else 1000
       products.append({
@@ -984,12 +988,11 @@ def admin():
           'desc': desc,
           'price': price,
           'image': image,
-          'game_accs': [game_acc],
+          'game_accs': [new_acc_item],
       })
       flash('Đã tạo danh mục sản phẩm mới thành công!')
     return redirect(url_for('admin'))
 
-  # --- XỬ LÝ THÊM GÓI CÀY THUÊ TỪ ADMIN ---
   if request.method == 'POST' and 'add_cay_thue' in request.form:
     name = request.form['ct_name'].strip()
     price = int(request.form['ct_price'])
@@ -1005,7 +1008,6 @@ def admin():
       flash(f'Đã thêm gói cày thuê "{name}" thành công!')
     return redirect(url_for('admin'))
 
-  # --- XỬ LÝ CẬP NHẬT TRẠNG THÁI CÀY THUÊ ---
   if request.method == 'POST' and 'update_cay_thue_status' in request.form:
     ready_val = request.form.get('is_ready')
     cay_thue_status['is_ready'] = True if ready_val == 'on' else False
@@ -1142,12 +1144,25 @@ def admin():
           + '</span></p></div>'
       )
 
+  # Hiển thị danh sách kho tài khoản kèm ghi chú nội bộ để quản lý
+  managed_accs_html = ''
+  for p in products:
+    managed_accs_html += f'<div style="margin-bottom: 15px; border-bottom: 1px dashed var(--border-color); padding-bottom: 10px;"><b style="color: var(--accent);">[{p["id"]}] {p["name"]}</b><ul style="margin: 5px 0 0 20px; padding: 0; font-size: 12px; color: var(--text-secondary);">'
+    for acc in p['game_accs']:
+      if isinstance(acc, dict):
+        acc_str = acc.get('account', '')
+        note_str = acc.get('note', '')
+        note_display = f' <span style="color: var(--success);">(Note: {note_str})</span>' if note_str else ''
+        managed_accs_html += f'<li>{acc_str}{note_display}</li>'
+      else:
+        managed_accs_html += f'<li>{acc}</li>'
+    managed_accs_html += '</ul></div>'
+
   checked_attr = 'checked' if cay_thue_status['is_ready'] else ''
 
   admin_content = (
       '<h2 class="rgb-text">⚙️ TRANG QUẢN TRỊ ADMIN</h2>'
       
-      # --- KHUNG QUẢN LÝ TRẠNG THÁI CÀY THUÊ ---
       '<div class="card rgb-box" style="border: 1px solid var(--success);">'
       '<h3 class="rgb-text" style="margin-top: 0;">⚡ Quản Lý Trạng Thái Cày Thuê</h3>'
       '<form method="POST">'
@@ -1155,22 +1170,21 @@ def admin():
       f'<input type="checkbox" name="is_ready" {checked_attr} style="width: 20px; height: 20px; accent-color: var(--success);">'
       '<label style="font-size: 14px; font-weight: 600; color: white; margin: 0;">Sẵn sàng nhận đơn cày thuê (Bỏ tích nếu đang bận)</label>'
       '</div>'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Ghi chú / Thông báo trạng thái cho khách (VD: Đang cày dở acc cho bạn A, vui lòng đợi):</label>'
+      '<label style="font-size: 13px; color: var(--text-secondary);">Ghi chú / Thông báo trạng thái cho khách:</label>'
       f'<input type="text" name="current_task" value="{cay_thue_status["current_task"]}" placeholder="Để trống nếu rảnh...">'
       '<button type="submit" name="update_cay_thue_status" class="btn rgb-btn" style="margin-top: 10px;">CẬP NHẬT TRẠNG THÁI</button>'
       '</form>'
       '</div>'
 
-      # --- KHUNG THÊM GÓI CÀY THUÊ ---
       '<div class="card rgb-box" style="border: 1px solid var(--primary);">'
       '<h3 class="rgb-text" style="margin-top: 0;">⚔️ Thêm Gói Cày Thuê Mới</h3>'
       '<form method="POST">'
       '<label style="font-size: 13px; color: var(--text-secondary);">Tên gói cày thuê:</label>'
-      '<input type="text" name="ct_name" placeholder="VD: Cày Đảo Bánh, Săn Katakuri..." required>'
+      '<input type="text" name="ct_name" placeholder="VD: Cày Đảo Bánh..." required>'
       '<label style="font-size: 13px; color: var(--text-secondary);">Giá tiền (VNĐ):</label>'
       '<input type="number" name="ct_price" placeholder="VD: 50000" required>'
       '<label style="font-size: 13px; color: var(--text-secondary);">Mô tả chi tiết gói:</label>'
-      '<input type="text" name="ct_desc" placeholder="Mô tả công việc thực hiện..." required>'
+      '<input type="text" name="ct_desc" placeholder="Mô tả công việc..." required>'
       '<button type="submit" name="add_cay_thue" class="btn rgb-btn" style="margin-top: 15px;">THÊM GÓI CÀY THUÊ</button>'
       '</form>'
       '</div>'
@@ -1178,7 +1192,36 @@ def admin():
       '<div class="card rgb-box" style="border: 1px solid #70a1ff;"><h3 class="rgb-text" style="margin-top: 0;">🌐 Lịch Sử Truy Cập Gần Đây</h3><div style="background: #12131c; padding: 12px; border-radius: 8px; max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color);">'
       + visitors_html
       + '</div></div>'
-      '<div class="card rgb-box" style="border: 1px solid var(--primary);"><h3 class="rgb-text" style="margin-top: 0;">📦 Thêm Sản Phẩm Mới</h3><form method="POST"><label style="font-size: 13px; color: var(--text-secondary);">Tên sản phẩm:</label><input type="text" name="name" placeholder="VD: Acc V4 Full..." required><label style="font-size: 13px; color: var(--text-secondary);">Phân loại:</label><select name="category"><option value="tuichon">Acc Tự Chọn (Cần link ảnh minh họa)</option><option value="random">Acc Random / Túi Mù (Không cần ảnh)</option></select><label style="font-size: 13px; color: var(--text-secondary);">Giá tiền (VNĐ):</label><input type="number" name="price" placeholder="VD: 30000" required><label style="font-size: 13px; color: var(--text-secondary);">Link ảnh minh họa (Chỉ dùng cho Tự chọn):</label><input type="text" name="image" placeholder="Link ảnh dạng https://i.ibb.co/..."><label style="font-size: 13px; color: var(--text-secondary);">Mô tả ngắn:</label><input type="text" name="desc" placeholder="Mô tả tài khoản..." required><label style="font-size: 13px; color: var(--text-secondary);">Tài khoản game:</label><input type="text" name="game_acc" placeholder="username | password" required><button type="submit" name="add_product" class="btn rgb-btn" style="margin-top: 15px;">THÊM VÀO KHO</button></form></div>'
+      
+      # Thêm sản phẩm kèm ô Ghi chú nội bộ
+      '<div class="card rgb-box" style="border: 1px solid var(--primary);">'
+      '<h3 class="rgb-text" style="margin-top: 0;">📦 Thêm Sản Phẩm & Ghi Chú Cày Cuốc</h3>'
+      '<form method="POST">'
+      '<label style="font-size: 13px; color: var(--text-secondary);">Tên sản phẩm:</label>'
+      '<input type="text" name="name" placeholder="VD: Acc V4 Full..." required>'
+      '<label style="font-size: 13px; color: var(--text-secondary);">Phân loại:</label>'
+      '<select name="category"><option value="tuichon">Acc Tự Chọn (Cần link ảnh minh họa)</option><option value="random">Acc Random / Túi Mù (Không cần ảnh)</option></select>'
+      '<label style="font-size: 13px; color: var(--text-secondary);">Giá tiền (VNĐ):</label>'
+      '<input type="number" name="price" placeholder="VD: 30000" required>'
+      '<label style="font-size: 13px; color: var(--text-secondary);">Link ảnh minh họa:</label>'
+      '<input type="text" name="image" placeholder="Link ảnh dạng https://i.ibb.co/...">'
+      '<label style="font-size: 13px; color: var(--text-secondary);">Mô tả ngắn:</label>'
+      '<input type="text" name="desc" placeholder="Mô tả tài khoản..." required>'
+      '<label style="font-size: 13px; color: var(--text-secondary);">Tài khoản game:</label>'
+      '<input type="text" name="game_acc" placeholder="username | password" required>'
+      '<label style="font-size: 13px; color: var(--accent);">📝 Ghi chú nội bộ (Chỉ admin thấy - Để lưu tiến độ cày, tránh quên pass):</label>'
+      '<input type="text" name="acc_note" placeholder="VD: Đang cày dở level 2200, giữ lại trái phật tổ trong rương...">'
+      '<button type="submit" name="add_product" class="btn rgb-btn" style="margin-top: 15px;">THÊM VÀO KHO & LƯU GHI CHÚ</button>'
+      '</form>'
+      '</div>'
+
+      # Khung hiển thị danh sách nick trong kho kèm ghi chú quản lý nội bộ
+      '<div class="card rgb-box" style="border: 1px solid var(--accent);">'
+      '<h3 class="rgb-text" style="margin-top: 0;">📋 Quản Lý Kho Nick & Ghi Chú Nội Bộ</h3>'
+      '<div style="background: #12131c; padding: 12px; border-radius: 8px; max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color);">'
+      + (managed_accs_html if managed_accs_html else '<p>Chưa có tài khoản nào trong kho.</p>')
+      + '</div></div>'
+
       '<div class="card rgb-box" style="border: 1px solid var(--accent);"><h3 class="rgb-text" style="margin-top: 0;">🎟️ Quản Lý Mã Giảm Giá Nâng Cao</h3><form method="POST" style="margin-bottom: 15px;"><input type="text" name="coupon_code" placeholder="Mã (VD: GIAM5K)" required><input type="number" name="discount_amount" placeholder="Số tiền giảm (VNĐ)" required><input type="number" name="expires_in_days" placeholder="Thời hạn (Số ngày sử dụng, VD: 3)" required><input type="number" name="max_uses" placeholder="Giới hạn số lượt dùng (VD: 10)" required><button type="submit" name="add_coupon" class="btn rgb-btn" style="margin-top: 8px;">THÊM MÃ GIẢM GIÁ</button></form><div style="background: #12131c; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">'
       + (coupons_html if coupons_html else '<p>Chưa có mã giảm giá nào.</p>')
       + '</div></div>'
