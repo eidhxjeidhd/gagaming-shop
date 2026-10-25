@@ -6,7 +6,7 @@ import urllib.request
 import urllib.parse
 
 app = Flask(__name__)
-app.secret_key = 'shop_blox_fruit_smart_v31_with_notes'
+app.secret_key = 'ga_gaming_roblox_pro_2026'
 
 PARTNER_ID = '71186911886'
 PARTNER_KEY = 'f7377b035f5b5d2c4a5d04e487b39aaf'
@@ -52,7 +52,7 @@ products = [
         'category': 'tuichon',
         'desc': 'Acc max level, full trang bị xịn, haki cực mạnh',
         'price': 30000,
-        'image': 'https://i.ibb.co/DHCWq65g/file-00000000414c821198dbb4fd0f8ab53e.png',
+        'image': 'https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png',
         'game_accs': [
             'bloxfruit_1276_1@gmail.com | Pass123',
             'bloxfruit_1276_2@gmail.com | Pass456',
@@ -82,13 +82,11 @@ cay_thue_services = [
     }
 ]
 
-# Trạng thái cày thuê
 cay_thue_status = {
     'is_ready': True,
     'current_task': 'Đang trống, sẵn sàng nhận đơn mới!'
 }
 
-# --- SỔ TAY GHI CHÚ / CÀY CUỐC RIÊNG TƯ CHO ADMIN ---
 private_cai_cuoc_db = []
 
 coupons_db = [
@@ -120,7 +118,7 @@ BASE_HTML = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop Blox Fruits - Uy Tín & Tự Động</title>
+    <title>GA GAMING ROBLOX - Shop Uy Tín & Tự Động</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -135,52 +133,11 @@ BASE_HTML = """
             --text-secondary: #8f9bb3;
         }
         
-        @keyframes rgb-rainbow {
-            0% { filter: hue-rotate(0deg); }
-            100% { filter: hue-rotate(360deg); }
-        }
-
-        @keyframes rgb-border {
-            0% { border-color: #ff0000; box-shadow: 0 0 10px rgba(255,0,0,0.4); }
-            20% { border-color: #ff8800; box-shadow: 0 0 10px rgba(255,136,0,0.4); }
-            40% { border-color: #ffff00; box-shadow: 0 0 10px rgba(255,255,0,0.4); }
-            60% { border-color: #00ff00; box-shadow: 0 0 10px rgba(0,255,0,0.4); }
-            80% { border-color: #00ffff; box-shadow: 0 0 10px rgba(0,255,255,0.4); }
-            100% { border-color: #ff00ff; box-shadow: 0 0 10px rgba(255,0,255,0.4); }
-        }
-
-        @keyframes rgb-anim {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .rgb-box {
-            border: 2px solid #ff0000 !important;
-            animation: rgb-border 6s infinite;
-        }
-
-        .rgb-btn {
-            background: linear-gradient(135deg, #ff4757, #ff6b81) !important;
-            color: white !important;
-            transition: 0.3s;
-        }
-
-        .rgb-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-
-        .rgb-text {
-            color: var(--primary);
-            font-weight: 700;
-        }
-
         body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Poppins', sans-serif; margin: 0; padding-bottom: 70px; }
         
         header { background: #12151f; border-bottom: 1px solid var(--border-color); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .logo-area { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; color: var(--primary); text-decoration: none; }
-        .logo-area img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--primary); }
+        .logo-area img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
         .menu-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; }
         
         .drawer { position: fixed; top: 0; right: -280px; width: 280px; height: 100%; background: #151823; border-left: 1px solid var(--border-color); z-index: 2000; transition: 0.3s ease; padding: 20px; box-sizing: border-box; }
@@ -192,7 +149,6 @@ BASE_HTML = """
         .notice-banner { background: linear-gradient(90deg, #1f2437, #151823); border: 1px solid var(--border-color); padding: 12px 15px; border-radius: 10px; margin: 15px 15px 5px 15px; font-size: 13px; line-height: 1.5; color: #d1d5db; }
         .notice-banner b { color: var(--accent); }
 
-        /* Chỉ hiển thị đúng 2 nút YouTube và TikTok chính chủ */
         .social-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
         .social-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; text-align: center; text-decoration: none; color: white; font-size: 12px; font-weight: 500; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: 0.2s; }
         .social-item:hover { border-color: var(--primary); }
@@ -213,7 +169,6 @@ BASE_HTML = """
         .chat-msg.user { color: #70a1ff; text-align: right; }
         .chat-msg.admin { color: var(--success); text-align: left; }
         
-        /* Bottom Nav Bar chuẩn mobile */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #12151f; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
         .bottom-item { color: var(--text-secondary); text-decoration: none; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-weight: 500; }
         .bottom-item.active, .bottom-item:hover { color: var(--primary); }
@@ -223,13 +178,12 @@ BASE_HTML = """
 <body>
     <header>
         <a href="/" class="logo-area">
-            <img src="https://i.ibb.co/DHCWq65g/file-00000000414c821198dbb4fd0f8ab53e.png" alt="Logo">
-            <span>VANTHANH ROBLOX</span>
+            <img src="https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png" alt="Logo">
+            <span>GA GAMING ROBLOX</span>
         </a>
         <button class="menu-btn" onclick="toggleDrawer()">☰</button>
     </header>
 
-    <!-- Drawer Menu Mobile -->
     <div class="drawer" id="mobileDrawer">
         <button class="drawer-close" onclick="toggleDrawer()">✕</button>
         {% if 'username' in session %}
@@ -246,13 +200,12 @@ BASE_HTML = """
         {% endif %}
     </div>
 
-    <!-- Thông báo hướng dẫn nạp / mua acc chuẩn mẫu -->
     <div class="notice-banner">
         <b>100% ACC BÊN MÌNH ĐỀU LÀ ROBLOX QUỐC TẾ NHÉ.</b><br>
         Khi đăng nhập tài khoản Roblox, hệ thống sẽ yêu cầu xác minh 2 bước (2FA). Hãy tạo mã Backup Code theo video hướng dẫn để vào shop nhận acc tự động siêu tốc!
     </div>
 
-    <!-- YouTube và TikTok chính chủ của bạn -->
+    <!-- YouTube và TikTok chính chủ -->
     <div class="social-grid">
         <a href="https://www.youtube.com/@e_hahe" target="_blank" class="social-item">
             <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt="YT">
@@ -275,7 +228,6 @@ BASE_HTML = """
         {{ content | safe }}
     </div>
 
-    <!-- Thanh điều hướng dưới chân y hệt mẫu vanthanhroblox -->
     <div class="bottom-nav">
         <a href="/register" class="bottom-item">
             <span>📝</span>
@@ -497,7 +449,7 @@ def index():
 
   banner_html = """
         <div class="card" style="text-align: center; padding: 10px; border: 1px solid var(--primary); background: linear-gradient(180deg, rgba(255,71,87,0.05), var(--card-bg));">
-            <img src="https://i.ibb.co/DHCWq65g/file-00000000414c821198dbb4fd0f8ab53e.png" alt="Banner" style="width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px;">
+            <img src="https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png" alt="Banner" style="width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px;">
         </div>
         """
 
