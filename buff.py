@@ -124,15 +124,15 @@ BASE_HTML = """
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0f1016;
-            --card-bg: #181a25;
-            --border-color: #2a2d3d;
+            --bg-color: #0b0c10;
+            --card-bg: #151823;
+            --border-color: #232738;
             --primary: #ff4757;
             --primary-hover: #ff6b81;
             --accent: #ffa502;
             --success: #2ed573;
             --text-main: #ffffff;
-            --text-secondary: #a4b0be;
+            --text-secondary: #8f9bb3;
         }
         
         @keyframes rgb-rainbow {
@@ -161,39 +161,50 @@ BASE_HTML = """
         }
 
         .rgb-btn {
-            background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000) !important;
-            background-size: 400% !important;
-            animation: rgb-anim 8s linear infinite !important;
+            background: linear-gradient(135deg, #ff4757, #ff6b81) !important;
             color: white !important;
             transition: 0.3s;
         }
 
         .rgb-btn:hover {
+            opacity: 0.9;
             transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6) !important;
         }
 
         .rgb-text {
-            background: linear-gradient(to right, #ff4757, #ffa502, #2ed573, #1e90ff, #70a1ff, #ff6b81);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: rgb-rainbow 6s linear infinite;
+            color: var(--primary);
             font-weight: 700;
         }
 
-        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
-        header { background: rgba(24, 26, 37, 0.95); backdrop-filter: blur(10px); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; gap: 15px; }
-        .logo { font-size: 22px; font-weight: 700; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; text-shadow: 0 0 15px rgba(255,71,87,0.4); }
-        .nav-buttons { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .nav-buttons a { background: var(--primary); color: white; padding: 9px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,71,87,0.3); }
-        .container { padding: 30px 20px; max-width: 1100px; margin: auto; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Poppins', sans-serif; margin: 0; padding-bottom: 70px; }
+        
+        header { background: #12151f; border-bottom: 1px solid var(--border-color); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .logo-area { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; color: var(--primary); text-decoration: none; }
+        .logo-area img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--primary); }
+        .menu-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; }
+        
+        .drawer { position: fixed; top: 0; right: -280px; width: 280px; height: 100%; background: #151823; border-left: 1px solid var(--border-color); z-index: 2000; transition: 0.3s ease; padding: 20px; box-sizing: border-box; }
+        .drawer.open { right: 0; }
+        .drawer-close { background: none; border: none; color: white; font-size: 20px; float: right; cursor: pointer; margin-bottom: 20px; }
+        .drawer a { display: block; padding: 12px 15px; color: white; text-decoration: none; font-weight: 500; border-radius: 8px; margin-bottom: 8px; background: #1f2437; font-size: 14px; }
+        .drawer a:hover { background: var(--primary); }
+
+        .notice-banner { background: linear-gradient(90deg, #1f2437, #151823); border: 1px solid var(--border-color); padding: 12px 15px; border-radius: 10px; margin: 15px 15px 5px 15px; font-size: 13px; line-height: 1.5; color: #d1d5db; }
+        .notice-banner b { color: var(--accent); }
+
+        /* Chỉ hiển thị đúng 2 nút YouTube và TikTok chính chủ */
+        .social-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
+        .social-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; text-align: center; text-decoration: none; color: white; font-size: 12px; font-weight: 500; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: 0.2s; }
+        .social-item:hover { border-color: var(--primary); }
+        .social-item img { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; }
+
+        .container { padding: 10px 15px; max-width: 1100px; margin: auto; }
         .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); position: relative; }
-        .product-title { color: var(--text-main); font-weight: 600; font-size: 16px; margin-bottom: 5px; }
-        .price { color: var(--primary); font-size: 20px; font-weight: 700; margin: 10px 0; }
-        .btn { background: linear-gradient(135deg, #ff4757, #ff6b81); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer; text-align: center; display: block; text-decoration: none; box-sizing: border-box; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,71,87,0.3); }
-        .btn-delete { background: rgba(255,71,87,0.2); border: 1px solid var(--primary); color: var(--primary-hover); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .product-title { color: var(--text-main); font-weight: 600; font-size: 15px; margin-bottom: 5px; }
+        .price { color: var(--primary); font-size: 18px; font-weight: 700; margin: 10px 0; }
+        .btn { background: linear-gradient(135deg, #ff4757, #ff6b81); color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer; text-align: center; display: block; text-decoration: none; box-sizing: border-box; transition: all 0.3s ease; }
+        .btn-delete { background: rgba(255,71,87,0.2); border: 1px solid var(--primary); color: var(--primary-hover); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
         input, select, textarea { width: 100%; padding: 12px 15px; margin: 10px 0; background: #12131c; border: 1px solid var(--border-color); color: white; border-radius: 8px; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 14px; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
         .alert { background: rgba(255,71,87,0.15); border: 1px solid var(--primary); color: #ff6b81; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-weight: 500; }
         .success-box { background: rgba(46,213,115,0.1); border: 1px solid var(--success); padding: 20px; border-radius: 10px; margin-top: 15px; text-align: center; }
         .top-user-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 14px; align-items: center; }
@@ -201,28 +212,58 @@ BASE_HTML = """
         .chat-msg { margin-bottom: 10px; font-size: 13px; line-height: 1.4; }
         .chat-msg.user { color: #70a1ff; text-align: right; }
         .chat-msg.admin { color: var(--success); text-align: left; }
-        h2 { font-weight: 700; font-size: 22px; margin-bottom: 20px; }
-        h3 { font-size: 18px; font-weight: 600; }
+        
+        /* Bottom Nav Bar chuẩn mobile */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #12151f; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
+        .bottom-item { color: var(--text-secondary); text-decoration: none; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-weight: 500; }
+        .bottom-item.active, .bottom-item:hover { color: var(--primary); }
+        .bottom-item .avatar-circle { width: 32px; height: 32px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; margin-top: -15px; border: 2px solid #12151f; }
     </style>
 </head>
 <body>
     <header>
-        <a href="/" class="logo rgb-text">⚡ BLOX FRUIT STORE</a>
-        <div class="nav-buttons">
-            {% if 'username' in session %}
-                <span style="background: rgba(46,213,115,0.15); border: 1px solid var(--success); color: var(--success); padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 13px;">Số dư: {{ "{:,.0f}".format(users[session['username']]['balance']) }}đ</span>
-                <a href="/lich-su" class="rgb-btn" style="padding: 9px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px;">📜 Lịch sử</a>
-                <a href="/doi-mat-khau" class="rgb-btn" style="padding: 9px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px;">🔒 Đổi MK</a>
-                {% if session.get('role') == 'admin' %}
-                    <a href="/admin" class="rgb-btn" style="padding: 9px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px;">⚙️ Quản trị</a>
-                {% endif %}
-                <a href="/logout" style="background: #747d8c;">Thoát</a>
-            {% else %}
-                <a href="/login" class="rgb-btn">Đăng nhập</a>
-                <a href="/register" class="rgb-btn">Đăng ký</a>
-            {% endif %}
-        </div>
+        <a href="/" class="logo-area">
+            <img src="https://i.ibb.co/DHCWq65g/file-00000000414c821198dbb4fd0f8ab53e.png" alt="Logo">
+            <span>VANTHANH ROBLOX</span>
+        </a>
+        <button class="menu-btn" onclick="toggleDrawer()">☰</button>
     </header>
+
+    <!-- Drawer Menu Mobile -->
+    <div class="drawer" id="mobileDrawer">
+        <button class="drawer-close" onclick="toggleDrawer()">✕</button>
+        {% if 'username' in session %}
+            <a href="#" style="background: rgba(46,213,115,0.2); color: var(--success);">Số dư: {{ "{:,.0f}".format(users[session['username']]['balance']) }}đ</a>
+            <a href="/lich-su">📜 Lịch sử giao dịch</a>
+            <a href="/doi-mat-khau">🔒 Đổi mật khẩu</a>
+            {% if session.get('role') == 'admin' %}
+                <a href="/admin">⚙️ Trang Quản Trị Admin</a>
+            {% endif %}
+            <a href="/logout" style="background: #e74c3c;">Đăng xuất</a>
+        {% else %}
+            <a href="/login">🔑 Đăng nhập hệ thống</a>
+            <a href="/register">📝 Đăng ký tài khoản</a>
+        {% endif %}
+    </div>
+
+    <!-- Thông báo hướng dẫn nạp / mua acc chuẩn mẫu -->
+    <div class="notice-banner">
+        <b>100% ACC BÊN MÌNH ĐỀU LÀ ROBLOX QUỐC TẾ NHÉ.</b><br>
+        Khi đăng nhập tài khoản Roblox, hệ thống sẽ yêu cầu xác minh 2 bước (2FA). Hãy tạo mã Backup Code theo video hướng dẫn để vào shop nhận acc tự động siêu tốc!
+    </div>
+
+    <!-- YouTube và TikTok chính chủ của bạn -->
+    <div class="social-grid">
+        <a href="https://www.youtube.com/@e_hahe" target="_blank" class="social-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt="YT">
+            Youtube mình
+        </a>
+        <a href="https://www.tiktok.com/@idollatao" target="_blank" class="social-item">
+            <img src="https://sf16-scmcdn-va.ibytedtos.com/obj/eden-va/uv_ln7wvj/ljhwZthlaukjlkulzlp/tiktok-icon-2.png" alt="TikTok">
+            TikTok Minh
+        </a>
+    </div>
+
     <div class="container">
         {% with messages = get_flashed_messages() %}
           {% if messages %}
@@ -233,6 +274,28 @@ BASE_HTML = """
         {% endwith %}
         {{ content | safe }}
     </div>
+
+    <!-- Thanh điều hướng dưới chân y hệt mẫu vanthanhroblox -->
+    <div class="bottom-nav">
+        <a href="/register" class="bottom-item">
+            <span>📝</span>
+            <span>Đăng ký</span>
+        </a>
+        <a href="/" class="bottom-item active">
+            <div class="avatar-circle">👤</div>
+            <span>Trang chủ</span>
+        </a>
+        <a href="/login" class="bottom-item">
+            <span>🔑</span>
+            <span>Đăng Nhập</span>
+        </a>
+    </div>
+
+    <script>
+        function toggleDrawer() {
+            document.getElementById('mobileDrawer').classList.toggle('open');
+        }
+    </script>
 </body>
 </html>
 """
@@ -299,7 +362,7 @@ def index():
         )
 
     chat_html = (
-        '<div class="card rgb-box" style="border: 1px solid var(--primary);"><h3'
+        '<div class="card" style="border: 1px solid var(--primary);"><h3'
         ' style="color: var(--primary); margin-top: 0;">💬 Hỗ Trợ Trực'
         ' Tuyến</h3><div class="chat-box">'
         + msgs_render
@@ -328,8 +391,8 @@ def index():
     img_tag = (
         '<img src="'
         + p['image']
-        + '" style="width: 100%; height: 160px; object-fit: cover;'
-        ' border-radius: 10px; margin-bottom: 12px; border: 1px solid'
+        + '" style="width: 100%; height: 130px; object-fit: cover;'
+        ' border-radius: 10px; margin-bottom: 10px; border: 1px solid'
         ' var(--border-color);">'
         if p.get('image')
         else ''
@@ -340,22 +403,22 @@ def index():
       delete_btn = f'<div style="position: absolute; top: 15px; right: 15px;"><a href="/admin/delete/{p["id"]}" class="btn-delete" onclick="return confirm(\'Bạn có chắc chắn muốn xóa sản phẩm này không?\');">🗑️ XÓA</a></div>'
 
     products_html += (
-        '<div class="card rgb-box" style="display: flex; flex-direction: column;'
+        '<div class="card" style="display: flex; flex-direction: column;'
         ' justify-content: space-between;">'
         + delete_btn
         + '<div>'
         + img_tag
-        + '<div style="color: var(--text-secondary); font-size: 12px; font-weight:'
+        + '<div style="color: var(--text-secondary); font-size: 11px; font-weight:'
         ' 600;">MÃ SÓ: #'
         + str(p['id'])
         + '</div><div class="product-title">'
         + p['name']
-        + '</div><p style="color: var(--text-secondary); font-size: 13px;'
+        + '</div><p style="color: var(--text-secondary); font-size: 12px;'
         ' line-height: 1.4;">'
         + p['desc']
         + '</p></div><div><div style="display: flex; justify-content:'
         ' space-between; align-items: center; margin-top: 10px;"><span'
-        ' style="font-size: 13px; color: var(--text-secondary);">Kho: <b'
+        ' style="font-size: 12px; color: var(--text-secondary);">Kho: <b'
         ' style="color: white;">'
         + str(stock_count)
         + '</b></span><span class="price">'
@@ -380,10 +443,10 @@ def index():
       delete_ct_btn = f'<div style="position: absolute; top: 15px; right: 15px;"><a href="/admin/delete-cay-thue/{ct["id"]}" class="btn-delete" onclick="return confirm(\'Xóa dịch vụ cày thuê này?\');">🗑️ XÓA</a></div>'
 
     cay_thue_html += (
-        '<div class="card rgb-box" style="position: relative;">'
+        '<div class="card" style="position: relative;">'
         + delete_ct_btn
         + f'<div class="product-title">{ct["name"]}</div>'
-        + f'<p style="color: var(--text-secondary); font-size: 13px;">{ct["desc"]}</p>'
+        + f'<p style="color: var(--text-secondary); font-size: 12px;">{ct["desc"]}</p>'
         + f'<div class="price">{ct["price"]:,}đ</div>'
         + btn_cay
         + '</div>'
@@ -396,7 +459,7 @@ def index():
     curr_username = session['username']
     suggest_note = f'NAP {curr_username.upper()}'
     nap_html = (
-        '<div class="card rgb-box" style="border: 1px solid var(--success);"><h3'
+        '<div class="card" style="border: 1px solid var(--success);"><h3'
         ' class="rgb-text" style="margin-top:0;">⚡ NẠP TIỀN TỰ ĐỘNG'
         ' 100%</h3><div style="background: #12131c; padding: 15px; border-radius:'
         ' 10px; margin-bottom: 20px; border: 1px solid var(--border-color);"><p'
@@ -433,24 +496,23 @@ def index():
     )
 
   banner_html = """
-        <div class="card rgb-box" style="text-align: center; padding: 15px; border: 1px solid var(--primary); background: linear-gradient(180deg, rgba(255,71,87,0.05), var(--card-bg));">
-            <img src="https://i.ibb.co/DHCWq65g/file-00000000414c821198dbb4fd0f8ab53e.png" alt="Banner" style="width: 100%; max-height: 380px; object-fit: cover; border-radius: 10px;">
+        <div class="card" style="text-align: center; padding: 10px; border: 1px solid var(--primary); background: linear-gradient(180deg, rgba(255,71,87,0.05), var(--card-bg));">
+            <img src="https://i.ibb.co/DHCWq65g/file-00000000414c821198dbb4fd0f8ab53e.png" alt="Banner" style="width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px;">
         </div>
         """
 
   content = (
       banner_html
       + nap_html
-      + '<div style="display: grid; grid-template-columns: 2fr 1fr; gap:'
-      ' 20px;"><div><h2 class="rgb-text">🔥 DANH MỤC TÀI KHOẢN & TÚI MÙ</h2><div'
+      + '<div style="display: grid; grid-template-columns: 1fr; gap: 20px;"><div><h2 class="rgb-text">🔥 DANH MỤC TÀI KHOẢN & TÚI MÙ</h2><div'
       ' style="display: grid; grid-template-columns: 1fr 1fr; gap:'
-      ' 20px;">'
+      ' 12px;">'
       + products_html
       + '</div><h2 class="rgb-text" style="margin-top: 30px;">⚔️ DỊCH VỤ CÀY THUÊ UY TÍN</h2>'
       + status_note_box
-      + '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">'
+      + '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">'
       + cay_thue_html
-      + '</div></div><div><div class="card rgb-box" style="border: 1px solid'
+      + '</div></div><div><div class="card" style="border: 1px solid'
       ' var(--accent); margin-bottom: 20px;"><h3 class="rgb-text" style="'
       ' text-align: center; margin-top: 0;">🏆 TOP NẠP TIỀN</h3>'
       + top_html
@@ -459,7 +521,6 @@ def index():
       + '</div></div>'
   )
   return render_template_string(BASE_HTML, content=content, users=users)
-
 
 @app.route('/dat-cay-thue/<int:ct_id>', methods=['GET', 'POST'])
 def dat_cay_thue(ct_id):
@@ -499,7 +560,7 @@ def dat_cay_thue(ct_id):
       return redirect(url_for('lich_su'))
 
   content = f"""
-    <div class="card rgb-box" style="max-width: 500px; margin: auto; border: 1px solid var(--accent);">
+    <div class="card" style="max-width: 500px; margin: auto; border: 1px solid var(--accent);">
         <h2 class="rgb-text" style="text-align: center;">ĐẶT CÀY THUÊ</h2>
         <p style="color: var(--text-secondary); text-align: center;">Gói: <b>{service['name']}</b></p>
         <p class="price" style="text-align: center;">Giá: {service['price']:,}đ</p>
@@ -518,7 +579,6 @@ def dat_cay_thue(ct_id):
     </div>
     """
   return render_template_string(BASE_HTML, content=content, users=users)
-
 
 @app.route('/doi-mat-khau', methods=['GET', 'POST'])
 def doi_mat_khau():
@@ -541,7 +601,7 @@ def doi_mat_khau():
       return redirect(url_for('index'))
       
   content = """
-    <div class="card rgb-box" style="max-width: 420px; margin: auto;">
+    <div class="card" style="max-width: 420px; margin: auto;">
         <h2 class="rgb-text" style="text-align: center;">ĐỔI MẬT KHẨU</h2>
         <form method="POST">
             <label style="font-size: 13px; color: var(--text-secondary);">Mật khẩu cũ:</label>
@@ -557,7 +617,6 @@ def doi_mat_khau():
     """
   return render_template_string(BASE_HTML, content=content, users=users)
 
-
 @app.route('/tui-mu/<int:product_id>')
 def tui_mu(product_id):
   if 'username' not in session:
@@ -569,7 +628,7 @@ def tui_mu(product_id):
     return redirect(url_for('index'))
 
   content = (
-      '<div class="card rgb-box" style="max-width: 500px; margin: auto; text-align:'
+      '<div class="card" style="max-width: 500px; margin: auto; text-align:'
       ' center; border: 1px solid var(--accent);"><h2 class="rgb-text">⚡ MỞ TÚI MÙ: '
       + product['name']
       + '</h2><p style="color: var(--text-secondary);">'
@@ -619,7 +678,6 @@ def tui_mu(product_id):
   )
   return render_template_string(BASE_HTML, content=content, users=users)
 
-
 @app.route('/api/check-coupon', methods=['POST'])
 def check_coupon():
   data = request.json or {}
@@ -638,7 +696,6 @@ def check_coupon():
     return jsonify({'success': False, 'message': 'Mã giảm giá đã hết lượt sử dụng!'})
     
   return jsonify({'success': True, 'discount': coupon['discount_amount']})
-
 
 @app.route('/api/buy-random/<int:product_id>', methods=['POST'])
 def api_buy_random(product_id):
@@ -682,7 +739,6 @@ def api_buy_random(product_id):
 
   return jsonify({'success': True, 'account_info': acc_info})
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
   if request.method == 'POST':
@@ -695,7 +751,7 @@ def login():
       return redirect(url_for('index'))
     flash('Sai tài khoản hoặc mật khẩu!')
   content = """
-    <div class="card rgb-box" style="max-width: 420px; margin: auto; border: 1px solid var(--primary);">
+    <div class="card" style="max-width: 420px; margin: auto; border: 1px solid var(--primary);">
         <h2 class="rgb-text" style="text-align: center;">ĐĂNG NHẬP</h2>
         <form method="POST">
             <label style="font-size: 13px; color: var(--text-secondary);">Tài khoản:</label>
@@ -707,7 +763,6 @@ def login():
     </div>
     """
   return render_template_string(BASE_HTML, content=content, users=users)
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -728,7 +783,7 @@ def register():
       flash('Đăng ký thành công! Hãy đăng nhập.')
       return redirect(url_for('login'))
   content = """
-    <div class="card rgb-box" style="max-width: 420px; margin: auto; border: 1px solid #3742fa;">
+    <div class="card" style="max-width: 420px; margin: auto; border: 1px solid #3742fa;">
         <h2 class="rgb-text" style="text-align: center;">ĐĂNG KÝ TÀI KHOẢN</h2>
         <form method="POST">
             <label style="font-size: 13px; color: var(--text-secondary);">Tài khoản mới:</label>
@@ -741,12 +796,10 @@ def register():
     """
   return render_template_string(BASE_HTML, content=content, users=users)
 
-
 @app.route('/logout')
 def logout():
   session.clear()
   return redirect(url_for('index'))
-
 
 @app.route('/admin/delete/<int:product_id>')
 def delete_product(product_id):
@@ -759,7 +812,6 @@ def delete_product(product_id):
   flash('Đã xóa sản phẩm thành công!')
   return redirect(url_for('index'))
 
-
 @app.route('/admin/delete-cay-thue/<int:ct_id>')
 def delete_cay_thue(ct_id):
   if 'username' not in session or session.get('role') != 'admin':
@@ -771,8 +823,6 @@ def delete_cay_thue(ct_id):
   flash('Đã xóa dịch vụ cày thuê thành công!')
   return redirect(url_for('admin'))
 
-
-# --- XÓA GHI CHÚ TRONG SỔ TAY CÀY CUỐC ---
 @app.route('/admin/delete-private-acc/<int:acc_id>')
 def delete_private_acc(acc_id):
   if 'username' not in session or session.get('role') != 'admin':
@@ -783,7 +833,6 @@ def delete_private_acc(acc_id):
   private_cai_cuoc_db = [acc for acc in private_cai_cuoc_db if acc['id'] != acc_id]
   flash('Đã xóa ghi chú trong sổ tay thành công!')
   return redirect(url_for('admin'))
-
 
 @app.route('/webhook/bank', methods=['POST'])
 def bank_webhook():
@@ -815,7 +864,6 @@ def bank_webhook():
         return jsonify({'success': True, 'message': f'Đã cộng {amount} cho {uname}'})
 
   return jsonify({'success': False, 'message': 'Không khớp tài khoản'})
-
 
 @app.route('/nap-the', methods=['POST'])
 def nap_the():
@@ -866,7 +914,6 @@ def nap_the():
 
   return redirect(url_for('index'))
 
-
 @app.route('/callback-the', methods=['GET', 'POST'])
 def callback_the():
   data = request.args if request.method == 'GET' else (request.json or request.form)
@@ -886,7 +933,6 @@ def callback_the():
           send_telegram_notification(f"💳 <b>Gạch thẻ thành công!</b>\n👤 User: {uname}\n💰 Số tiền: {amount:,}đ")
         break
   return jsonify({'success': True})
-
 
 @app.route('/buy/<int:product_id>')
 def buy(product_id):
@@ -913,7 +959,7 @@ def buy(product_id):
   send_telegram_notification(f"🛒 <b>Có khách mua tài khoản!</b>\n👤 User: {username}\n📦 Sản phẩm: {product['name']}\n🔑 Acc: {acc_info}")
 
   content = (
-      '<div class="card rgb-box" style="max-width: 600px; margin: auto; text-align:'
+      '<div class="card" style="max-width: 600px; margin: auto; text-align:'
       ' center; border: 1px solid var(--success);"><h2 class="rgb-text">🎉 MUA TÀI KHOẢN THÀNH CÔNG!</h2><p>Sản phẩm: <b'
       ' style="color: white;">'
       + product['name']
@@ -929,7 +975,6 @@ def buy(product_id):
   )
   return render_template_string(BASE_HTML, content=content, users=users)
 
-
 @app.route('/lich-su')
 def lich_su():
   if 'username' not in session:
@@ -940,13 +985,13 @@ def lich_su():
   history_html = '<h2 class="rgb-text">📜 LỊCH SỬ GIAO DỊCH & CÀY THUÊ</h2>'
   if not user_history:
     history_html += (
-        '<div class="card rgb-box" style="text-align: center; color:'
+        '<div class="card" style="text-align: center; color:'
         ' var(--text-secondary);"><p>Bạn chưa có lịch sử giao dịch nào.</p></div>'
     )
   else:
     for h in user_history:
       history_html += (
-          '<div class="card rgb-box"><p style="margin: 0 0 5px 0; color:'
+          '<div class="card"><p style="margin: 0 0 5px 0; color:'
           ' var(--text-secondary);"><b>Gói / Sản phẩm:</b> <span style="color:'
           ' white;">'
           + h['product_name']
@@ -956,7 +1001,6 @@ def lich_su():
           + '</span></p></div>'
       )
   return render_template_string(BASE_HTML, content=history_html, users=users)
-
 
 @app.route('/send-message', methods=['POST'])
 def send_message():
@@ -970,7 +1014,6 @@ def send_message():
     flash('Đã gửi tin nhắn cho Admin thành công!')
     send_telegram_notification(f"💬 <b>Có tin nhắn hỗ trợ mới!</b>\n👤 Từ user: {session['username']}\n📝 Nội dung: {msg}")
   return redirect(url_for('index'))
-
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
@@ -1004,7 +1047,6 @@ def admin():
       flash('Đã tạo danh mục sản phẩm mới thành công!')
     return redirect(url_for('admin'))
 
-  # --- XỬ LÝ THÊM GÓI CÀY THUÊ TỪ ADMIN ---
   if request.method == 'POST' and 'add_cay_thue' in request.form:
     name = request.form['ct_name'].strip()
     price = int(request.form['ct_price'])
@@ -1020,7 +1062,6 @@ def admin():
       flash(f'Đã thêm gói cày thuê "{name}" thành công!')
     return redirect(url_for('admin'))
 
-  # --- XỬ LÝ LƯU GHI CHÚ VÀO SỔ TAY CÀY CUỐC ---
   if request.method == 'POST' and 'add_private_acc' in request.form:
     account = request.form.get('private_account', '').strip()
     note = request.form.get('private_note', '').strip()
@@ -1034,7 +1075,6 @@ def admin():
       flash('Đã lưu thông tin vào sổ tay cày cuốc thành công!')
     return redirect(url_for('admin'))
 
-  # --- XỬ LÝ CẬP NHẬT TRẠNG THÁI CÀY THUÊ ---
   if request.method == 'POST' and 'update_cay_thue_status' in request.form:
     ready_val = request.form.get('is_ready')
     cay_thue_status['is_ready'] = True if ready_val == 'on' else False
@@ -1094,7 +1134,6 @@ def admin():
     for v in visitors_history:
       visitors_html += f'<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border-color); font-size: 13px;"><span>🌐 IP: <b style="color: #70a1ff;">{v["ip"]}</b></span><span style="color: var(--accent);">{v["time"]}</span></div>'
 
-  # --- RENDER DANH SÁCH SỔ TAY GHI CHÚ ---
   private_accs_html = ''
   if not private_cai_cuoc_db:
     private_accs_html = '<p style="color: var(--text-secondary); font-size: 13px;">Sổ tay trống, chưa có ghi chú nào.</p>'
@@ -1140,7 +1179,7 @@ def admin():
           '<div><b>' + sender_label + ':</b> ' + m['message'] + '</div>'
       )
     chat_admin_html += (
-        '<div class="card rgb-box" style="background: #12131c; margin-bottom:'
+        '<div class="card" style="background: #12131c; margin-bottom:'
         ' 12px;"><p style="margin: 0 0 8px 0;"><b>Khách hàng: <span'
         ' style="color: #70a1ff;">'
         + cu
@@ -1164,7 +1203,7 @@ def admin():
   else:
     for c in cards_queue:
       cards_html += (
-          '<div class="card rgb-box" style="margin-bottom: 10px;"><p'
+          '<div class="card" style="margin-bottom: 10px;"><p'
           ' style="margin: 0 0 5px 0;"><b>User:</b> '
           + c['user']
           + ' | <b>Loại:</b> '
@@ -1184,13 +1223,12 @@ def admin():
   admin_content = (
       '<h2 class="rgb-text">⚙️ TRANG QUẢN TRỊ ADMIN</h2>'
       
-      # --- KHUNG SỔ TAY GHI CHÚ CÀY CUỐC ---
-      '<div class="card rgb-box" style="border: 1px solid var(--accent);">'
+      '<div class="card" style="border: 1px solid var(--accent);">'
       '<h3 class="rgb-text" style="margin-top: 0;">📒 Sổ Tay Ghi Chú Cày Cuốc Nick (Riêng tư)</h3>'
       '<form method="POST">'
       '<label style="font-size: 13px; color: var(--text-secondary);">Tài khoản game / Mật khẩu:</label>'
       '<input type="text" name="private_account" placeholder="username | password" required>'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Ghi chú tiến độ (VD: Đang cày dở level 2400, giữ lại trái phật tổ):</label>'
+      '<label style="font-size: 13px; color: var(--text-secondary);">Ghi chú tiến độ:</label>'
       '<textarea name="private_note" placeholder="Nhập ghi chú chi tiết..." rows="2" style="width: 100%; padding: 12px 15px; margin: 10px 0; background: #12131c; border: 1px solid var(--border-color); color: white; border-radius: 8px; box-sizing: border-box; font-family: \'Poppins\', sans-serif; font-size: 14px;" required></textarea>'
       '<button type="submit" name="add_private_acc" class="btn rgb-btn" style="margin-top: 10px;">LƯU VÀO SỔ TAY</button>'
       '</form>'
@@ -1199,51 +1237,48 @@ def admin():
       + '</div>'
       '</div>'
 
-      # --- KHUNG QUẢN LÝ TRẠNG THÁI CÀY THUÊ ---
-      '<div class="card rgb-box" style="border: 1px solid var(--success);">'
+      '<div class="card" style="border: 1px solid var(--success);">'
       '<h3 class="rgb-text" style="margin-top: 0;">⚡ Quản Lý Trạng Thái Cày Thuê</h3>'
       '<form method="POST">'
       '<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">'
       f'<input type="checkbox" name="is_ready" {checked_attr} style="width: 20px; height: 20px; accent-color: var(--success);">'
-      '<label style="font-size: 14px; font-weight: 600; color: white; margin: 0;">Sẵn sàng nhận đơn cày thuê (Bỏ tích nếu đang bận)</label>'
+      '<label style="font-size: 14px; font-weight: 600; color: white; margin: 0;">Sẵn sàng nhận đơn cày thuê</label>'
       '</div>'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Ghi chú / Thông báo trạng thái cho khách:</label>'
+      '<label style="font-size: 13px; color: var(--text-secondary);">Thông báo trạng thái:</label>'
       f'<input type="text" name="current_task" value="{cay_thue_status["current_task"]}" placeholder="Để trống nếu rảnh...">'
       '<button type="submit" name="update_cay_thue_status" class="btn rgb-btn" style="margin-top: 10px;">CẬP NHẬT TRẠNG THÁI</button>'
       '</form>'
       '</div>'
 
-      # --- KHUNG THÊM GÓI CÀY THUÊ ---
-      '<div class="card rgb-box" style="border: 1px solid var(--primary);">'
+      '<div class="card" style="border: 1px solid var(--primary);">'
       '<h3 class="rgb-text" style="margin-top: 0;">⚔️ Thêm Gói Cày Thuê Mới</h3>'
       '<form method="POST">'
       '<label style="font-size: 13px; color: var(--text-secondary);">Tên gói cày thuê:</label>'
-      '<input type="text" name="ct_name" placeholder="VD: Cày Đảo Bánh, Săn Katakuri..." required>'
+      '<input type="text" name="ct_name" placeholder="VD: Cày Đảo Bánh..." required>'
       '<label style="font-size: 13px; color: var(--text-secondary);">Giá tiền (VNĐ):</label>'
       '<input type="number" name="ct_price" placeholder="VD: 50000" required>'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Mô tả chi tiết gói:</label>'
-      '<input type="text" name="ct_desc" placeholder="Mô tả công việc thực hiện..." required>'
+      '<label style="font-size: 13px; color: var(--text-secondary);">Mô tả chi tiết:</label>'
+      '<input type="text" name="ct_desc" placeholder="Mô tả công việc..." required>'
       '<button type="submit" name="add_cay_thue" class="btn rgb-btn" style="margin-top: 15px;">THÊM GÓI CÀY THUÊ</button>'
       '</form>'
       '</div>'
 
-      '<div class="card rgb-box" style="border: 1px solid #70a1ff;"><h3 class="rgb-text" style="margin-top: 0;">🌐 Lịch Sử Truy Cập Gần Đây</h3><div style="background: #12131c; padding: 12px; border-radius: 8px; max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color);">'
+      '<div class="card" style="border: 1px solid #70a1ff;"><h3 class="rgb-text" style="margin-top: 0;">🌐 Lịch Sử Truy Cập Gần Đây</h3><div style="background: #12131c; padding: 12px; border-radius: 8px; max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color);">'
       + visitors_html
       + '</div></div>'
-      '<div class="card rgb-box" style="border: 1px solid var(--primary);"><h3 class="rgb-text" style="margin-top: 0;">📦 Thêm Sản Phẩm Mới</h3><form method="POST"><label style="font-size: 13px; color: var(--text-secondary);">Tên sản phẩm:</label><input type="text" name="name" placeholder="VD: Acc V4 Full..." required><label style="font-size: 13px; color: var(--text-secondary);">Phân loại:</label><select name="category"><option value="tuichon">Acc Tự Chọn (Cần link ảnh minh họa)</option><option value="random">Acc Random / Túi Mù (Không cần ảnh)</option></select><label style="font-size: 13px; color: var(--text-secondary);">Giá tiền (VNĐ):</label><input type="number" name="price" placeholder="VD: 30000" required><label style="font-size: 13px; color: var(--text-secondary);">Link ảnh minh họa (Chỉ dùng cho Tự chọn):</label><input type="text" name="image" placeholder="Link ảnh dạng https://i.ibb.co/..."><label style="font-size: 13px; color: var(--text-secondary);">Mô tả ngắn:</label><input type="text" name="desc" placeholder="Mô tả tài khoản..." required><label style="font-size: 13px; color: var(--text-secondary);">Tài khoản game:</label><input type="text" name="game_acc" placeholder="username | password" required><button type="submit" name="add_product" class="btn rgb-btn" style="margin-top: 15px;">THÊM VÀO KHO</button></form></div>'
-      '<div class="card rgb-box" style="border: 1px solid var(--accent);"><h3 class="rgb-text" style="margin-top: 0;">🎟️ Quản Lý Mã Giảm Giá Nâng Cao</h3><form method="POST" style="margin-bottom: 15px;"><input type="text" name="coupon_code" placeholder="Mã (VD: GIAM5K)" required><input type="number" name="discount_amount" placeholder="Số tiền giảm (VNĐ)" required><input type="number" name="expires_in_days" placeholder="Thời hạn (Số ngày sử dụng, VD: 3)" required><input type="number" name="max_uses" placeholder="Giới hạn số lượt dùng (VD: 10)" required><button type="submit" name="add_coupon" class="btn rgb-btn" style="margin-top: 8px;">THÊM MÃ GIẢM GIÁ</button></form><div style="background: #12131c; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">'
+      '<div class="card" style="border: 1px solid var(--primary);"><h3 class="rgb-text" style="margin-top: 0;">📦 Thêm Sản Phẩm Mới</h3><form method="POST"><label style="font-size: 13px; color: var(--text-secondary);">Tên sản phẩm:</label><input type="text" name="name" placeholder="VD: Acc V4 Full..." required><label style="font-size: 13px; color: var(--text-secondary);">Phân loại:</label><select name="category"><option value="tuichon">Acc Tự Chọn</option><option value="random">Acc Random / Túi Mù</option></select><label style="font-size: 13px; color: var(--text-secondary);">Giá tiền (VNĐ):</label><input type="number" name="price" placeholder="VD: 30000" required><label style="font-size: 13px; color: var(--text-secondary);">Link ảnh minh họa:</label><input type="text" name="image" placeholder="Link ảnh dạng https://i.ibb.co/..."><label style="font-size: 13px; color: var(--text-secondary);">Mô tả ngắn:</label><input type="text" name="desc" placeholder="Mô tả tài khoản..." required><label style="font-size: 13px; color: var(--text-secondary);">Tài khoản game:</label><input type="text" name="game_acc" placeholder="username | password" required><button type="submit" name="add_product" class="btn rgb-btn" style="margin-top: 15px;">THÊM VÀO KHO</button></form></div>'
+      '<div class="card" style="border: 1px solid var(--accent);"><h3 class="rgb-text" style="margin-top: 0;">🎟️ Quản Lý Mã Giảm Giá Nâng Cao</h3><form method="POST" style="margin-bottom: 15px;"><input type="text" name="coupon_code" placeholder="Mã (VD: GIAM5K)" required><input type="number" name="discount_amount" placeholder="Số tiền giảm (VNĐ)" required><input type="number" name="expires_in_days" placeholder="Thời hạn (Số ngày)" required><input type="number" name="max_uses" placeholder="Giới hạn số lượt dùng" required><button type="submit" name="add_coupon" class="btn rgb-btn" style="margin-top: 8px;">THÊM MÃ GIẢM GIÁ</button></form><div style="background: #12131c; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">'
       + (coupons_html if coupons_html else '<p>Chưa có mã giảm giá nào.</p>')
       + '</div></div>'
-      '<div class="card rgb-box" style="border: 1px solid var(--accent);"><h3 class="rgb-text" style="margin-top: 0;">💰 Cộng tiền cho Thành viên</h3><form method="POST"><input type="text" name="target_username" placeholder="Tên tài khoản khách..." required><input type="number" name="bonus_amount" placeholder="Số tiền cộng (VNĐ)..." required><button type="submit" name="bonus_user" class="btn rgb-btn" style="margin-top: 15px;">CỘNG TIỀN NGAY</button></form></div>'
-      '<div class="card rgb-box" style="border: 1px solid #70a1ff;"><h3 class="rgb-text" style="margin-top: 0;">💬 Tin Nhắn Hỗ Trợ Khách Hàng</h3>'
+      '<div class="card" style="border: 1px solid var(--accent);"><h3 class="rgb-text" style="margin-top: 0;">💰 Cộng tiền cho Thành viên</h3><form method="POST"><input type="text" name="target_username" placeholder="Tên tài khoản khách..." required><input type="number" name="bonus_amount" placeholder="Số tiền cộng (VNĐ)..." required><button type="submit" name="bonus_user" class="btn rgb-btn" style="margin-top: 15px;">CỘNG TIỀN NGAY</button></form></div>'
+      '<div class="card" style="border: 1px solid #70a1ff;"><h3 class="rgb-text" style="margin-top: 0;">💬 Tin Nhắn Hỗ Trợ Khách Hàng</h3>'
       + (chat_admin_html if chat_admin_html else '<p>Chưa có tin nhắn nào.</p>')
       + '</div>'
-      '<div class="card rgb-box" style="border: 1px solid var(--success);"><h3 class="rgb-text" style="margin-top: 0;">📋 Lịch Sử Nạp Tiền</h3>'
+      '<div class="card" style="border: 1px solid var(--success);"><h3 class="rgb-text" style="margin-top: 0;">📋 Lịch Sử Nạp Tiền</h3>'
       + cards_html
       + '</div>'
   )
   return render_template_string(BASE_HTML, content=admin_content, users=users)
-
 
 @app.route('/admin/coupon/toggle/<int:coupon_id>', methods=['POST'])
 def toggle_coupon(coupon_id):
@@ -1255,7 +1290,6 @@ def toggle_coupon(coupon_id):
       flash(f'Đã đổi trạng thái mã {c["code"]} thành công!')
       break
   return redirect(url_for('admin'))
-
 
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=5000)
