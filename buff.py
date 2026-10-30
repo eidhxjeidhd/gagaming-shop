@@ -37,16 +37,12 @@ users = {
         'role': 'admin',
         'balance': 500000,
         'total_deposited': 0,
-        'last_checkin': '',
-        'last_spin': ''
     },
     'player1': {
         'password': '123',
         'role': 'user',
         'balance': 50050,
         'total_deposited': 100000,
-        'last_checkin': '',
-        'last_spin': ''
     },
 }
 
@@ -193,8 +189,6 @@ BASE_HTML = """
         <button class="drawer-close" onclick="toggleDrawer()">✕</button>
         {% if 'username' in session %}
             <a href="#" style="background: rgba(46,213,115,0.2); color: var(--success);">Số dư: {{ "{:,.0f}".format(users[session['username']]['balance']) }}đ</a>
-            <a href="/diem-danh" style="background: rgba(255,165,2,0.2); color: var(--accent);">🎁 Điểm danh nhận mã giảm giá</a>
-            <a href="/vong-quay" style="background: rgba(255,71,87,0.2); color: var(--primary);">🎡 Vòng quay miễn phí (1 lần/ngày)</a>
             <a href="/lich-su">📜 Lịch sử giao dịch</a>
             <a href="/doi-mat-khau">🔒 Đổi mật khẩu</a>
             {% if session.get('role') == 'admin' %}
@@ -236,17 +230,9 @@ BASE_HTML = """
     </div>
 
     <div class="bottom-nav">
-        <a href="/diem-danh" class="bottom-item">
-            <span>🎁</span>
-            <span>Điểm danh</span>
-        </a>
-        <a href="/" class="bottom-item active">
+        <a href="/" class="bottom-item active" style="width: 100%;">
             <div class="avatar-circle">👤</div>
             <span>Trang chủ</span>
-        </a>
-        <a href="/vong-quay" class="bottom-item">
-            <span>🎡</span>
-            <span>Vòng quay</span>
         </a>
     </div>
 
@@ -419,8 +405,7 @@ def index():
     suggest_note = f'NAP {curr_username.upper()}'
     nap_html = (
         '<div class="card" style="border: 1px solid var(--success);"><h3'
-        ' class="rgb-text" style="margin-top:0;">⚡ NẠP TIỀN TỰ ĐỘNG'
-        ' 100%</h3><div style="background: #12131c; padding: 15px; border-radius:'
+        ' class="rgb-text" style="margin-top:0;">⚡ NẠP TIỀN</h3><div style="background: #12131c; padding: 15px; border-radius:'
         ' 10px; margin-bottom: 20px; border: 1px solid var(--border-color);"><p'
         ' style="margin: 0 0 8px 0; color: var(--accent); font-weight:'
         ' 600;">📝 1. Chuyển khoản QR siêu tốc:</p><p style="margin: 0; font-size:'
@@ -434,8 +419,7 @@ def index():
         ' margin: 8px 0 0 0;">Chủ TK: NGUYEN VAN DUONG</p></div><form'
         ' action="/nap-the" method="POST" style="margin-top: 20px; border-top:'
         ' 1px dashed var(--border-color); padding-top: 20px;"><h4 style="color:'
-        ' var(--accent); margin: 0 0 12px 0; font-size: 15px;">2. Nạp Thẻ Cào Tự'
-        ' Động</h4><label style="font-size: 13px; color:'
+        ' var(--accent); margin: 0 0 12px 0; font-size: 15px;">2. Gửi Thẻ Cào (Duyệt Tay)</h4><label style="font-size: 13px; color:'
         ' var(--text-secondary);">Nhà mạng:</label><select name="telco"><option'
         ' value="VIETTEL">Viettel</option><option'
         ' value="MOBIFONE">Mobifone</option><option'
@@ -451,7 +435,7 @@ def index():
         ' đ</option></select><input type="text" name="code" placeholder="Mã thẻ'
         ' cào" required><input type="text" name="serial" placeholder="Số Serial"'
         ' required><button type="submit" class="btn rgb-btn" style="margin-top:'
-        ' 12px;">NẠP THẺ TỰ ĐỘNG</button></form></div>'
+        ' 12px;">GỬI THẺ CÀO DUYỆT</button></form></div>'
     )
 
   banner_html = """
@@ -479,112 +463,6 @@ def index():
       + chat_html
       + '</div></div>'
   )
-  return render_template_string(BASE_HTML, content=content, users=users)
-
-@app.route('/diem-danh', methods=['GET', 'POST'])
-def diem_danh():
-  if 'username' not in session:
-    flash('Vui lòng đăng nhập để điểm danh nhận mã giảm giá!')
-    return redirect(url_for('login'))
-  
-  username = session['username']
-  today_str = datetime.now().strftime('%d/%m/%Y')
-  
-  if request.method == 'POST':
-    if users[username].get('last_checkin') == today_str:
-      flash('Hôm nay bạn đã điểm danh rồi, hãy quay lại vào ngày mai nhé!')
-    else:
-      users[username]['last_checkin'] = today_str
-      # Tự động sinh mã giảm giá ngẫu nhiên cho khách điểm danh
-      random_code = f"DIEMDANH_{random.randint(1000, 9999)}"
-      coupons_db.append({
-          'id': len(coupons_db) + 1,
-          'code': random_code,
-          'discount_amount': 5000,
-          'expiry_date': datetime.now().timestamp() + (1 * 86400), # Hạn 1 ngày
-          'max_uses': 1,
-          'used_count': 0,
-          'is_active': True
-      })
-      flash(f'🎉 Điểm danh thành công! Bạn nhận được mã giảm giá 5K: <b>{random_code}</b> (Hạn dùng 1 ngày).')
-      send_telegram_notification(f"🎁 <b>Có khách điểm danh!</b>\n👤 User: {username}\n🎟️ Tặng mã: {random_code}")
-    return redirect(url_for('diem-danh'))
-
-  checked_today = (users[username].get('last_checkin') == today_str)
-  btn_html = '<button type="submit" class="btn rgb-btn" style="margin-top: 15px;">🎁 NHẬN MÃ GIẢM GIÁ NGAY</button>' if not checked_today else '<button class="btn" style="background: #475569; cursor: not-allowed; margin-top: 15px;" disabled>Hôm nay bạn đã điểm danh rồi!</button>'
-
-  content = f"""
-    <div class="card" style="max-width: 450px; margin: auto; text-align: center; border: 1px solid var(--accent);">
-        <h2 class="rgb-text">ĐIỂM DANH NHẬN MÃ GIẢM GIÁ</h2>
-        <p style="color: var(--text-secondary);">Điểm danh mỗi ngày để nhận mã giảm giá 5K mua sắm siêu hời!</p>
-        <div style="background: #12131c; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid var(--border-color);">
-            <p style="margin: 0; font-size: 14px; color: var(--success);">Phần thưởng: <b>Mã giảm giá trị giá 5,000đ</b></p>
-        </div>
-        <form method="POST">
-            {btn_html}
-        </form>
-        <a href="/" style="display: inline-block; margin-top: 15px; color: var(--text-secondary); text-decoration: none; font-size: 13px;">← Quay lại trang chủ</a>
-    </div>
-    """
-  return render_template_string(BASE_HTML, content=content, users=users)
-
-@app.route('/vong-quay', methods=['GET', 'POST'])
-def vong_quay():
-  if 'username' not in session:
-    flash('Vui lòng đăng nhập để tham gia vòng quay!')
-    return redirect(url_for('login'))
-  
-  username = session['username']
-  today_str = datetime.now().strftime('%d/%m/%Y')
-
-  if request.method == 'POST':
-    if users[username].get('last_spin') == today_str:
-      flash('Hôm nay bạn đã hết lượt quay miễn phí, hãy quay lại vào ngày mai nhé!')
-    else:
-      users[username]['last_spin'] = today_str
-      
-      # Vòng quay miễn phí tặng mã giảm giá hoặc chúc may mắn
-      spin_results = [
-          ('Chúc bạn may mắn lần sau, hẹn gặp lại ngày mai!', None, 0),
-          ('Trúng mã giảm giá 5.000đ!', 'VQUAY_5K', 5000),
-          ('Trúng mã giảm giá 10.000đ siêu khủng!', 'VQUAY_10K', 10000)
-      ]
-      won = random.choice(spin_results)
-      
-      if won[1]:
-        coupons_db.append({
-            'id': len(coupons_db) + 1,
-            'code': won[1],
-            'discount_amount': won[2],
-            'expiry_date': datetime.now().timestamp() + (1 * 86400),
-            'max_uses': 1,
-            'used_count': 0,
-            'is_active': True
-        })
-        flash(f'🎡 Kết quả vòng quay: <b>{won[0]}</b> (Mã: {won[1]})')
-      else:
-        flash(f'🎡 Kết quả vòng quay: <b>{won[0]}</b>')
-        
-      send_telegram_notification(f"🎡 <b>Khách chơi vòng quay miễn phí!</b>\n👤 User: {username}\n🎁 Kết quả: {won[0]}")
-    return redirect(url_for('vong-quay'))
-
-  spinned_today = (users[username].get('last_spin') == today_str)
-  btn_quay_html = '<button type="submit" class="btn rgb-btn" style="margin-top: 15px; font-size: 16px; padding: 12px;">🎯 QUAY MIỄN PHÍ NGAY</button>' if not spinned_today else '<button class="btn" style="background: #475569; cursor: not-allowed; margin-top: 15px;" disabled>Hôm nay bạn đã hết lượt quay!</button>'
-
-  content = f"""
-    <div class="card" style="max-width: 500px; margin: auto; text-align: center; border: 1px solid var(--primary);">
-        <h2 class="rgb-text">VÒNG QUAY MAY MẮN MIỄN PHÍ</h2>
-        <p style="color: var(--text-secondary);">Mỗi ngày 1 lượt quay miễn phí 100 nhận mã giảm giá hot!</p>
-        <div style="background: #12131c; padding: 25px; border-radius: 50%; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; margin: 20px auto; border: 4px dashed var(--accent);">
-            <span style="font-size: 32px;">🎡</span>
-        </div>
-        <p style="color: var(--accent); font-weight: 600;">Lượt quay: 1 lần / ngày (Miễn phí)</p>
-        <form method="POST">
-            {btn_quay_html}
-        </form>
-        <a href="/" style="display: inline-block; margin-top: 15px; color: var(--text-secondary); text-decoration: none; font-size: 13px;">← Quay lại trang chủ</a>
-    </div>
-    """
   return render_template_string(BASE_HTML, content=content, users=users)
 
 @app.route('/dat-cay-thue/<int:ct_id>', methods=['GET', 'POST'])
@@ -938,66 +816,52 @@ def nap_the():
   telco = request.form['telco']
   code = request.form['code'].strip()
   serial = request.form['serial'].strip()
-  amount = request.form['amount']
-  request_id = str(len(cards_queue) + 1000)
+  amount = int(request.form['amount'])
 
-  raw_sign = PARTNER_KEY + code + serial
-  sign = hashlib.md5(raw_sign.encode('utf-8')).hexdigest()
-
-  api_url = f"https://shopbanthe.com/api/card-charging?partner_id={PARTNER_ID}&telco={telco}&code={code}&serial={serial}&amount={amount}&request_id={request_id}&sign={sign}"
-
-  try:
-    req = urllib.request.Request(
-        api_url,
-        headers={
-            'User-Agent': 'Mozilla/5.0',
-            'Accept': 'application/json',
-        },
-    )
-    with urllib.request.urlopen(req, timeout=15) as response:
-      res = json.loads(response.read().decode('utf-8'))
-      message = res.get('message', 'Đã xử lý thẻ')
-      cards_queue.append({
-          'id': len(cards_queue) + 1,
-          'user': session['username'],
-          'type': f'Thẻ {telco}',
-          'info': f'Seri: {serial} - Mã: {code}',
-          'amount': int(amount),
-          'status': 'Đang chờ xử lý',
-      })
-      flash(f'Phản hồi từ cổng thẻ: {message}')
-  except Exception as e:
-    cards_queue.append({
-        'id': len(cards_queue) + 1,
-        'user': session['username'],
-        'type': f'Thẻ {telco}',
-        'info': f'Seri: {serial} - Mã: {code}',
-        'amount': int(amount),
-        'status': 'Đang chờ xử lý (Hệ thống gạch thẻ đang bận)',
-    })
-    flash('Đã ghi nhận thẻ vào hệ thống, đang chờ xử lý!')
+  # Chuyển hoàn toàn sang trạng thái Gửi thẻ chờ duyệt tay
+  cards_queue.append({
+      'id': len(cards_queue) + 1,
+      'user': session['username'],
+      'type': f'Thẻ {telco}',
+      'info': f'Seri: {serial} - Mã: {code}',
+      'amount': amount,
+      'status': 'Đang chờ Admin duyệt',
+  })
+  
+  send_telegram_notification(f"💳 <b>Có thẻ cào mới chờ duyệt!</b>\n👤 User: {session['username']}\n📌 Nhà mạng: {telco} | Trị giá: {amount:,}đ\n🔢 Seri: {serial}\n🔑 Mã: {code}")
+  flash('Đã gửi thẻ cào thành công! Vui lòng đợi Admin kiểm tra và duyệt.')
 
   return redirect(url_for('index'))
 
-@app.route('/callback-the', methods=['GET', 'POST'])
-def callback_the():
-  data = request.args if request.method == 'GET' else (request.json or request.form)
-  status = data.get('status')
-  amount = int(data.get('amount', 0))
+@app.route('/admin/duyet-the/<int:card_id>', methods=['POST'])
+def duyet_the(card_id):
+  if 'username' not in session or session.get('role') != 'admin':
+    return redirect(url_for('index'))
+  
+  for c in cards_queue:
+    if c['id'] == card_id and c['status'] == 'Đang chờ Admin duyệt':
+      c['status'] = 'Thành công'
+      uname = c['user']
+      amount = c['amount']
+      if uname in users:
+        users[uname]['balance'] += amount
+        users[uname]['total_deposited'] = users[uname].get('total_deposited', 0) + amount
+        send_telegram_notification(f"✅ <b>Admin đã duyệt thẻ thành công!</b>\n👤 User: {uname}\n💰 Số tiền cộng: {amount:,}đ")
+        flash(f'Đã duyệt thẻ và cộng {amount:,}đ cho user {uname}!')
+      break
+  return redirect(url_for('admin'))
 
-  if str(status) == '1' and amount > 0:
-    for c in cards_queue:
-      if c['status'] in ['Đang chờ xử lý', 'Đang chờ xử lý (Hệ thống gạch thẻ đang bận)']:
-        c['status'] = 'Thành công'
-        uname = c['user']
-        if uname in users:
-          users[uname]['balance'] += amount
-          users[uname]['total_deposited'] = (
-              users[uname].get('total_deposited', 0) + amount
-          )
-          send_telegram_notification(f"💳 <b>Gạch thẻ thành công!</b>\n👤 User: {uname}\n💰 Số tiền: {amount:,}đ")
-        break
-  return jsonify({'success': True})
+@app.route('/admin/huy-the/<int:card_id>', methods=['POST'])
+def huy_the(card_id):
+  if 'username' not in session or session.get('role') != 'admin':
+    return redirect(url_for('index'))
+  
+  for c in cards_queue:
+    if c['id'] == card_id and c['status'] == 'Đang chờ Admin duyệt':
+      c['status'] = 'Đã hủy / Thẻ lỗi'
+      flash('Đã từ chối thẻ cào này!')
+      break
+  return redirect(url_for('admin'))
 
 @app.route('/buy/<int:product_id>')
 def buy(product_id):
@@ -1267,6 +1131,14 @@ def admin():
     cards_html = '<p style="color: var(--text-secondary); font-size: 13px;">Không có lịch sử nạp tiền nào.</p>'
   else:
     for c in cards_queue:
+      action_buttons = ''
+      if c['status'] == 'Đang chờ Admin duyệt':
+        action_buttons = f"""
+          <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <form action="/admin/duyet-the/{c['id']}" method="POST" style="margin:0;"><button type="submit" class="btn rgb-btn" style="padding: 6px 12px; font-size: 12px; background: #2ed573;">✔️ DUYỆT</button></form>
+            <form action="/admin/huy-the/{c['id']}" method="POST" style="margin:0;"><button type="submit" class="btn rgb-btn" style="padding: 6px 12px; font-size: 12px; background: #ff4757;">❌ HỦY</button></form>
+          </div>
+        """
       cards_html += (
           '<div class="card" style="margin-bottom: 10px;"><p'
           ' style="margin: 0 0 5px 0;"><b>User:</b> '
@@ -1277,10 +1149,12 @@ def admin():
           + f"{c['amount']:,}"
           + 'đ</span></p><p style="margin: 0 0 5px 0;"><b>Thông tin:</b> '
           + c['info']
-          + '</p><p style="margin: 0;"><b>Trạng thái:</b> <span'
+          + '</p><p style="margin: 0 0 5px 0;"><b>Trạng thái:</b> <span'
           ' style="color: var(--success);">'
           + c['status']
-          + '</span></p></div>'
+          + '</span></p>'
+          + action_buttons
+          + '</div>'
       )
 
   checked_attr = 'checked' if cay_thue_status['is_ready'] else ''
@@ -1290,7 +1164,7 @@ def admin():
       
       '<div class="card" style="border: 1px solid var(--accent); background: linear-gradient(135deg, rgba(255,165,2,0.05), var(--card-bg));">'
       '<h3 class="rgb-text" style="margin-top: 0;">🤖 Trợ Lý AI Hỗ Trợ Quản Trị Shop</h3>'
-      '<p style="font-size: 13px; color: var(--text-secondary);">Nhập yêu cầu của ông (Ví dụ: <i>"Cách tạo thêm mã giảm giá"</i>, <i>"Hướng dẫn cấu hình nạp tiền"</i>, hoặc <i>"Gợi ý tối ưu shop"</i>):</p>'
+      '<p style="font-size: 13px; color: var(--text-secondary);">Nhập yêu cầu của ông (Ví dụ: <i>"Cách tạo thêm mã giảm giá"</i>, <i>"Hướng dẫn duyệt thẻ"</i>, hoặc <i>"Gợi ý tối ưu shop"</i>):</p>'
       '<input type="text" id="ai_prompt" placeholder="Nhập câu hỏi hoặc yêu cầu cho AI...">'
       '<button type="button" onclick="askAdminAI()" class="btn rgb-btn" style="margin-top: 8px;">GỬI YÊU CẦU CHO TRỢ LÝ AI</button>'
       '<div id="ai_response_box" style="display: none; background: #12131c; padding: 12px; border-radius: 8px; margin-top: 12px; border: 1px solid var(--border-color); font-size: 13px; color: var(--success);"></div>'
@@ -1363,7 +1237,7 @@ def admin():
       '<div class="card" style="border: 1px solid #70a1ff;"><h3 class="rgb-text" style="margin-top: 0;">💬 Tin Nhắn Hỗ Trợ Khách Hàng</h3>'
       + (chat_admin_html if chat_admin_html else '<p>Chưa có tin nhắn nào.</p>')
       + '</div>'
-      '<div class="card" style="border: 1px solid var(--success);"><h3 class="rgb-text" style="margin-top: 0;">📋 Lịch Sử Nạp Tiền</h3>'
+      '<div class="card" style="border: 1px solid var(--success);"><h3 class="rgb-text" style="margin-top: 0;">📋 Quản Lý & Duyệt Thẻ Cào (Duyệt Tay)</h3>'
       + cards_html
       + '</div>'
   )
@@ -1377,18 +1251,16 @@ def admin_ai_handler():
   data = request.json or {}
   prompt = data.get('prompt', '').strip().lower()
   
-  reply = "Tôi là Trợ lý AI của GA GAMING ROBLOX. Ông có thể hỏi tôi về cách thêm sản phẩm, quản lý mã giảm giá, kiểm tra nạp thẻ hoặc hướng dẫn vận hành shop nhé!"
+  reply = "Tôi là Trợ lý AI của GA GAMING ROBLOX. Ông có thể hỏi tôi về cách thêm sản phẩm, quản lý mã giảm giá, kiểm tra thẻ nạp duyệt tay hoặc hướng dẫn vận hành shop nhé!"
   
   if 'mã giảm giá' in prompt or 'coupon' in prompt:
     reply = "Để tạo mã giảm giá, ông kéo xuống phần <b>Quản Lý Mã Giảm Giá Nâng Cao</b> trong trang admin, điền mã (VD: GIAM5K), số tiền giảm, số ngày hết hạn và bấm nút Thêm Mã Giảm Giá là xong!"
   elif 'nạp tiền' in prompt or 'qr' in prompt or 'thẻ cào' in prompt:
-    reply = "Hệ thống nạp tiền đã tích hợp sẵn QR tự động qua nội dung chuyển khoản và cổng gạch thẻ cào tự động qua API. Khách nạp đúng cú pháp tiền sẽ tự cộng vào tài khoản sau vài giây!"
+    reply = "Hệ thống nạp QR chạy tự động qua webhook. Riêng thẻ cào đã chuyển sang chế độ <b>Duyệt Tay</b>: khách gửi thẻ sẽ hiển thị trong bảng Quản Lý Thẻ Cào ở trang Admin để ông bấm nút Duyệt hoặc Hủy!"
   elif 'cày thuê' in prompt:
     reply = "Ông có thể quản lý trạng thái rảnh/bận nhận đơn cày thuê ở mục <b>Quản Lý Trạng Thái Cày Thuê</b> ngay phía trên, hoặc thêm các gói cày mới bất cứ lúc nào!"
   elif 'sổ tay' in prompt or 'ghi chú' in prompt:
     reply = "Sổ tay ghi chú cày cuốc là nơi lưu lại tài khoản và mật khẩu game của khách khi họ gửi cày thuê một cách riêng tư, chỉ có tài khoản Admin mới xem và quản lý được."
-  elif 'điểm danh' in prompt or 'vòng quay' in prompt:
-    reply = "Tính năng Điểm danh và Vòng quay may mắn giờ đây sẽ tự động thưởng mã giảm giá cho khách hàng và giới hạn đúng 1 lần mỗi ngày!"
 
   return jsonify({'success': True, 'reply': reply})
 
