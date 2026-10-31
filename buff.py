@@ -433,7 +433,7 @@ def tui_mu(product_id):
       function prevSlide() {{ slideIndex--; showSlide(slideIndex); }}
       function currentSlide(n) {{ slideIndex = n; showSlide(slideIndex); }}
       function applyCoupon(basePrice) {{ let code = document.getElementById("coupon_code").value; fetch("/api/check-coupon", {{method: "POST", headers: {{"Content-Type": "application/json"}}, body: JSON.stringify({{code: code}})}}).then(res => res.json()).then(data => {{ let msg = document.getElementById("coupon_msg"); if(data.success) {{ let final = Math.max(0, basePrice - data.discount); msg.style.color = "var(--success)"; msg.innerText = "Giảm " + data.discount.toLocaleString() + "đ"; document.getElementById("final_price_display").innerText = "Tổng thanh toán: " + final.toLocaleString() + "đ"; }} else {{ msg.style.color = "var(--primary)"; msg.innerText = data.message; }} }}); }}
-      function xeTui(productId) {{ let code = document.getElementById("coupon_code").value; fetch("/api/buy-random/" + productId, {{method: "POST", headers: {{"Content-Type": "application/json"}}, body: JSON.stringify({{coupon_code: code}})}}).then(res => res.json()).then(data => {{ if(data.success) {{ alert("🎉 Thành công! Acc:\\n" + data.account_info); window.location.href = "/lich-su"; }} else {{ alert(data.message); }} }}); }}
+      function xeTui(productId) {{ let code = document.getElementById("coupon_code").value; fetch("/api/buy-random/" + productId, {{method: "POST", headers: {{"Content-Type": "application/json"}}, body: JSON.stringify({{code: code}})}}).then(res => res.json()).then(data => {{ if(data.success) {{ alert("🎉 Thành công! Acc:\\n" + data.account_info); window.location.href = "/lich-su"; }} else {{ alert(data.message); }} }}); }}
       </script>
     """
     return render_template_string(BASE_HTML, content=content, users=users)
@@ -495,7 +495,7 @@ def buy(product_id):
       function prevSlide() {{ slideIndex--; showSlide(slideIndex); }}
       function currentSlide(n) {{ slideIndex = n; showSlide(slideIndex); }}
       function applyCoupon(basePrice) {{ let code = document.getElementById('coupon_code').value; fetch('/api/check-coupon', {{method: 'POST', headers: {{'Content-Type': 'application/json'}}, body: JSON.stringify({{code: code}})}}).then(res => res.json()).then(data => {{ let msg = document.getElementById('coupon_msg'); if(data.success) {{ let final = Math.max(0, basePrice - data.discount); msg.style.color = 'var(--success)'; msg.innerText = "Giảm " + data.discount.toLocaleString() + "đ"; document.getElementById('final_price_display').innerText = "Tổng thanh toán: " + final.toLocaleString() + "đ"; }} else {{ msg.style.color = 'var(--primary)'; msg.innerText = data.message; }} }}); }}
-      function confirmBuy(productId) {{ let code = document.getElementById('coupon_code').value; fetch('/api/buy-product/' + productId, {{method: 'POST', headers: {{'Content-Type': 'application/json'}}, body: JSON.stringify({{coupon_code: code}})}}).then(res => res.json()).then(data => {{ if(data.success) {{ alert("🎉 Mua thành công! Thông tin:\\n" + data.account_info); window.location.href = '/lich-su'; }} else {{ alert(data.message); }} }}); }}
+      function confirmBuy(productId) {{ let code = document.getElementById('coupon_code').value; fetch('/api/buy-product/' + productId, {{method: 'POST', headers: {{'Content-Type': 'application/json'}}, body: JSON.stringify({{code: code}})}}).then(res => res.json()).then(data => {{ if(data.success) {{ alert("🎉 Mua thành công! Thông tin:\\n" + data.account_info); window.location.href = '/lich-su'; }} else {{ alert(data.message); }} }}); }}
       </script>
     """
     return render_template_string(BASE_HTML, content=content, users=users)
@@ -514,7 +514,7 @@ def api_buy_product(product_id):
     return jsonify({'success': False, 'message': 'Hết hàng!'})
 
   data = request.json or {}
-  coupon_code = data.get('coupon_code', '').strip().upper()
+  coupon_code = data.get('code', data.get('coupon_code', '')).strip().upper()
   final_price = product['price']
   now_ts = datetime.now().timestamp()
 
@@ -553,7 +553,7 @@ def api_buy_random(product_id):
     return jsonify({'success': False, 'message': 'Hết hàng túi mù!'})
 
   data = request.json or {}
-  coupon_code = data.get('coupon_code', '').strip().upper()
+  coupon_code = data.get('code', data.get('coupon_code', '')).strip().upper()
   final_price = product['price']
   now_ts = datetime.now().timestamp()
 
@@ -862,7 +862,7 @@ def admin():
 
 @app.route('/admin/coupon/toggle/<int:coupon_id>', methods=['POST'])
 def toggle_coupon(coupon_id):
-  if 'username' not in session or session.get('role'] != 'admin':
+  if 'username' not in session or session.get('role') != 'admin':
     return redirect(url_for('index'))
   for c in coupons_db:
     if c['id'] == coupon_id:
