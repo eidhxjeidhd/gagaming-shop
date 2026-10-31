@@ -12,9 +12,6 @@ UPLOAD_FOLDER = 'static/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-PARTNER_ID = '71186911886'
-PARTNER_KEY = 'f7377b035f5b5d2c4a5d04e487b39aaf'
-
 TELEGRAM_BOT_TOKEN = '8818555905:AAGFfnQhNpSQ0jC20X5IsZ0WVAVQImJVkM4'
 TELEGRAM_CHAT_ID = '8976860826'
 
@@ -402,28 +399,34 @@ def tui_mu(product_id):
       return redirect(url_for('index'))
 
     images = product.get('images', [])
-    if not isinstance(images, list) or len(images) == 0 or not images[0]:
+    if not isinstance(images, list) or len(images) == 0:
       images = ['https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png']
 
     slider_slides = ''
     slider_dots = ''
     for i, img in enumerate(images):
-      slider_slides += f'<div class="slider-slide"><img src="{img}" alt="Img"></div>'
+      safe_img = img if img else 'https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png'
+      slider_slides += f'<div class="slider-slide"><img src="{safe_img}" alt="Img"></div>'
       active_cls = ' active' if i == 0 else ''
       slider_dots += f'<span class="dot{active_cls}" onclick="currentSlide({i})"></span>'
 
     slider_html = f'<div class="slider-container"><div class="slider-track" id="sliderTrack">{slider_slides}</div>{"<button class=\"slider-btn slider-prev\" onclick=\"prevSlide()\">❮</button><button class=\"slider-btn slider-next\" onclick=\"nextSlide()\">❯</button>" if len(images) > 1 else ""}</div>{"<div class=\"slider-dots\">" + slider_dots + "</div>" if len(images) > 1 else ""}'
 
+    prod_name = product.get('name', 'Túi mù')
+    prod_desc = product.get('desc', '')
+    prod_price = product.get('price', 0)
+    game_accs_count = len(product.get('game_accs', []))
+
     content = f"""
       <div class="card" style="max-width: 500px; margin: auto; border: 1px solid var(--accent);">
-          <h2 class="rgb-text" style="text-align: center;">⚡ MỞ TÚI MÙ: {product.get('name', '')}</h2>
+          <h2 class="rgb-text" style="text-align: center;">⚡ MỞ TÚI MÙ: {prod_name}</h2>
           {slider_html}
-          <p style="color: var(--text-secondary); text-align: center; margin-top: 10px;">{product.get('desc', '')}</p>
-          <p class="price" style="text-align: center;">Giá: {product.get('price', 0):,}đ</p>
-          <p style="color: var(--text-secondary); text-align: center;">Kho còn: <b style="color: white;">{len(product.get('game_accs', []))}</b> tài khoản</p>
-          <div style="margin: 20px 0;"><label style="font-size: 13px; color: var(--text-secondary);">Mã giảm giá:</label><input type="text" id="coupon_code" placeholder="Mã (nếu có)"><button type="button" onclick="applyCoupon({product.get('price', 0)})" class="btn rgb-btn" style="margin-top: 8px;">Áp dụng mã</button><p id="coupon_msg" style="font-size: 13px; margin-top: 8px; text-align: center;"></p></div>
-          <h3 id="final_price_display" style="margin: 15px 0; text-align: center; color: var(--success);">Tổng thanh toán: {product.get('price', 0):,}đ</h3>
-          <button onclick="xeTui({product['id']})" class="btn rgb-btn" style="font-size: 16px; padding: 14px;">🔥 XÉ TÚI NGAY</button>
+          <p style="color: var(--text-secondary); text-align: center; margin-top: 10px;">{prod_desc}</p>
+          <p class="price" style="text-align: center;">Giá: {prod_price:,}đ</p>
+          <p style="color: var(--text-secondary); text-align: center;">Kho còn: <b style="color: white;">{game_accs_count}</b> tài khoản</p>
+          <div style="margin: 20px 0;"><label style="font-size: 13px; color: var(--text-secondary);">Mã giảm giá:</label><input type="text" id="coupon_code" placeholder="Mã (nếu có)"><button type="button" onclick="applyCoupon({prod_price})" class="btn rgb-btn" style="margin-top: 8px;">Áp dụng mã</button><p id="coupon_msg" style="font-size: 13px; margin-top: 8px; text-align: center;"></p></div>
+          <h3 id="final_price_display" style="margin: 15px 0; text-align: center; color: var(--success);">Tổng thanh toán: {prod_price:,}đ</h3>
+          <button onclick="xeTui({product_id})" class="btn rgb-btn" style="font-size: 16px; padding: 14px;">🔥 XÉ TÚI NGAY</button>
           <div style="text-align: center; margin-top: 15px;"><a href="/" style="color: var(--text-secondary); font-size: 13px;">← Trang chủ</a></div>
       </div>
       <script>
@@ -439,7 +442,7 @@ def tui_mu(product_id):
     return render_template_string(BASE_HTML, content=content, users=users)
   except Exception as e:
     print(f"Lỗi tui-mu: {e}")
-    flash("Đã xảy ra lỗi khi tải trang sản phẩm!")
+    flash(f"Lỗi hệ thống túi mù: {str(e)}")
     return redirect(url_for('index'))
 
 @app.route('/buy/<int:product_id>')
@@ -455,37 +458,43 @@ def buy(product_id):
       return redirect(url_for('index'))
 
     images = product.get('images', [])
-    if not isinstance(images, list) or len(images) == 0 or not images[0]:
+    if not isinstance(images, list) or len(images) == 0:
       images = ['https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png']
 
     slider_slides = ''
     slider_dots = ''
     for i, img in enumerate(images):
-      slider_slides += f'<div class="slider-slide"><img src="{img}" alt="Img"></div>'
+      safe_img = img if img else 'https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png'
+      slider_slides += f'<div class="slider-slide"><img src="{safe_img}" alt="Img"></div>'
       active_cls = ' active' if i == 0 else ''
       slider_dots += f'<span class="dot{active_cls}" onclick="currentSlide({i})"></span>'
 
     slider_html = f'<div class="slider-container"><div class="slider-track" id="sliderTrack">{slider_slides}</div>{"<button class=\"slider-btn slider-prev\" onclick=\"prevSlide()\">❮</button><button class=\"slider-btn slider-next\" onclick=\"nextSlide()\">❯</button>" if len(images) > 1 else ""}</div>{"<div class=\"slider-dots\">" + slider_dots + "</div>" if len(images) > 1 else ""}'
 
+    prod_name = product.get('name', 'Sản phẩm')
+    prod_desc = product.get('desc', '')
+    prod_price = product.get('price', 0)
+    game_accs_count = len(product.get('game_accs', []))
+
     content = f"""
       <div class="card" style="max-width: 500px; margin: auto; border: 1px solid var(--primary);">
           <h2 class="rgb-text" style="text-align: center;">CHI TIẾT SẢN PHẨM</h2>
           {slider_html}
-          <div class="product-title" style="font-size: 16px; margin-top: 10px;">{product.get('name', '')}</div>
-          <p style="color: var(--text-secondary); font-size: 13px;">{product.get('desc', '')}</p>
-          <p class="price">Giá: {product.get('price', 0):,}đ</p>
-          <p style="color: var(--text-secondary); font-size: 13px;">Kho còn: <b style="color: white;">{len(product.get('game_accs', []))}</b> tài khoản</p>
+          <div class="product-title" style="font-size: 16px; margin-top: 10px;">{prod_name}</div>
+          <p style="color: var(--text-secondary); font-size: 13px;">{prod_desc}</p>
+          <p class="price">Giá: {prod_price:,}đ</p>
+          <p style="color: var(--text-secondary); font-size: 13px;">Kho còn: <b style="color: white;">{game_accs_count}</b> tài khoản</p>
           
           <div style="margin: 15px 0;">
               <label style="font-size: 13px; color: var(--text-secondary);">Mã giảm giá:</label>
               <input type="text" id="coupon_code" placeholder="Mã (nếu có)">
-              <button type="button" onclick="applyCoupon({product.get('price', 0)})" class="btn rgb-btn" style="margin-top: 8px;">Áp dụng mã</button>
+              <button type="button" onclick="applyCoupon({prod_price})" class="btn rgb-btn" style="margin-top: 8px;">Áp dụng mã</button>
               <p id="coupon_msg" style="font-size: 13px; margin-top: 8px; text-align: center;"></p>
           </div>
           
-          <h3 id="final_price_display" style="margin: 15px 0; text-align: center; color: var(--success);">Tổng thanh toán: {product.get('price', 0):,}đ</h3>
+          <h3 id="final_price_display" style="margin: 15px 0; text-align: center; color: var(--success);">Tổng thanh toán: {prod_price:,}đ</h3>
           
-          <button onclick="confirmBuy({product['id']})" class="btn rgb-btn" style="font-size: 16px; padding: 14px;">🛒 MUA NGAY</button>
+          <button onclick="confirmBuy({product_id})" class="btn rgb-btn" style="font-size: 16px; padding: 14px;">🛒 MUA NGAY</button>
           <div style="text-align: center; margin-top: 15px;"><a href="/" style="color: var(--text-secondary); font-size: 13px;">← Trang chủ</a></div>
       </div>
       <script>
@@ -500,8 +509,8 @@ def buy(product_id):
     """
     return render_template_string(BASE_HTML, content=content, users=users)
   except Exception as e:
-    print(f"Lỗi buy: {e}")
-    flash("Đã xảy ra lỗi khi tải trang mua hàng!")
+    print(f"Lỗi buy route: {e}")
+    flash(f"Lỗi hệ thống mua hàng: {str(e)}")
     return redirect(url_for('index'))
 
 @app.route('/api/buy-product/<int:product_id>', methods=['POST'])
