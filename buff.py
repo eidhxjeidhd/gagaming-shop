@@ -153,11 +153,12 @@ BASE_HTML = """
         .bottom-item { color: var(--text-secondary); text-decoration: none; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-weight: 500; }
         .bottom-item.active, .bottom-item:hover { color: var(--primary); }
         .bottom-item .avatar-circle { width: 32px; height: 32px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; margin-top: -15px; border: 2px solid #12151f; }
-        /* Modal xem ảnh */
-        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
-        .modal-content { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); max-width: 450px; width: 90%; text-align: center; position: relative; }
-        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 24px; color: white; cursor: pointer; background: none; border: none; }
-        .modal img { width: 100%; height: 260px; object-fit: cover; border-radius: 8px; margin-top: 10px; }
+        /* Modal xem ảnh đa dạng */
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
+        .modal-content { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); max-width: 480px; width: 92%; text-align: center; position: relative; max-height: 85vh; display: flex; flex-direction: column; }
+        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 24px; color: white; cursor: pointer; background: none; border: none; z-index: 10; }
+        .modal-body { overflow-y: auto; margin-top: 10px; display: flex; flex-direction: column; gap: 12px; }
+        .modal-body img { width: 100%; max-height: 320px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border-color); background: #0b0c10; }
     </style>
 </head>
 <body>
@@ -212,12 +213,14 @@ BASE_HTML = """
         {{ content | safe }}
     </div>
 
-    <!-- Modal xem ảnh -->
+    <!-- Modal xem tất cả ảnh -->
     <div id="imageModal" class="modal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeImageModal()">×</button>
-            <h3 id="modalTitle" style="color: var(--primary); margin-top: 0; font-size: 16px;">Ảnh Sản Phẩm</h3>
-            <img id="modalImg" src="" alt="Product Image">
+            <h3 id="modalTitle" style="color: var(--primary); margin-top: 0; font-size: 16px;">Tất Cả Ảnh Sản Phẩm</h3>
+            <div class="modal-body" id="modalImagesContainer">
+                <!-- Danh sách ảnh sẽ được nhét vào đây bằng JS -->
+            </div>
         </div>
     </div>
 
@@ -232,9 +235,26 @@ BASE_HTML = """
         function toggleDrawer() {
             document.getElementById('mobileDrawer').classList.toggle('open');
         }
-        function openImageModal(imgUrl, title) {
-            document.getElementById('modalImg').src = imgUrl;
-            document.getElementById('modalTitleinnerText' || 'modalTitle').innerText = title;
+        function openImageModal(imagesListJson, title) {
+            document.getElementById('modalTitle').innerText = title;
+            let container = document.getElementById('modalImagesContainer');
+            container.innerHTML = "";
+            
+            try {
+                let images = JSON.parse(imagesListJson);
+                if (images && images.length > 0) {
+                    images.forEach((imgUrl, index) => {
+                        let imgElem = document.createElement('img');
+                        imgElem.src = imgUrl;
+                        container.appendChild(imgElem);
+                    });
+                } else {
+                    container.innerHTML = "<p style='color: var(--text-secondary);'>Không có ảnh nào.</p>";
+                }
+            } catch(e) {
+                container.innerHTML = "<p style='color: var(--primary);'>Lỗi tải danh sách ảnh.</p>";
+            }
+            
             document.getElementById('imageModal').style.display = 'flex';
         }
         function closeImageModal() {
@@ -286,16 +306,18 @@ def index():
     pprice = p.get('price', 0)
     pdesc = p.get('desc', '')
 
-    # Nút bấm mua ngay trực tiếp gọi hàm JS
     action_btn = f'<button onclick="buyProduct({pid}, \'{pname}\', {pprice})" class="btn rgb-btn" style="margin-top: 15px;">🛒 MUA NGAY</button>'
 
     images_list = p.get('images', [])
     if not isinstance(images_list, list) or len(images_list) == 0 or not images_list[0]:
       images_list = ['https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png']
-    thumb_img = images_list[0]
     
-    # Bấm vào ảnh sẽ bật modal xem ảnh
-    img_tag = f'<img src="{thumb_img}" onclick="openImageModal(\'{thumb_img}\', \'{pname}\')" style="width: 100%; height: 130px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); cursor: pointer;" title="Bấm vào để xem ảnh lớn">' if thumb_img else ''
+    thumb_img = images_list[0]
+    import json
+    images_json_str = json.dumps(images_list).replace('"', '&quot;')
+    
+    # Bấm vào ảnh sẽ truyền toàn bộ mảng ảnh vào modal để xem hết
+    img_tag = f'<img src="{thumb_img}" onclick="openImageModal(\'{images_json_str}\', \'{pname}\')" style="width: 100%; height: 130px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); cursor: pointer;" title="Bấm vào để xem tất cả ảnh">' if thumb_img else ''
     delete_btn = f'<div style="position: absolute; top: 15px; right: 15px;"><a href="/admin/delete/{pid}" class="btn-delete" onclick="return confirm(\'Xóa sản phẩm này?\');">🗑️ XÓA</a></div>' if session.get('role') == 'admin' else ''
 
     products_html += f'<div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">{delete_btn}<div>{img_tag}<div style="color: var(--text-secondary); font-size: 11px; font-weight: 600;">MÃ SÓ: #{pid}</div><div class="product-title">{pname}</div><p style="color: var(--text-secondary); font-size: 12px; line-height: 1.4;">{pdesc}</p></div><div><div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;"><span style="font-size: 12px; color: var(--text-secondary);">Kho: <b style="color: white;">{stock_count}</b></span><span class="price">{pprice:,}đ</span></div>{action_btn}</div></div>'
@@ -324,7 +346,6 @@ def index():
 
   content = banner_html + nap_html + f'<div style="display: grid; grid-template-columns: 1fr; gap: 20px;"><div><h2 class="rgb-text">🔥 DANH MỤC TÀI KHOẢN</h2><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">{products_html}</div><h2 class="rgb-text" style="margin-top: 30px;">⚔️ DỊCH VỤ CÀY THUÊ UY TÍN</h2>{status_note_box}<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">{cay_thue_html}</div></div><div><div class="card" style="border: 1px solid var(--accent); margin-bottom: 20px;"><h3 class="rgb-text" style="text-align: center; margin-top: 0;">🏆 TOP NẠP TIỀN</h3>{top_html}</div>{chat_html}</div></div>'
   
-  # Đoạn script xử lý mua nhanh trực tiếp ngay ngoài trang chủ
   content += """
   <script>
   function buyProduct(productId, productName, productPrice) {
