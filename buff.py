@@ -1,4 +1,4 @@
-from datetime import datetime
+From datetime import datetime
 from flask import Flask, flash, jsonify, redirect, render_template_string, request, session, url_for
 import hashlib
 import json
@@ -46,7 +46,6 @@ users = {
     },
 }
 
-# Sản phẩm hỗ trợ nhiều ảnh (dạng danh sách image list)
 products = [
     {
         'id': 1276,
@@ -54,10 +53,7 @@ products = [
         'category': 'tuichon',
         'desc': 'Acc max level, full trang bị xịn, haki cực mạnh',
         'price': 30000,
-        'images': [
-            'https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png',
-            'https://i.ibb.co/0pvhCGz1/zlp-1792493518267.jpg'
-        ],
+        'image': 'https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png',
         'game_accs': [
             'bloxfruit_1276_1@gmail.com | Pass123',
             'bloxfruit_1276_2@gmail.com | Pass456',
@@ -69,9 +65,7 @@ products = [
         'category': 'random',
         'desc': 'Hên xui trúng acc khủng, tỷ lệ trúng tộc v4 cực cao!',
         'price': 5000,
-        'images': [
-            'https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png'
-        ],
+        'image': '',
         'game_accs': [
             'random_acc_1@gmail.com | Pass111',
             'random_acc_2@gmail.com | Pass222',
@@ -176,19 +170,6 @@ BASE_HTML = """
         .chat-msg.user { color: #70a1ff; text-align: right; }
         .chat-msg.admin { color: var(--success); text-align: left; }
         
-        /* CSS cho Slider Ảnh Chi Tiết Sản Phẩm */
-        .slider-container { position: relative; width: 100%; border-radius: 10px; overflow: hidden; background: #12131c; border: 1px solid var(--border-color); margin-bottom: 15px; }
-        .slider-track { display: flex; transition: transform 0.4s ease-in-out; width: 100%; }
-        .slider-slide { min-width: 100%; box-sizing: border-box; display: flex; justify-content: center; align-items: center; }
-        .slider-slide img { width: 100%; height: 240px; object-fit: cover; }
-        .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: none; padding: 10px 14px; cursor: pointer; font-size: 16px; border-radius: 50%; z-index: 10; transition: 0.2s; }
-        .slider-btn:hover { background: var(--primary); }
-        .slider-prev { left: 10px; }
-        .slider-next { right: 10px; }
-        .slider-dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
-        .dot { width: 8px; height: 8px; background: #475569; border-radius: 50%; cursor: pointer; transition: 0.3s; }
-        .dot.active { background: var(--primary); width: 20px; border-radius: 4px; }
-
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #12151f; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
         .bottom-item { color: var(--text-secondary); text-decoration: none; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-weight: 500; }
         .bottom-item.active, .bottom-item:hover { color: var(--primary); }
@@ -352,15 +333,13 @@ def index():
           + '" class="btn rgb-btn" style="margin-top: 15px;">🛒 MUA NGAY</a>'
       )
 
-    # Lấy ảnh đại diện đầu tiên trong danh sách images
-    thumb_img = p['images'][0] if (p.get('images') and len(p['images']) > 0) else ''
     img_tag = (
         '<img src="'
-        + thumb_img
+        + p['image']
         + '" style="width: 100%; height: 130px; object-fit: cover;'
         ' border-radius: 10px; margin-bottom: 10px; border: 1px solid'
         ' var(--border-color);">'
-        if thumb_img
+        if p.get('image')
         else ''
     )
 
@@ -591,243 +570,56 @@ def tui_mu(product_id):
     flash('Không tìm thấy sản phẩm!')
     return redirect(url_for('index'))
 
-  images = product.get('images', [])
-  if not images:
-    images = ['https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png']
-
-  slider_slides = ''
-  slider_dots = ''
-  for i, img in enumerate(images):
-    slider_slides += f'<div class="slider-slide"><img src="{img}" alt="Product Image"></div>'
-    active_cls = ' active' if i == 0 else ''
-    slider_dots += f'<span class="dot{active_cls}" onclick="currentSlide({i})"></span>'
-
-  slider_html = f"""
-    <div class="slider-container">
-        <div class="slider-track" id="sliderTrack">
-            {slider_slides}
-        </div>
-        {'<button class="slider-btn slider-prev" onclick="prevSlide()">❮</button><button class="slider-btn slider-next" onclick="nextSlide()">❯</button>' if len(images) > 1 else ''}
-    </div>
-    {'<div class="slider-dots">' + slider_dots + '</div>' if len(images) > 1 else ''}
-  """
-
   content = (
-      '<div class="card" style="max-width: 500px; margin: auto; border: 1px solid var(--accent);">'
-      + '<h2 class="rgb-text" style="text-align: center;">⚡ MỞ TÚI MÙ: ' + product['name'] + '</h2>'
-      + slider_html
-      + '<p style="color: var(--text-secondary); text-align: center; margin-top: 10px;">' + product['desc'] + '</p>'
-      + '<p class="price" style="text-align: center;">Giá túi: ' + f"{product['price']:,}" + 'đ</p>'
-      + '<p style="color: var(--text-secondary); text-align: center;">Kho còn: <b style="color: white;">' + str(len(product['game_accs'])) + '</b> tài khoản</p>'
-      + '<div style="margin: 20px 0;"><label style="font-size: 13px; color: var(--text-secondary);">Nhập mã giảm giá:</label><input type="text" id="coupon_code" placeholder="Nhập mã (VD: GIAM5K)"><button type="button" onclick="applyCoupon(' + str(product['price']) + ')" class="btn rgb-btn" style="margin-top: 8px;">Áp dụng mã</button><p id="coupon_msg" style="font-size: 13px; margin-top: 8px; text-align: center;"></p></div>'
-      + '<h3 id="final_price_display" style="margin: 15px 0; text-align: center; color: var(--success);">Tổng thanh toán: ' + f"{product['price']:,}" + 'đ</h3>'
-      + '<button onclick="xeTui(' + str(product['id']) + ')" class="btn rgb-btn" style="font-size: 16px; padding: 14px;">🔥 XÉ TÚI NGAY</button>'
-      + '<div style="text-align: center; margin-top: 15px;"><a href="/" style="color: var(--text-secondary); text-decoration: none; font-size: 13px;">← Quay về trang chủ</a></div>'
-      + '</div>'
-      + '<script>'
-      + 'let slideIndex = 0;'
-      + 'function showSlide(index) {'
-      + '  const track = document.getElementById("sliderTrack");'
-      + '  const slides = document.querySelectorAll(".slider-slide");'
-      + '  const dots = document.querySelectorAll(".dot");'
-      + '  if (slides.length === 0) return;'
-      + '  if (index >= slides.length) slideIndex = 0;'
-      + '  if (index < 0) slideIndex = slides.length - 1;'
-      + '  track.style.transform = `translateX(-${slideIndex * 100}%)`;'
-      + '  dots.forEach((dot, i) => {'
-      + '    dot.classList.toggle("active", i === slideIndex);'
-      + '  });'
-      + '}'
-      + 'function nextSlide() { slideIndex++; showSlide(slideIndex); }'
-      + 'function prevSlide() { slideIndex--; showSlide(slideIndex); }'
-      + 'function currentSlide(n) { slideIndex = n; showSlide(slideIndex); }'
-      + 'let currentDiscount = 0;'
-      + 'function applyCoupon(basePrice) {'
-      + '  let code = document.getElementById("coupon_code").value;'
-      + '  fetch("/api/check-coupon", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({code: code})})'
-      + '  .then(res => res.json()).then(data => {'
-      + '    let msg = document.getElementById("coupon_msg");'
-      + '    if(data.success) {'
-      + '      currentDiscount = data.discount;'
-      + '      let final = Math.max(0, basePrice - currentDiscount);'
-      + '      msg.style.color = "var(--success)";'
-      + '      msg.innerText = "Áp mã thành công! Giảm " + data.discount.toLocaleString() + "đ";'
-      + '      document.getElementById("final_price_display").innerText = "Tổng thanh toán: " + final.toLocaleString() + "đ";'
-      + '    } else {'
-      + '      currentDiscount = 0;'
-      + '      msg.style.color = "var(--primary)";'
-      + '      msg.innerText = data.message;'
-      + '      document.getElementById("final_price_display").innerText = "Tổng thanh toán: " + basePrice.toLocaleString() + "đ";'
-      + '    }'
-      + '  });'
-      + '}'
-      + 'function xeTui(productId) {'
-      + '  let code = document.getElementById("coupon_code").value;'
-      + '  fetch("/api/buy-random/" + productId, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({coupon_code: code})})'
-      + '  .then(res => res.json()).then(data => {'
-      + '    if(data.success) {'
-      + '      alert("🎉 Xé túi thành công! Tài khoản của bạn:\\n" + data.account_info);'
-      + '      window.location.href = "/lich-su";'
-      + '    } else {'
-      + '      alert(data.message);'
-      + '    }'
-      + '  });'
-      + '}'
-      + '</script>'
+      '<div class="card" style="max-width: 500px; margin: auto; text-align:'
+      ' center; border: 1px solid var(--accent);"><h2 class="rgb-text">⚡ MỞ TÚI MÙ: '
+      + product['name']
+      + '</h2><p style="color: var(--text-secondary);">'
+      + product['desc']
+      + '</p><p class="price">Giá túi: '
+      + f"{product['price']:,}"
+      + 'đ</p><p style="color: var(--text-secondary);">Kho còn: <b'
+      ' style="color: white;">'
+      + str(len(product['game_accs']))
+      + '</b> tài khoản</p><div style="margin: 20px 0; text-align:'
+      ' left;"><label style="font-size: 13px; color:'
+      ' var(--text-secondary);">Nhập mã giảm giá:</label><input type="text"'
+      ' id="coupon_code" placeholder="Nhập mã (VD: GIAM5K)"><button'
+      ' type="button" onclick="applyCoupon('
+      + str(product['price'])
+      + ')" class="btn rgb-btn" style="margin-top:'
+      ' 8px;">Áp dụng mã</button><p id="coupon_msg" style="font-size: 13px;'
+      ' margin-top: 8px;"></p></div><h3 id="final_price_display" style="margin:'
+      ' 15px 0; color: var(--success);">Tổng thanh toán: '
+      + f"{product['price']:,}"
+      + 'đ</h3><button onclick="xeTui('
+      + str(product['id'])
+      + ')" class="btn rgb-btn" style="font-size: 16px; padding: 14px;">🔥 XÉ TÚI NGAY</button><br><a'
+      ' href="/" style="color: var(--text-secondary); text-decoration: none;'
+      ' font-size: 13px; display: inline-block; margin-top: 15px;">← Quay về'
+      ' trang chủ</a></div><script>let currentDiscount = 0;function'
+      ' applyCoupon(basePrice) {let code ='
+      ' document.getElementById(\'coupon_code\').value;fetch(\'/api/check-coupon\','
+      ' {method: \'POST\', headers: {\'Content-Type\': \'application/json\'},'
+      ' body: JSON.stringify({code: code})}).then(res => res.json()).then(data'
+      ' => {let msg = document.getElementById(\'coupon_msg\');if(data.success)'
+      ' {currentDiscount = data.discount;let final = Math.max(0, basePrice -'
+      ' currentDiscount);msg.style.color = \'var(--success)\';msg.innerText ='
+      ' "Áp mã thành công! Giảm " + data.discount.toLocaleString() +'
+      ' "đ";document.getElementById(\'final_price_display\').innerText = "Tổng'
+      ' thanh toán: " + final.toLocaleString() + "đ";} else'
+      ' {currentDiscount = 0;msg.style.color = \'var(--primary)\';msg.innerText'
+      ' = data.message;document.getElementById(\'final_price_display\').innerText'
+      ' = "Tổng thanh toán: " + basePrice.toLocaleString() + "đ";}});}'
+      'function xeTui(productId) {let code ='
+      ' document.getElementById(\'coupon_code\').value;fetch(\'/api/buy-random/\''
+      ' + productId, {method: \'POST\', headers: {\'Content-Type\':'
+      ' \'application/json\'}, body: JSON.stringify({coupon_code: code})}).then(res'
+      ' => res.json()).then(data => {if(data.success) {alert("🎉 Xé túi thành'
+      ' công! Tài khoản của bạn:\\n" + data.account_info);window.location.href'
+      ' = \'/lich-su\';} else {alert(data.message);}});}</script>'
   )
   return render_template_string(BASE_HTML, content=content, users=users)
-
-@app.route('/buy/<int:product_id>')
-def buy(product_id):
-  if 'username' not in session:
-    flash('Vui lòng đăng nhập để mua tài khoản!')
-    return redirect(url_for('login'))
-  username = session['username']
-  product = next((p for p in products if p['id'] == product_id), None)
-  if not product:
-    flash('Không tìm thấy sản phẩm!')
-    return redirect(url_for('index'))
-
-  images = product.get('images', [])
-  if not images:
-    images = ['https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png']
-
-  slider_slides = ''
-  slider_dots = ''
-  for i, img in enumerate(images):
-    slider_slides += f'<div class="slider-slide"><img src="{img}" alt="Product Image"></div>'
-    active_cls = ' active' if i == 0 else ''
-    slider_dots += f'<span class="dot{active_cls}" onclick="currentSlide({i})"></span>'
-
-  slider_html = f"""
-    <div class="slider-container">
-        <div class="slider-track" id="sliderTrack">
-            {slider_slides}
-        </div>
-        {'<button class="slider-btn slider-prev" onclick="prevSlide()">❮</button><button class="slider-btn slider-next" onclick="nextSlide()">❯</button>' if len(images) > 1 else ''}
-    </div>
-    {'<div class="slider-dots">' + slider_dots + '</div>' if len(images) > 1 else ''}
-  """
-
-  # Nếu chưa bấm xác nhận mua (GET), hiển thị trang thông tin chi tiết, slider ảnh, nhập mã giảm giá và nút Mua ngay
-  if 'confirm' not in request.args:
-    content = f"""
-    <div class="card" style="max-width: 500px; margin: auto; border: 1px solid var(--primary);">
-        <h2 class="rgb-text" style="text-align: center;">CHI TIẾT SẢN PHẨM</h2>
-        {slider_html}
-        <div class="product-title" style="font-size: 16px; margin-top: 10px;">{product['name']}</div>
-        <p style="color: var(--text-secondary); font-size: 13px;">{product['desc']}</p>
-        <p class="price">Giá bán: {product['price']:,}đ</p>
-        <p style="color: var(--text-secondary); font-size: 13px;">Kho còn: <b style="color: white;">{len(product['game_accs'])}</b> tài khoản</p>
-        
-        <div style="margin: 15px 0;">
-            <label style="font-size: 13px; color: var(--text-secondary);">Nhập mã giảm giá:</label>
-            <input type="text" id="coupon_code" placeholder="Nhập mã (VD: GIAM5K)">
-            <button type="button" onclick="applyCoupon({product['price']})" class="btn rgb-btn" style="margin-top: 8px;">Áp dụng mã</button>
-            <p id="coupon_msg" style="font-size: 13px; margin-top: 8px; text-align: center;"></p>
-        </div>
-        
-        <h3 id="final_price_display" style="margin: 15px 0; text-align: center; color: var(--success);">Tổng thanh toán: {product['price']:,}đ</h3>
-        
-        <button onclick="confirmBuy({product['id']})" class="btn rgb-btn" style="font-size: 16px; padding: 14px;">🛒 XÁC NHẬN MUA NGAY</button>
-        <div style="text-align: center; margin-top: 15px;">
-            <a href="/" style="color: var(--text-secondary); text-decoration: none; font-size: 13px;">← Quay lại trang chủ</a>
-        </div>
-    </div>
-    <script>
-    let slideIndex = 0;
-    function showSlide(index) {{
-      const track = document.getElementById("sliderTrack");
-      const slides = document.querySelectorAll(".slider-slide");
-      const dots = document.querySelectorAll(".dot");
-      if (slides.length === 0) return;
-      if (index >= slides.length) slideIndex = 0;
-      if (index < 0) slideIndex = slides.length - 1;
-      track.style.transform = `translateX(-${slideIndex * 100}%)`;
-      dots.forEach((dot, i) => {{
-        dot.classList.toggle("active", i === slideIndex);
-      }});
-    }}
-    function nextSlide() {{ slideIndex++; showSlide(slideIndex); }}
-    function prevSlide() {{ slideIndex--; showSlide(slideIndex); }}
-    function currentSlide(n) {{ slideIndex = n; showSlide(slideIndex); }}
-
-    let currentDiscount = 0;
-    function applyCoupon(basePrice) {{
-      let code = document.getElementById('coupon_code').value;
-      fetch('/api/check-coupon', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({code: code})})
-      .then(res => res.json()).then(data => {{
-        let msg = document.getElementById('coupon_msg');
-        if(data.success) {{
-          currentDiscount = data.discount;
-          let final = Math.max(0, basePrice - currentDiscount);
-          msg.style.color = 'var(--success)';
-          msg.innerText = "Áp mã thành công! Giảm " + data.discount.toLocaleString() + "đ";
-          document.getElementById('final_price_display').innerText = "Tổng thanh toán: " + final.toLocaleString() + "đ";
-        }} else {{
-          currentDiscount = 0;
-          msg.style.color = 'var(--primary)';
-          msg.innerText = data.message;
-          document.getElementById('final_price_display').innerText = "Tổng thanh toán: " + basePrice.toLocaleString() + "đ";
-        }}
-      }});
-    }}
-    function confirmBuy(productId) {{
-      let code = document.getElementById('coupon_code').value;
-      fetch('/api/buy-product/' + productId, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({coupon_code: code})})
-      .then(res => res.json()).then(data => {{
-        if(data.success) {{
-          alert("🎉 Mua tài khoản thành công! Thông tin tài khoản:\\n" + data.account_info);
-          window.location.href = '/lich-su';
-        }} else {{
-          alert(data.message);
-        }}
-      }});
-    }}
-    </script>
-    """
-    return render_template_string(BASE_HTML, content=content, users=users)
-
-  return redirect(url_for('index'))
-
-@app.route('/api/buy-product/<int:product_id>', methods=['POST'])
-def api_buy_product(product_id):
-  if 'username' not in session:
-    return jsonify({'success': False, 'message': 'Vui lòng đăng nhập!'})
-  username = session['username']
-  product = next((p for p in products if p['id'] == product_id), None)
-
-  if not product or len(product['game_accs']) <= 0:
-    return jsonify({'success': False, 'message': 'Sản phẩm đã hết hàng trong kho!'})
-
-  data = request.json or {}
-  coupon_code = data.get('coupon_code', '').strip().upper()
-  final_price = product['price']
-  now_ts = datetime.now().timestamp()
-
-  if coupon_code:
-    coupon = next((c for c in coupons_db if c['code'] == coupon_code), None)
-    if not coupon or not coupon['is_active'] or now_ts > coupon.get('expiry_date', 0) or (coupon.get('max_uses', 0) > 0 and coupon.get('used_count', 0) >= coupon.get('max_uses', 0)):
-      return jsonify({'success': False, 'message': 'Mã giảm giá không hợp lệ, đã hết hạn hoặc hết lượt!'})
-    
-    final_price = max(0, product['price'] - coupon['discount_amount'])
-    coupon['used_count'] = coupon.get('used_count', 0) + 1
-
-  if users[username]['balance'] < final_price:
-    return jsonify({'success': False, 'message': 'Số dư tài khoản không đủ!'})
-
-  users[username]['balance'] -= final_price
-  acc_info = product['game_accs'].pop(0)
-
-  purchase_history.append({
-      'user': username,
-      'product_name': product['name'],
-      'account_details': acc_info,
-  })
-
-  send_telegram_notification(f"🛒 <b>Có khách mua tài khoản!</b>\n👤 User: {username}\n📦 Sản phẩm: {product['name']}\n💰 Giá: {final_price:,}đ\n🔑 Acc: {acc_info}")
-
-  return jsonify({'success': True, 'account_info': acc_info})
 
 @app.route('/api/check-coupon', methods=['POST'])
 def check_coupon():
@@ -1026,6 +818,7 @@ def nap_the():
   serial = request.form['serial'].strip()
   amount = int(request.form['amount'])
 
+  # Chuyển hoàn toàn sang trạng thái Gửi thẻ chờ duyệt tay
   cards_queue.append({
       'id': len(cards_queue) + 1,
       'user': session['username'],
@@ -1069,6 +862,47 @@ def huy_the(card_id):
       flash('Đã từ chối thẻ cào này!')
       break
   return redirect(url_for('admin'))
+
+@app.route('/buy/<int:product_id>')
+def buy(product_id):
+  if 'username' not in session:
+    flash('Vui lòng đăng nhập để mua tài khoản!')
+    return redirect(url_for('login'))
+  username = session['username']
+  product = next((p for p in products if p['id'] == product_id), None)
+  if not product or len(product['game_accs']) <= 0:
+    flash('Sản phẩm đã hết hàng trong kho!')
+    return redirect(url_for('index'))
+  if users[username]['balance'] < product['price']:
+    flash('Số dư của bạn không đủ, vui lòng nạp thêm tiền!')
+    return redirect(url_for('index'))
+
+  users[username]['balance'] -= product['price']
+  acc_info = product['game_accs'].pop(0)
+  purchase_history.append({
+      'user': username,
+      'product_name': product['name'],
+      'account_details': acc_info,
+  })
+
+  send_telegram_notification(f"🛒 <b>Có khách mua tài khoản!</b>\n👤 User: {username}\n📦 Sản phẩm: {product['name']}\n🔑 Acc: {acc_info}")
+
+  content = (
+      '<div class="card" style="max-width: 600px; margin: auto; text-align:'
+      ' center; border: 1px solid var(--success);"><h2 class="rgb-text">🎉 MUA TÀI KHOẢN THÀNH CÔNG!</h2><p>Sản phẩm: <b'
+      ' style="color: white;">'
+      + product['name']
+      + '</b></p><div class="success-box"><p style="margin: 0 0 8px 0; color:'
+      ' var(--text-secondary);">Thông tin tài khoản & mật khẩu:</p><h3'
+      ' style="color: var(--accent); background: #12131c; padding: 15px;'
+      ' border-radius: 8px; word-break: break-all; border: 1px solid'
+      ' var(--border-color);">'
+      + acc_info
+      + '</h3><p style="font-size: 13px; color: var(--primary); margin: 8px 0 0'
+      ' 0;">⚠️ Hãy đổi mật khẩu ngay lập tức để bảo mật!</p></div><a href="/"'
+      ' class="btn rgb-btn" style="margin-top: 25px;">VỀ TRANG CHỦ</a></div>'
+  )
+  return render_template_string(BASE_HTML, content=content, users=users)
 
 @app.route('/lich-su')
 def lich_su():
@@ -1121,19 +955,12 @@ def admin():
     price = int(request.form['price'])
     category = request.form['category']
     desc = request.form['desc']
-    # Cho phép nhập nhiều link ảnh phân tách bằng dấu phẩy (,) hoặc xuống dòng
-    raw_images = request.form.get('images', '').strip()
-    if raw_images:
-      images_list = [img.strip() for img in raw_images.replace('\n', ',').split(',') if img.strip()]
-    else:
-      images_list = ['https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png']
-
+    image = request.form.get('image', '').strip() if category == 'tuichon' else ''
     game_acc = request.form['game_acc'].strip()
 
     existing_product = next((p for p in products if p['name'] == name), None)
     if existing_product:
-      if game_acc:
-        existing_product['game_accs'].append(game_acc)
+      existing_product['game_accs'].append(game_acc)
       flash('Đã thêm tài khoản vào kho sản phẩm có sẵn!')
     else:
       new_id = products[-1]['id'] + 1 if products else 1000
@@ -1143,10 +970,10 @@ def admin():
           'category': category,
           'desc': desc,
           'price': price,
-          'images': images_list,
-          'game_accs': [game_acc] if game_acc else [],
+          'image': image,
+          'game_accs': [game_acc],
       })
-      flash('Đã tạo danh mục sản phẩm mới thành công với nhiều ảnh!')
+      flash('Đã tạo danh mục sản phẩm mới thành công!')
     return redirect(url_for('admin'))
 
   if request.method == 'POST' and 'add_cay_thue' in request.form:
@@ -1402,26 +1229,7 @@ def admin():
       '<div class="card" style="border: 1px solid #70a1ff;"><h3 class="rgb-text" style="margin-top: 0;">🌐 Lịch Sử Truy Cập Gần Đây</h3><div style="background: #12131c; padding: 12px; border-radius: 8px; max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color);">'
       + visitors_html
       + '</div></div>'
-      
-      '<div class="card" style="border: 1px solid var(--primary);">'
-      '<h3 class="rgb-text" style="margin-top: 0;">📦 Thêm Sản Phẩm Mới (Hỗ Trợ Nhiều Ảnh)</h3>'
-      '<form method="POST">'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Tên sản phẩm:</label>'
-      '<input type="text" name="name" placeholder="VD: Acc V4 Full..." required>'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Phân loại:</label>'
-      '<select name="category"><option value="tuichon">Acc Tự Chọn</option><option value="random">Acc Random / Túi Mù</option></select>'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Giá tiền (VNĐ):</label>'
-      '<input type="number" name="price" placeholder="VD: 30000" required>'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Link các ảnh minh họa (Nhiều ảnh cách nhau bằng dấu phẩy):</label>'
-      '<textarea name="images" placeholder="https://i.ibb.co/anh1.jpg, https://i.ibb.co/anh2.jpg" rows="3" style="width: 100%; padding: 12px 15px; margin: 10px 0; background: #12131c; border: 1px solid var(--border-color); color: white; border-radius: 8px; box-sizing: border-box; font-family: \'Poppins\', sans-serif; font-size: 14px;"></textarea>'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Mô tả ngắn:</label>'
-      '<input type="text" name="desc" placeholder="Mô tả tài khoản..." required>'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Tài khoản game:</label>'
-      '<input type="text" name="game_acc" placeholder="username | password">'
-      '<button type="submit" name="add_product" class="btn rgb-btn" style="margin-top: 15px;">THÊM VÀO KHO</button>'
-      '</form>'
-      '</div>'
-
+      '<div class="card" style="border: 1px solid var(--primary);"><h3 class="rgb-text" style="margin-top: 0;">📦 Thêm Sản Phẩm Mới</h3><form method="POST"><label style="font-size: 13px; color: var(--text-secondary);">Tên sản phẩm:</label><input type="text" name="name" placeholder="VD: Acc V4 Full..." required><label style="font-size: 13px; color: var(--text-secondary);">Phân loại:</label><select name="category"><option value="tuichon">Acc Tự Chọn</option><option value="random">Acc Random / Túi Mù</option></select><label style="font-size: 13px; color: var(--text-secondary);">Giá tiền (VNĐ):</label><input type="number" name="price" placeholder="VD: 30000" required><label style="font-size: 13px; color: var(--text-secondary);">Link ảnh minh họa:</label><input type="text" name="image" placeholder="Link ảnh dạng https://i.ibb.co/..."><label style="font-size: 13px; color: var(--text-secondary);">Mô tả ngắn:</label><input type="text" name="desc" placeholder="Mô tả tài khoản..." required><label style="font-size: 13px; color: var(--text-secondary);">Tài khoản game:</label><input type="text" name="game_acc" placeholder="username | password" required><button type="submit" name="add_product" class="btn rgb-btn" style="margin-top: 15px;">THÊM VÀO KHO</button></form></div>'
       '<div class="card" style="border: 1px solid var(--accent);"><h3 class="rgb-text" style="margin-top: 0;">🎟️ Quản Lý Mã Giảm Giá Nâng Cao</h3><form method="POST" style="margin-bottom: 15px;"><input type="text" name="coupon_code" placeholder="Mã (VD: GIAM5K)" required><input type="number" name="discount_amount" placeholder="Số tiền giảm (VNĐ)" required><input type="number" name="expires_in_days" placeholder="Thời hạn (Số ngày)" required><input type="number" name="max_uses" placeholder="Giới hạn số lượt dùng" required><button type="submit" name="add_coupon" class="btn rgb-btn" style="margin-top: 8px;">THÊM MÃ GIẢM GIÁ</button></form><div style="background: #12131c; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">'
       + (coupons_html if coupons_html else '<p>Chưa có mã giảm giá nào.</p>')
       + '</div></div>'
