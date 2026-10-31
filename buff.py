@@ -149,21 +149,15 @@ BASE_HTML = """
         .chat-msg { margin-bottom: 10px; font-size: 13px; line-height: 1.4; }
         .chat-msg.user { color: #70a1ff; text-align: right; }
         .chat-msg.admin { color: var(--success); text-align: left; }
-        .slider-container { position: relative; width: 100%; border-radius: 10px; overflow: hidden; background: #12131c; border: 1px solid var(--border-color); margin-bottom: 15px; }
-        .slider-track { display: flex; transition: transform 0.4s ease-in-out; width: 100%; }
-        .slider-slide { min-width: 100%; box-sizing: border-box; display: flex; justify-content: center; align-items: center; }
-        .slider-slide img { width: 100%; height: 240px; object-fit: cover; }
-        .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: none; padding: 10px 14px; cursor: pointer; font-size: 16px; border-radius: 50%; z-index: 10; transition: 0.2s; }
-        .slider-btn:hover { background: var(--primary); }
-        .slider-prev { left: 10px; }
-        .slider-next { right: 10px; }
-        .slider-dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
-        .dot { width: 8px; height: 8px; background: #475569; border-radius: 50%; cursor: pointer; transition: 0.3s; }
-        .dot.active { background: var(--primary); width: 20px; border-radius: 4px; }
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #12151f; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
         .bottom-item { color: var(--text-secondary); text-decoration: none; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-weight: 500; }
         .bottom-item.active, .bottom-item:hover { color: var(--primary); }
         .bottom-item .avatar-circle { width: 32px; height: 32px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; margin-top: -15px; border: 2px solid #12151f; }
+        /* Modal xem ảnh */
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
+        .modal-content { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); max-width: 450px; width: 90%; text-align: center; position: relative; }
+        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 24px; color: white; cursor: pointer; background: none; border: none; }
+        .modal img { width: 100%; height: 260px; object-fit: cover; border-radius: 8px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -218,6 +212,15 @@ BASE_HTML = """
         {{ content | safe }}
     </div>
 
+    <!-- Modal xem ảnh -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeImageModal()">×</button>
+            <h3 id="modalTitle" style="color: var(--primary); margin-top: 0; font-size: 16px;">Ảnh Sản Phẩm</h3>
+            <img id="modalImg" src="" alt="Product Image">
+        </div>
+    </div>
+
     <div class="bottom-nav">
         <a href="/" class="bottom-item active" style="width: 100%;">
             <div class="avatar-circle">👤</div>
@@ -228,6 +231,14 @@ BASE_HTML = """
     <script>
         function toggleDrawer() {
             document.getElementById('mobileDrawer').classList.toggle('open');
+        }
+        function openImageModal(imgUrl, title) {
+            document.getElementById('modalImg').src = imgUrl;
+            document.getElementById('modalTitleinnerText' || 'modalTitle').innerText = title;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
         }
     </script>
 </body>
@@ -270,20 +281,24 @@ def index():
   products_html = ''
   for p in products:
     stock_count = len(p.get('game_accs', []))
-    if p.get('category') == 'random':
-      action_btn = f'<a href="/tui-mu/{p["id"]}" class="btn rgb-btn" style="margin-top: 15px;">⚡ XÉ TÚI NGAY</a>'
-    else:
-      action_btn = f'<a href="/buy/{p["id"]}" class="btn rgb-btn" style="margin-top: 15px;">🛒 MUA NGAY</a>'
+    pid = p['id']
+    pname = p.get('name', '')
+    pprice = p.get('price', 0)
+    pdesc = p.get('desc', '')
+
+    # Nút bấm mua ngay trực tiếp gọi hàm JS
+    action_btn = f'<button onclick="buyProduct({pid}, \'{pname}\', {pprice})" class="btn rgb-btn" style="margin-top: 15px;">🛒 MUA NGAY</button>'
 
     images_list = p.get('images', [])
     if not isinstance(images_list, list) or len(images_list) == 0 or not images_list[0]:
       images_list = ['https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png']
     thumb_img = images_list[0]
     
-    img_tag = f'<img src="{thumb_img}" style="width: 100%; height: 130px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border-color);">' if thumb_img else ''
-    delete_btn = f'<div style="position: absolute; top: 15px; right: 15px;"><a href="/admin/delete/{p["id"]}" class="btn-delete" onclick="return confirm(\'Xóa sản phẩm này?\');">🗑️ XÓA</a></div>' if session.get('role') == 'admin' else ''
+    # Bấm vào ảnh sẽ bật modal xem ảnh
+    img_tag = f'<img src="{thumb_img}" onclick="openImageModal(\'{thumb_img}\', \'{pname}\')" style="width: 100%; height: 130px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); cursor: pointer;" title="Bấm vào để xem ảnh lớn">' if thumb_img else ''
+    delete_btn = f'<div style="position: absolute; top: 15px; right: 15px;"><a href="/admin/delete/{pid}" class="btn-delete" onclick="return confirm(\'Xóa sản phẩm này?\');">🗑️ XÓA</a></div>' if session.get('role') == 'admin' else ''
 
-    products_html += f'<div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">{delete_btn}<div>{img_tag}<div style="color: var(--text-secondary); font-size: 11px; font-weight: 600;">MÃ SÓ: #{p["id"]}</div><div class="product-title">{p.get("name", "")}</div><p style="color: var(--text-secondary); font-size: 12px; line-height: 1.4;">{p.get("desc", "")}</p></div><div><div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;"><span style="font-size: 12px; color: var(--text-secondary);">Kho: <b style="color: white;">{stock_count}</b></span><span class="price">{p.get("price", 0):,}đ</span></div>{action_btn}</div></div>'
+    products_html += f'<div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">{delete_btn}<div>{img_tag}<div style="color: var(--text-secondary); font-size: 11px; font-weight: 600;">MÃ SÓ: #{pid}</div><div class="product-title">{pname}</div><p style="color: var(--text-secondary); font-size: 12px; line-height: 1.4;">{pdesc}</p></div><div><div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;"><span style="font-size: 12px; color: var(--text-secondary);">Kho: <b style="color: white;">{stock_count}</b></span><span class="price">{pprice:,}đ</span></div>{action_btn}</div></div>'
 
   status_badge = '<span style="color: var(--success); font-weight: bold;">🟢 Đang sẵn sàng nhận đơn</span>' if cay_thue_status['is_ready'] else '<span style="color: var(--primary); font-weight: bold;">🔴 Đang bận (Vui lòng đợi)</span>'
   status_note_box = f'<div style="background: #12131c; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; border: 1px solid var(--border-color);">Trạng thái hiện tại: {status_badge}<br><span style="color: var(--text-secondary);">Thông báo: <b>{cay_thue_status["current_task"]}</b></span></div>'
@@ -307,7 +322,35 @@ def index():
 
   banner_html = '<div class="card" style="text-align: center; padding: 10px; border: 1px solid var(--primary); background: linear-gradient(180deg, rgba(255,71,87,0.05), var(--card-bg));"><img src="https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png" alt="Banner" style="width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px;"></div>'
 
-  content = banner_html + nap_html + f'<div style="display: grid; grid-template-columns: 1fr; gap: 20px;"><div><h2 class="rgb-text">🔥 DANH MỤC TÀI KHOẢN & TÚI MÙ</h2><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">{products_html}</div><h2 class="rgb-text" style="margin-top: 30px;">⚔️ DỊCH VỤ CÀY THUÊ UY TÍN</h2>{status_note_box}<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">{cay_thue_html}</div></div><div><div class="card" style="border: 1px solid var(--accent); margin-bottom: 20px;"><h3 class="rgb-text" style="text-align: center; margin-top: 0;">🏆 TOP NẠP TIỀN</h3>{top_html}</div>{chat_html}</div></div>'
+  content = banner_html + nap_html + f'<div style="display: grid; grid-template-columns: 1fr; gap: 20px;"><div><h2 class="rgb-text">🔥 DANH MỤC TÀI KHOẢN</h2><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">{products_html}</div><h2 class="rgb-text" style="margin-top: 30px;">⚔️ DỊCH VỤ CÀY THUÊ UY TÍN</h2>{status_note_box}<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">{cay_thue_html}</div></div><div><div class="card" style="border: 1px solid var(--accent); margin-bottom: 20px;"><h3 class="rgb-text" style="text-align: center; margin-top: 0;">🏆 TOP NẠP TIỀN</h3>{top_html}</div>{chat_html}</div></div>'
+  
+  # Đoạn script xử lý mua nhanh trực tiếp ngay ngoài trang chủ
+  content += """
+  <script>
+  function buyProduct(productId, productName, productPrice) {
+      if (!confirm("Bạn có chắc chắn muốn mua sản phẩm: " + productName + " với giá " + productPrice.toLocaleString() + "đ không?")) {
+          return;
+      }
+      fetch('/api/buy-product/' + productId, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({})
+      })
+      .then(res => res.json())
+      .then(data => {
+          if (data.success) {
+              alert("🎉 Mua thành công! Thông tin tài khoản:\\n\\n" + data.account_info + "\\n\\n(Thông tin đã được lưu vào lịch sử giao dịch)");
+              window.location.reload();
+          } else {
+              alert(data.message);
+          }
+      })
+      .catch(err => {
+          alert("Đã xảy ra lỗi kết nối!");
+      });
+  }
+  </script>
+  """
   return render_template_string(BASE_HTML, content=content, users=users)
 
 @app.route('/dat-cay-thue/<int:ct_id>', methods=['GET', 'POST'])
@@ -386,199 +429,23 @@ def doi_mat_khau():
     """
   return render_template_string(BASE_HTML, content=content, users=users)
 
-@app.route('/tui-mu/<int:product_id>')
-def tui_mu(product_id):
-  if 'username' not in session:
-    flash('Đăng nhập để mở túi mù!')
-    return redirect(url_for('login'))
-  
-  try:
-    product = next((p for p in products if p['id'] == product_id), None)
-    if not product:
-      flash('Không tìm thấy sản phẩm!')
-      return redirect(url_for('index'))
-
-    images = product.get('images', [])
-    if not isinstance(images, list) or len(images) == 0:
-      images = ['https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png']
-
-    slider_slides = ''
-    slider_dots = ''
-    for i, img in enumerate(images):
-      safe_img = img if img else 'https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png'
-      slider_slides += f'<div class="slider-slide"><img src="{safe_img}" alt="Img"></div>'
-      active_cls = ' active' if i == 0 else ''
-      slider_dots += f'<span class="dot{active_cls}" onclick="currentSlide({i})"></span>'
-
-    slider_html = f'<div class="slider-container"><div class="slider-track" id="sliderTrack">{slider_slides}</div>{"<button class=\"slider-btn slider-prev\" onclick=\"prevSlide()\">❮</button><button class=\"slider-btn slider-next\" onclick=\"nextSlide()\">❯</button>" if len(images) > 1 else ""}</div>{"<div class=\"slider-dots\">" + slider_dots + "</div>" if len(images) > 1 else ""}'
-
-    prod_name = product.get('name', 'Túi mù')
-    prod_desc = product.get('desc', '')
-    prod_price = product.get('price', 0)
-    game_accs_count = len(product.get('game_accs', []))
-
-    content = f"""
-      <div class="card" style="max-width: 500px; margin: auto; border: 1px solid var(--accent);">
-          <h2 class="rgb-text" style="text-align: center;">⚡ MỞ TÚI MÙ: {prod_name}</h2>
-          {slider_html}
-          <p style="color: var(--text-secondary); text-align: center; margin-top: 10px;">{prod_desc}</p>
-          <p class="price" style="text-align: center;">Giá: {prod_price:,}đ</p>
-          <p style="color: var(--text-secondary); text-align: center;">Kho còn: <b style="color: white;">{game_accs_count}</b> tài khoản</p>
-          <div style="margin: 20px 0;"><label style="font-size: 13px; color: var(--text-secondary);">Mã giảm giá:</label><input type="text" id="coupon_code" placeholder="Mã (nếu có)"><button type="button" onclick="applyCoupon({prod_price})" class="btn rgb-btn" style="margin-top: 8px;">Áp dụng mã</button><p id="coupon_msg" style="font-size: 13px; margin-top: 8px; text-align: center;"></p></div>
-          <h3 id="final_price_display" style="margin: 15px 0; text-align: center; color: var(--success);">Tổng thanh toán: {prod_price:,}đ</h3>
-          <button onclick="xeTui({product_id})" class="btn rgb-btn" style="font-size: 16px; padding: 14px;">🔥 XÉ TÚI NGAY</button>
-          <div style="text-align: center; margin-top: 15px;"><a href="/" style="color: var(--text-secondary); font-size: 13px;">← Trang chủ</a></div>
-      </div>
-      <script>
-      let slideIndex = 0;
-      function showSlide(index) {{ const track = document.getElementById("sliderTrack"); const slides = document.querySelectorAll(".slider-slide"); const dots = document.querySelectorAll(".dot"); if (slides.length === 0) return; if (index >= slides.length) slideIndex = 0; if (index < 0) slideIndex = slides.length - 1; track.style.transform = `translateX(-${slideIndex * 100}%)`; dots.forEach((dot, i) => {{ dot.classList.toggle("active", i === slideIndex); }}); }}
-      function nextSlide() {{ slideIndex++; showSlide(slideIndex); }}
-      function prevSlide() {{ slideIndex--; showSlide(slideIndex); }}
-      function currentSlide(n) {{ slideIndex = n; showSlide(slideIndex); }}
-      function applyCoupon(basePrice) {{ let code = document.getElementById("coupon_code").value; fetch("/api/check-coupon", {{method: "POST", headers: {{"Content-Type": "application/json"}}, body: JSON.stringify({{code: code}})}}).then(res => res.json()).then(data => {{ let msg = document.getElementById("coupon_msg"); if(data.success) {{ let final = Math.max(0, basePrice - data.discount); msg.style.color = "var(--success)"; msg.innerText = "Giảm " + data.discount.toLocaleString() + "đ"; document.getElementById("final_price_display").innerText = "Tổng thanh toán: " + final.toLocaleString() + "đ"; }} else {{ msg.style.color = "var(--primary)"; msg.innerText = data.message; }} }}); }}
-      function xeTui(productId) {{ let code = document.getElementById("coupon_code").value; fetch("/api/buy-random/" + productId, {{method: "POST", headers: {{"Content-Type": "application/json"}}, body: JSON.stringify({{code: code}})}}).then(res => res.json()).then(data => {{ if(data.success) {{ alert("🎉 Thành công! Acc:\\n" + data.account_info); window.location.href = "/lich-su"; }} else {{ alert(data.message); }} }}); }}
-      </script>
-    """
-    return render_template_string(BASE_HTML, content=content, users=users)
-  except Exception as e:
-    print(f"Lỗi tui-mu: {e}")
-    flash(f"Lỗi hệ thống túi mù: {str(e)}")
-    return redirect(url_for('index'))
-
-@app.route('/buy/<int:product_id>')
-def buy(product_id):
-  if 'username' not in session:
-    flash('Vui lòng đăng nhập!')
-    return redirect(url_for('login'))
-  
-  try:
-    product = next((p for p in products if p['id'] == product_id), None)
-    if not product:
-      flash('Không tìm thấy sản phẩm!')
-      return redirect(url_for('index'))
-
-    images = product.get('images', [])
-    if not isinstance(images, list) or len(images) == 0:
-      images = ['https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png']
-
-    slider_slides = ''
-    slider_dots = ''
-    for i, img in enumerate(images):
-      safe_img = img if img else 'https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png'
-      slider_slides += f'<div class="slider-slide"><img src="{safe_img}" alt="Img"></div>'
-      active_cls = ' active' if i == 0 else ''
-      slider_dots += f'<span class="dot{active_cls}" onclick="currentSlide({i})"></span>'
-
-    slider_html = f'<div class="slider-container"><div class="slider-track" id="sliderTrack">{slider_slides}</div>{"<button class=\"slider-btn slider-prev\" onclick=\"prevSlide()\">❮</button><button class=\"slider-btn slider-next\" onclick=\"nextSlide()\">❯</button>" if len(images) > 1 else ""}</div>{"<div class=\"slider-dots\">" + slider_dots + "</div>" if len(images) > 1 else ""}'
-
-    prod_name = product.get('name', 'Sản phẩm')
-    prod_desc = product.get('desc', '')
-    prod_price = product.get('price', 0)
-    game_accs_count = len(product.get('game_accs', []))
-
-    content = f"""
-      <div class="card" style="max-width: 500px; margin: auto; border: 1px solid var(--primary);">
-          <h2 class="rgb-text" style="text-align: center;">CHI TIẾT SẢN PHẨM</h2>
-          {slider_html}
-          <div class="product-title" style="font-size: 16px; margin-top: 10px;">{prod_name}</div>
-          <p style="color: var(--text-secondary); font-size: 13px;">{prod_desc}</p>
-          <p class="price">Giá: {prod_price:,}đ</p>
-          <p style="color: var(--text-secondary); font-size: 13px;">Kho còn: <b style="color: white;">{game_accs_count}</b> tài khoản</p>
-          
-          <div style="margin: 15px 0;">
-              <label style="font-size: 13px; color: var(--text-secondary);">Mã giảm giá:</label>
-              <input type="text" id="coupon_code" placeholder="Mã (nếu có)">
-              <button type="button" onclick="applyCoupon({prod_price})" class="btn rgb-btn" style="margin-top: 8px;">Áp dụng mã</button>
-              <p id="coupon_msg" style="font-size: 13px; margin-top: 8px; text-align: center;"></p>
-          </div>
-          
-          <h3 id="final_price_display" style="margin: 15px 0; text-align: center; color: var(--success);">Tổng thanh toán: {prod_price:,}đ</h3>
-          
-          <button onclick="confirmBuy({product_id})" class="btn rgb-btn" style="font-size: 16px; padding: 14px;">🛒 MUA NGAY</button>
-          <div style="text-align: center; margin-top: 15px;"><a href="/" style="color: var(--text-secondary); font-size: 13px;">← Trang chủ</a></div>
-      </div>
-      <script>
-      let slideIndex = 0;
-      function showSlide(index) {{ const track = document.getElementById("sliderTrack"); const slides = document.querySelectorAll(".slider-slide"); const dots = document.querySelectorAll(".dot"); if (slides.length === 0) return; if (index >= slides.length) slideIndex = 0; if (index < 0) slideIndex = slides.length - 1; track.style.transform = `translateX(-${slideIndex * 100}%)`; dots.forEach((dot, i) => {{ dot.classList.toggle("active", i === slideIndex); }}); }}
-      function nextSlide() {{ slideIndex++; showSlide(slideIndex); }}
-      function prevSlide() {{ slideIndex--; showSlide(slideIndex); }}
-      function currentSlide(n) {{ slideIndex = n; showSlide(slideIndex); }}
-      function applyCoupon(basePrice) {{ let code = document.getElementById('coupon_code').value; fetch('/api/check-coupon', {{method: 'POST', headers: {{'Content-Type': 'application/json'}}, body: JSON.stringify({{code: code}})}}).then(res => res.json()).then(data => {{ let msg = document.getElementById('coupon_msg'); if(data.success) {{ let final = Math.max(0, basePrice - data.discount); msg.style.color = 'var(--success)'; msg.innerText = "Giảm " + data.discount.toLocaleString() + "đ"; document.getElementById('final_price_display').innerText = "Tổng thanh toán: " + final.toLocaleString() + "đ"; }} else {{ msg.style.color = 'var(--primary)'; msg.innerText = data.message; }} }}); }}
-      function confirmBuy(productId) {{ let code = document.getElementById('coupon_code').value; fetch('/api/buy-product/' + productId, {{method: 'POST', headers: {{'Content-Type': 'application/json'}}, body: JSON.stringify({{code: code}})}}).then(res => res.json()).then(data => {{ if(data.success) {{ alert("🎉 Mua thành công! Thông tin:\\n" + data.account_info); window.location.href = '/lich-su'; }} else {{ alert(data.message); }} }}); }}
-      </script>
-    """
-    return render_template_string(BASE_HTML, content=content, users=users)
-  except Exception as e:
-    print(f"Lỗi buy route: {e}")
-    flash(f"Lỗi hệ thống mua hàng: {str(e)}")
-    return redirect(url_for('index'))
-
 @app.route('/api/buy-product/<int:product_id>', methods=['POST'])
 def api_buy_product(product_id):
   if 'username' not in session:
-    return jsonify({'success': False, 'message': 'Vui lòng đăng nhập!'})
+    return jsonify({'success': False, 'message': 'Vui lòng đăng nhập trước khi mua hàng!'})
   username = session['username']
   product = next((p for p in products if p['id'] == product_id), None)
   if not product or len(product.get('game_accs', [])) <= 0:
-    return jsonify({'success': False, 'message': 'Hết hàng!'})
+    return jsonify({'success': False, 'message': 'Sản phẩm này đã hết hàng!'})
 
-  data = request.json or {}
-  coupon_code = data.get('code', data.get('coupon_code', '')).strip().upper()
   final_price = product['price']
-  now_ts = datetime.now().timestamp()
-
-  if coupon_code:
-    coupon = next((c for c in coupons_db if c['code'] == coupon_code), None)
-    if not coupon or not coupon['is_active'] or now_ts > coupon.get('expiry_date', 0):
-      return jsonify({'success': False, 'message': 'Mã giảm giá không hợp lệ!'})
-    final_price = max(0, product['price'] - coupon['discount_amount'])
-    coupon['used_count'] = coupon.get('used_count', 0) + 1
-
   if users[username]['balance'] < final_price:
-    return jsonify({'success': False, 'message': 'Số dư không đủ!'})
+    return jsonify({'success': False, 'message': 'Số dư trong tài khoản của bạn không đủ để mua sản phẩm này!'})
 
   users[username]['balance'] -= final_price
   acc_info = product['game_accs'].pop(0)
   purchase_history.append({'user': username, 'product_name': product['name'], 'account_details': acc_info})
-  send_telegram_notification(f"🛒 <b>Mua acc!</b>\nUser: {username}\nSP: {product['name']}\nAcc: {acc_info}")
-  return jsonify({'success': True, 'account_info': acc_info})
-
-@app.route('/api/check-coupon', methods=['POST'])
-def check_coupon():
-  data = request.json or {}
-  code = data.get('code', '').strip().upper()
-  coupon = next((c for c in coupons_db if c['code'] == code), None)
-  if not coupon or not coupon['is_active']:
-    return jsonify({'success': False, 'message': 'Mã không tồn tại!'})
-  return jsonify({'success': True, 'discount': coupon['discount_amount']})
-
-@app.route('/api/buy-random/<int:product_id>', methods=['POST'])
-def api_buy_random(product_id):
-  if 'username' not in session:
-    return jsonify({'success': False, 'message': 'Vui lòng đăng nhập!'})
-  username = session['username']
-  product = next((p for p in products if p['id'] == product_id), None)
-  if not product or len(product.get('game_accs', [])) <= 0:
-    return jsonify({'success': False, 'message': 'Hết hàng túi mù!'})
-
-  data = request.json or {}
-  coupon_code = data.get('code', data.get('coupon_code', '')).strip().upper()
-  final_price = product['price']
-  now_ts = datetime.now().timestamp()
-
-  if coupon_code:
-    coupon = next((c for c in coupons_db if c['code'] == coupon_code), None)
-    if not coupon or not coupon['is_active']:
-      return jsonify({'success': False, 'message': 'Mã không hợp lệ!'})
-    final_price = max(0, product['price'] - coupon['discount_amount'])
-
-  if users[username]['balance'] < final_price:
-    return jsonify({'success': False, 'message': 'Số dư không đủ!'})
-
-  users[username]['balance'] -= final_price
-  acc_info = product['game_accs'].pop(0)
-  purchase_history.append({'user': username, 'product_name': product['name'] + ' (Random)', 'account_details': acc_info})
-  send_telegram_notification(f"🔥 <b>Mua túi mù!</b>\nUser: {username}\nSP: {product['name']}")
+  send_telegram_notification(f"🛒 <b>Mua acc thành công!</b>\nUser: {username}\nSP: {product['name']}\nAcc: {acc_info}")
   return jsonify({'success': True, 'account_info': acc_info})
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -686,7 +553,7 @@ def lich_su():
     history_html += '<div class="card" style="text-align: center; color: var(--text-secondary);"><p>Chưa có lịch sử.</p></div>'
   else:
     for h in user_history:
-      history_html += f'<div class="card"><p style="margin: 0 0 5px 0; color: var(--text-secondary);"><b>Sản phẩm:</b> {h["product_name"]}</p><p style="margin: 0;"><b>Chi tiết:</b> <span style="color: var(--success); font-weight: 600;">{h["account_details"]}</span></p></div>'
+      history_html += f'<div class="card"><p style="margin: 0 0 5px 0; color: var(--text-secondary);"><b>Sản phẩm:</b> {h["product_name"]}</p><p style="margin: 0;"><b>Chi tiết tài khoản:</b> <span style="color: var(--success); font-weight: 600;">{h["account_details"]}</span></p></div>'
   return render_template_string(BASE_HTML, content=history_html, users=users)
 
 @app.route('/send-message', methods=['POST'])
@@ -868,17 +735,6 @@ def admin():
       '<div class="card" style="border: 1px solid var(--success);"><h3 class="rgb-text" style="margin-top: 0;">📋 Quản Lý Thẻ Cào</h3>' + cards_html + '</div>'
   )
   return render_template_string(BASE_HTML, content=admin_content, users=users)
-
-@app.route('/admin/coupon/toggle/<int:coupon_id>', methods=['POST'])
-def toggle_coupon(coupon_id):
-  if 'username' not in session or session.get('role') != 'admin':
-    return redirect(url_for('index'))
-  for c in coupons_db:
-    if c['id'] == coupon_id:
-      c['is_active'] = not c['is_active']
-      flash('Đã đổi trạng thái mã!')
-      break
-  return redirect(url_for('admin'))
 
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=5000)
