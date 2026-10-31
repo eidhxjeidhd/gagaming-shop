@@ -8,7 +8,6 @@ import random
 app = Flask(__name__)
 app.secret_key = 'ga_gaming_roblox_full_option_2026'
 
-# --- CẤU HÌNH THƯ MỤC UPLOAD ẢNH TỪ ĐIỆN THOẠI ---
 UPLOAD_FOLDER = 'static/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -16,7 +15,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 PARTNER_ID = '71186911886'
 PARTNER_KEY = 'f7377b035f5b5d2c4a5d04e487b39aaf'
 
-# --- CẤU HÌNH TELEGRAM BOT CHÍNH CHỦ ---
 TELEGRAM_BOT_TOKEN = '8818555905:AAGFfnQhNpSQ0jC20X5IsZ0WVAVQImJVkM4'
 TELEGRAM_CHAT_ID = '8976860826'
 
@@ -125,28 +123,22 @@ BASE_HTML = """
             --text-main: #ffffff;
             --text-secondary: #8f9bb3;
         }
-        
         body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Poppins', sans-serif; margin: 0; padding-bottom: 70px; }
-        
         header { background: #12151f; border-bottom: 1px solid var(--border-color); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .logo-area { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; color: var(--primary); text-decoration: none; }
         .logo-area img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
         .menu-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; }
-        
         .drawer { position: fixed; top: 0; right: -280px; width: 280px; height: 100%; background: #151823; border-left: 1px solid var(--border-color); z-index: 2000; transition: 0.3s ease; padding: 20px; box-sizing: border-box; }
         .drawer.open { right: 0; }
         .drawer-close { background: none; border: none; color: white; font-size: 20px; float: right; cursor: pointer; margin-bottom: 20px; }
         .drawer a { display: block; padding: 12px 15px; color: white; text-decoration: none; font-weight: 500; border-radius: 8px; margin-bottom: 8px; background: #1f2437; font-size: 14px; }
         .drawer a:hover { background: var(--primary); }
-
         .notice-banner { background: linear-gradient(90deg, #1f2437, #151823); border: 1px solid var(--border-color); padding: 12px 15px; border-radius: 10px; margin: 15px 15px 5px 15px; font-size: 13px; line-height: 1.5; color: #d1d5db; }
         .notice-banner b { color: var(--accent); }
-
         .social-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
         .social-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; text-align: center; text-decoration: none; color: white; font-size: 12px; font-weight: 500; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: 0.2s; }
         .social-item:hover { border-color: var(--primary); }
         .social-item img { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; }
-
         .container { padding: 10px 15px; max-width: 1100px; margin: auto; }
         .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); position: relative; }
         .product-title { color: var(--text-main); font-weight: 600; font-size: 15px; margin-bottom: 5px; }
@@ -160,7 +152,6 @@ BASE_HTML = """
         .chat-msg { margin-bottom: 10px; font-size: 13px; line-height: 1.4; }
         .chat-msg.user { color: #70a1ff; text-align: right; }
         .chat-msg.admin { color: var(--success); text-align: left; }
-        
         .slider-container { position: relative; width: 100%; border-radius: 10px; overflow: hidden; background: #12131c; border: 1px solid var(--border-color); margin-bottom: 15px; }
         .slider-track { display: flex; transition: transform 0.4s ease-in-out; width: 100%; }
         .slider-slide { min-width: 100%; box-sizing: border-box; display: flex; justify-content: center; align-items: center; }
@@ -172,7 +163,6 @@ BASE_HTML = """
         .slider-dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
         .dot { width: 8px; height: 8px; background: #475569; border-radius: 50%; cursor: pointer; transition: 0.3s; }
         .dot.active { background: var(--primary); width: 20px; border-radius: 4px; }
-
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #12151f; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
         .bottom-item { color: var(--text-secondary); text-decoration: none; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-weight: 500; }
         .bottom-item.active, .bottom-item:hover { color: var(--primary); }
@@ -251,32 +241,17 @@ BASE_HTML = """
 def index():
   visitor_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
   current_time = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
-  
   visitors_history.insert(0, {'ip': visitor_ip, 'time': current_time})
   if len(visitors_history) > 50:
     visitors_history.pop()
 
-  sorted_users = sorted(
-      users.items(), key=lambda x: x[1].get('total_deposited', 0), reverse=True
-  )
+  sorted_users = sorted(users.items(), key=lambda x: x[1].get('total_deposited', 0), reverse=True)
   top_html = ''
   rank = 1
   for uname, udata in sorted_users:
     if udata.get('total_deposited', 0) > 0:
-      medal = (
-          '🥇'
-          if rank == 1
-          else ('🥈' if rank == 2 else ('🥉' if rank == 3 else f'#{rank}'))
-      )
-      top_html += (
-          '<div class="top-user-item"><span><b>'
-          + medal
-          + '</b> '
-          + uname
-          + '</span><span style="color: var(--accent); font-weight: 600;">'
-          + f"{udata.get('total_deposited', 0):,}"
-          + 'đ</span></div>'
-      )
+      medal = '🥇' if rank == 1 else ('🥈' if rank == 2 else ('🥉' if rank == 3 else f'#{rank}'))
+      top_html += f'<div class="top-user-item"><span><b>{medal}</b> {uname}</span><span style="color: var(--accent); font-weight: 600;">{udata.get("total_deposited", 0):,}đ</span></div>'
       rank += 1
   if not top_html:
     top_html = '<p style="color: var(--text-secondary); text-align: center; font-size: 13px;">Chưa có dữ liệu nạp tiền.</p>'
@@ -292,44 +267,26 @@ def index():
       for m in user_msgs:
         sender_label = 'Bạn' if m['sender'] == curr_user else 'Admin'
         css_class = 'user' if m['sender'] == curr_user else 'admin'
-        msgs_render += '<div class="chat-msg ' + css_class + '"><b>' + sender_label + ':</b> ' + m['message'] + '</div>'
-
-    chat_html = '<div class="card" style="border: 1px solid var(--primary);"><h3 style="color: var(--primary); margin-top: 0;">💬 Hỗ Trợ Trực Tuyến</h3><div class="chat-box">' + msgs_render + '</div><form action="/send-message" method="POST"><input type="text" name="message" placeholder="Nhập tin nhắn cho Admin..." required style="margin: 0 0 10px 0;"><button type="submit" class="btn rgb-btn" style="padding: 8px; font-size: 13px;">GỬI TIN NHẮN</button></form></div>'
+        msgs_render += f'<div class="chat-msg {css_class}"><b>{sender_label}:</b> {m["message"]}</div>'
+    chat_html = f'<div class="card" style="border: 1px solid var(--primary);"><h3 style="color: var(--primary); margin-top: 0;">💬 Hỗ Trợ Trực Tuyến</h3><div class="chat-box">{msgs_render}</div><form action="/send-message" method="POST"><input type="text" name="message" placeholder="Nhập tin nhắn cho Admin..." required style="margin: 0 0 10px 0;"><button type="submit" class="btn rgb-btn" style="padding: 8px; font-size: 13px;">GỬI TIN NHẮN</button></form></div>'
 
   products_html = ''
   for p in products:
     stock_count = len(p.get('game_accs', []))
     if p.get('category') == 'random':
-      action_btn = '<a href="/tui-mu/' + str(p['id']) + '" class="btn rgb-btn" style="margin-top: 15px;">⚡ XÉ TÚI NGAY</a>'
+      action_btn = f'<a href="/tui-mu/{p["id"]}" class="btn rgb-btn" style="margin-top: 15px;">⚡ XÉ TÚI NGAY</a>'
     else:
-      action_btn = '<a href="/buy/' + str(p['id']) + '" class="btn rgb-btn" style="margin-top: 15px;">🛒 MUA NGAY</a>'
+      action_btn = f'<a href="/buy/{p["id"]}" class="btn rgb-btn" style="margin-top: 15px;">🛒 MUA NGAY</a>'
 
     images_list = p.get('images', [])
     if not isinstance(images_list, list) or len(images_list) == 0 or not images_list[0]:
       images_list = ['https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png']
     thumb_img = images_list[0]
     
-    img_tag = '<img src="' + thumb_img + '" style="width: 100%; height: 130px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border-color);">' if thumb_img else ''
+    img_tag = f'<img src="{thumb_img}" style="width: 100%; height: 130px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border-color);">' if thumb_img else ''
+    delete_btn = f'<div style="position: absolute; top: 15px; right: 15px;"><a href="/admin/delete/{p["id"]}" class="btn-delete" onclick="return confirm(\'Xóa sản phẩm này?\');">🗑️ XÓA</a></div>' if session.get('role') == 'admin' else ''
 
-    delete_btn = ''
-    if session.get('role') == 'admin':
-      delete_btn = f'<div style="position: absolute; top: 15px; right: 15px;"><a href="/admin/delete/{p["id"]}" class="btn-delete" onclick="return confirm(\'Xóa sản phẩm này?\');">🗑️ XÓA</a></div>'
-
-    products_html += (
-        '<div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">'
-        + delete_btn
-        + '<div>'
-        + img_tag
-        + '<div style="color: var(--text-secondary); font-size: 11px; font-weight: 600;">MÃ SÓ: #' + str(p['id']) + '</div>'
-        + '<div class="product-title">' + p.get('name', '') + '</div>'
-        + '<p style="color: var(--text-secondary); font-size: 12px; line-height: 1.4;">' + p.get('desc', '') + '</p>'
-        + '</div><div>'
-        + '<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">'
-        + '<span style="font-size: 12px; color: var(--text-secondary);">Kho: <b style="color: white;">' + str(stock_count) + '</b></span>'
-        + '<span class="price">' + f"{p.get('price', 0):,}" + 'đ</span></div>'
-        + action_btn
-        + '</div></div>'
-    )
+    products_html += f'<div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">{delete_btn}<div>{img_tag}<div style="color: var(--text-secondary); font-size: 11px; font-weight: 600;">MÃ SÓ: #{p["id"]}</div><div class="product-title">{p.get("name", "")}</div><p style="color: var(--text-secondary); font-size: 12px; line-height: 1.4;">{p.get("desc", "")}</p></div><div><div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;"><span style="font-size: 12px; color: var(--text-secondary);">Kho: <b style="color: white;">{stock_count}</b></span><span class="price">{p.get("price", 0):,}đ</span></div>{action_btn}</div></div>'
 
   status_badge = '<span style="color: var(--success); font-weight: bold;">🟢 Đang sẵn sàng nhận đơn</span>' if cay_thue_status['is_ready'] else '<span style="color: var(--primary); font-weight: bold;">🔴 Đang bận (Vui lòng đợi)</span>'
   status_note_box = f'<div style="background: #12131c; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; border: 1px solid var(--border-color);">Trạng thái hiện tại: {status_badge}<br><span style="color: var(--text-secondary);">Thông báo: <b>{cay_thue_status["current_task"]}</b></span></div>'
@@ -339,21 +296,9 @@ def index():
     if cay_thue_status['is_ready']:
       btn_cay = f'<a href="/dat-cay-thue/{ct["id"]}" class="btn rgb-btn" style="margin-top: 12px;">⚡ ĐẶT DỊCH VỤ</a>'
     else:
-      btn_cay = f'<button class="btn" style="background: #475569; cursor: not-allowed; margin-top: 12px;" disabled>Đang bận cày cho khách, vui lòng đợi!</button>'
-
-    delete_ct_btn = ''
-    if session.get('role') == 'admin':
-      delete_ct_btn = f'<div style="position: absolute; top: 15px; right: 15px;"><a href="/admin/delete-cay-thue/{ct["id"]}" class="btn-delete" onclick="return confirm(\'Xóa dịch vụ này?\');">🗑️ XÓA</a></div>'
-
-    cay_thue_html += (
-        '<div class="card" style="position: relative;">'
-        + delete_ct_btn
-        + f'<div class="product-title">{ct["name"]}</div>'
-        + f'<p style="color: var(--text-secondary); font-size: 12px;">{ct["desc"]}</p>'
-        + f'<div class="price">{ct["price"]:,}đ</div>'
-        + btn_cay
-        + '</div>'
-    )
+      btn_cay = '<button class="btn" style="background: #475569; cursor: not-allowed; margin-top: 12px;" disabled>Đang bận cày cho khách, vui lòng đợi!</button>'
+    delete_ct_btn = f'<div style="position: absolute; top: 15px; right: 15px;"><a href="/admin/delete-cay-thue/{ct["id"]}" class="btn-delete" onclick="return confirm(\'Xóa dịch vụ này?\');">🗑️ XÓA</a></div>' if session.get('role') == 'admin' else ''
+    cay_thue_html += f'<div class="card" style="position: relative;">{delete_ct_btn}<div class="product-title">{ct["name"]}</div><p style="color: var(--text-secondary); font-size: 12px;">{ct["desc"]}</p><div class="price">{ct["price"]:,}đ</div>{btn_cay}</div>'
   if not cay_thue_html:
     cay_thue_html = '<p style="color: var(--text-secondary); font-size: 13px;">Chưa có gói cày thuê nào.</p>'
 
@@ -361,40 +306,11 @@ def index():
   if 'username' in session and session.get('role') != 'admin':
     curr_username = session['username']
     suggest_note = f'NAP {curr_username.upper()}'
-    nap_html = (
-        '<div class="card" style="border: 1px solid var(--success);"><h3 class="rgb-text" style="margin-top:0;">⚡ NẠP TIỀN</h3>'
-        '<div style="background: #12131c; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--border-color);">'
-        '<p style="margin: 0 0 8px 0; color: var(--accent); font-weight: 600;">📝 1. Chuyển khoản QR siêu tốc:</p>'
-        f'<p style="margin: 0; font-size: 13px; color: var(--text-secondary);">Nội dung: <b style="color: var(--success); font-size: 15px;">{suggest_note}</b>. Tự động cộng tiền sau 3 giây!</p></div>'
-        '<div style="text-align: center; margin-bottom: 15px;"><img src="https://i.ibb.co/0pvhCGz1/zlp-1792493518267.jpg" alt="QR" style="max-width: 190px; border-radius: 10px; border: 3px solid white;">'
-        '<p style="font-size: 12px; color: var(--text-secondary); margin: 8px 0 0 0;">Chủ TK: NGUYEN VAN DUONG</p></div>'
-        '<form action="/nap-the" method="POST" style="margin-top: 20px; border-top: 1px dashed var(--border-color); padding-top: 20px;">'
-        '<h4 style="color: var(--accent); margin: 0 0 12px 0; font-size: 15px;">2. Gửi Thẻ Cào (Duyệt Tay)</h4>'
-        '<label style="font-size: 13px; color: var(--text-secondary);">Nhà mạng:</label>'
-        '<select name="telco"><option value="VIETTEL">Viettel</option><option value="MOBIFONE">Mobifone</option><option value="VINAPHONE">Vinaphone</option></select>'
-        '<label style="font-size: 13px; color: var(--text-secondary);">Mệnh giá:</label>'
-        '<select name="amount"><option value="10000">10.000 đ</option><option value="20000">20.000 đ</option><option value="50000">50.000 đ</option><option value="100000">100.000 đ</option><option value="200000">200.000 đ</option><option value="500000">500.000 đ</option></select>'
-        '<input type="text" name="code" placeholder="Mã thẻ cào" required><input type="text" name="serial" placeholder="Số Serial" required>'
-        '<button type="submit" class="btn rgb-btn" style="margin-top: 12px;">GỬI THẺ CÀO DUYỆT</button></form></div>'
-    )
+    nap_html = f'<div class="card" style="border: 1px solid var(--success);"><h3 class="rgb-text" style="margin-top:0;">⚡ NẠP TIỀN</h3><div style="background: #12131c; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--border-color);"><p style="margin: 0 0 8px 0; color: var(--accent); font-weight: 600;">📝 1. Chuyển khoản QR siêu tốc:</p><p style="margin: 0; font-size: 13px; color: var(--text-secondary);">Nội dung: <b style="color: var(--success); font-size: 15px;">{suggest_note}</b>. Tự động cộng tiền sau 3 giây!</p></div><div style="text-align: center; margin-bottom: 15px;"><img src="https://i.ibb.co/0pvhCGz1/zlp-1792493518267.jpg" alt="QR" style="max-width: 190px; border-radius: 10px; border: 3px solid white;"><p style="font-size: 12px; color: var(--text-secondary); margin: 8px 0 0 0;">Chủ TK: NGUYEN VAN DUONG</p></div><form action="/nap-the" method="POST" style="margin-top: 20px; border-top: 1px dashed var(--border-color); padding-top: 20px;"><h4 style="color: var(--accent); margin: 0 0 12px 0; font-size: 15px;">2. Gửi Thẻ Cào (Duyệt Tay)</h4><label style="font-size: 13px; color: var(--text-secondary);">Nhà mạng:</label><select name="telco"><option value="VIETTEL">Viettel</option><option value="MOBIFONE">Mobifone</option><option value="VINAPHONE">Vinaphone</option></select><label style="font-size: 13px; color: var(--text-secondary);">Mệnh giá:</label><select name="amount"><option value="10000">10.000 đ</option><option value="20000">20.000 đ</option><option value="50000">50.000 đ</option><option value="100000">100.000 đ</option><option value="200000">200.000 đ</option><option value="500000">500.000 đ</option></select><input type="text" name="code" placeholder="Mã thẻ cào" required><input type="text" name="serial" placeholder="Số Serial" required><button type="submit" class="btn rgb-btn" style="margin-top: 12px;">GỬI THẺ CÀO DUYỆT</button></form></div>'
 
   banner_html = '<div class="card" style="text-align: center; padding: 10px; border: 1px solid var(--primary); background: linear-gradient(180deg, rgba(255,71,87,0.05), var(--card-bg));"><img src="https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png" alt="Banner" style="width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px;"></div>'
 
-  content = (
-      banner_html
-      + nap_html
-      + '<div style="display: grid; grid-template-columns: 1fr; gap: 20px;"><div><h2 class="rgb-text">🔥 DANH MỤC TÀI KHOẢN & TÚI MÙ</h2><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">'
-      + products_html
-      + '</div><h2 class="rgb-text" style="margin-top: 30px;">⚔️ DỊCH VỤ CÀY THUÊ UY TÍN</h2>'
-      + status_note_box
-      + '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">'
-      + cay_thue_html
-      + '</div></div><div><div class="card" style="border: 1px solid var(--accent); margin-bottom: 20px;"><h3 class="rgb-text" style="text-align: center; margin-top: 0;">🏆 TOP NẠP TIỀN</h3>'
-      + top_html
-      + '</div>'
-      + chat_html
-      + '</div></div>'
-  )
+  content = banner_html + nap_html + f'<div style="display: grid; grid-template-columns: 1fr; gap: 20px;"><div><h2 class="rgb-text">🔥 DANH MỤC TÀI KHOẢN & TÚI MÙ</h2><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">{products_html}</div><h2 class="rgb-text" style="margin-top: 30px;">⚔️ DỊCH VỤ CÀY THUÊ UY TÍN</h2>{status_note_box}<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">{cay_thue_html}</div></div><div><div class="card" style="border: 1px solid var(--accent); margin-bottom: 20px;"><h3 class="rgb-text" style="text-align: center; margin-top: 0;">🏆 TOP NẠP TIỀN</h3>{top_html}</div>{chat_html}</div></div>'
   return render_template_string(BASE_HTML, content=content, users=users)
 
 @app.route('/dat-cay-thue/<int:ct_id>', methods=['GET', 'POST'])
@@ -478,103 +394,115 @@ def tui_mu(product_id):
   if 'username' not in session:
     flash('Đăng nhập để mở túi mù!')
     return redirect(url_for('login'))
-  product = next((p for p in products if p['id'] == product_id), None)
-  if not product:
-    flash('Không tìm thấy sản phẩm!')
+  
+  try:
+    product = next((p for p in products if p['id'] == product_id), None)
+    if not product:
+      flash('Không tìm thấy sản phẩm!')
+      return redirect(url_for('index'))
+
+    images = product.get('images', [])
+    if not isinstance(images, list) or len(images) == 0 or not images[0]:
+      images = ['https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png']
+
+    slider_slides = ''
+    slider_dots = ''
+    for i, img in enumerate(images):
+      slider_slides += f'<div class="slider-slide"><img src="{img}" alt="Img"></div>'
+      active_cls = ' active' if i == 0 else ''
+      slider_dots += f'<span class="dot{active_cls}" onclick="currentSlide({i})"></span>'
+
+    slider_html = f'<div class="slider-container"><div class="slider-track" id="sliderTrack">{slider_slides}</div>{"<button class=\"slider-btn slider-prev\" onclick=\"prevSlide()\">❮</button><button class=\"slider-btn slider-next\" onclick=\"nextSlide()\">❯</button>" if len(images) > 1 else ""}</div>{"<div class=\"slider-dots\">" + slider_dots + "</div>" if len(images) > 1 else ""}'
+
+    content = f"""
+      <div class="card" style="max-width: 500px; margin: auto; border: 1px solid var(--accent);">
+          <h2 class="rgb-text" style="text-align: center;">⚡ MỞ TÚI MÙ: {product.get('name', '')}</h2>
+          {slider_html}
+          <p style="color: var(--text-secondary); text-align: center; margin-top: 10px;">{product.get('desc', '')}</p>
+          <p class="price" style="text-align: center;">Giá: {product.get('price', 0):,}đ</p>
+          <p style="color: var(--text-secondary); text-align: center;">Kho còn: <b style="color: white;">{len(product.get('game_accs', []))}</b> tài khoản</p>
+          <div style="margin: 20px 0;"><label style="font-size: 13px; color: var(--text-secondary);">Mã giảm giá:</label><input type="text" id="coupon_code" placeholder="Mã (nếu có)"><button type="button" onclick="applyCoupon({product.get('price', 0)})" class="btn rgb-btn" style="margin-top: 8px;">Áp dụng mã</button><p id="coupon_msg" style="font-size: 13px; margin-top: 8px; text-align: center;"></p></div>
+          <h3 id="final_price_display" style="margin: 15px 0; text-align: center; color: var(--success);">Tổng thanh toán: {product.get('price', 0):,}đ</h3>
+          <button onclick="xeTui({product['id']})" class="btn rgb-btn" style="font-size: 16px; padding: 14px;">🔥 XÉ TÚI NGAY</button>
+          <div style="text-align: center; margin-top: 15px;"><a href="/" style="color: var(--text-secondary); font-size: 13px;">← Trang chủ</a></div>
+      </div>
+      <script>
+      let slideIndex = 0;
+      function showSlide(index) {{ const track = document.getElementById("sliderTrack"); const slides = document.querySelectorAll(".slider-slide"); const dots = document.querySelectorAll(".dot"); if (slides.length === 0) return; if (index >= slides.length) slideIndex = 0; if (index < 0) slideIndex = slides.length - 1; track.style.transform = `translateX(-${slideIndex * 100}%)`; dots.forEach((dot, i) => {{ dot.classList.toggle("active", i === slideIndex); }}); }}
+      function nextSlide() {{ slideIndex++; showSlide(slideIndex); }}
+      function prevSlide() {{ slideIndex--; showSlide(slideIndex); }}
+      function currentSlide(n) {{ slideIndex = n; showSlide(slideIndex); }}
+      function applyCoupon(basePrice) {{ let code = document.getElementById("coupon_code").value; fetch("/api/check-coupon", {{method: "POST", headers: {{"Content-Type": "application/json"}}, body: JSON.stringify({{code: code}})}}).then(res => res.json()).then(data => {{ let msg = document.getElementById("coupon_msg"); if(data.success) {{ let final = Math.max(0, basePrice - data.discount); msg.style.color = "var(--success)"; msg.innerText = "Giảm " + data.discount.toLocaleString() + "đ"; document.getElementById("final_price_display").innerText = "Tổng thanh toán: " + final.toLocaleString() + "đ"; }} else {{ msg.style.color = "var(--primary)"; msg.innerText = data.message; }} }}); }}
+      function xeTui(productId) {{ let code = document.getElementById("coupon_code").value; fetch("/api/buy-random/" + productId, {{method: "POST", headers: {{"Content-Type": "application/json"}}, body: JSON.stringify({{coupon_code: code}})}}).then(res => res.json()).then(data => {{ if(data.success) {{ alert("🎉 Thành công! Acc:\\n" + data.account_info); window.location.href = "/lich-su"; }} else {{ alert(data.message); }} }}); }}
+      </script>
+    """
+    return render_template_string(BASE_HTML, content=content, users=users)
+  except Exception as e:
+    print(f"Lỗi tui-mu: {e}")
+    flash("Đã xảy ra lỗi khi tải trang sản phẩm!")
     return redirect(url_for('index'))
-
-  images = product.get('images', [])
-  if not isinstance(images, list) or len(images) == 0 or not images[0]:
-    images = ['https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png']
-
-  slider_slides = ''
-  slider_dots = ''
-  for i, img in enumerate(images):
-    slider_slides += f'<div class="slider-slide"><img src="{img}" alt="Img"></div>'
-    active_cls = ' active' if i == 0 else ''
-    slider_dots += f'<span class="dot{active_cls}" onclick="currentSlide({i})"></span>'
-
-  slider_html = f'<div class="slider-container"><div class="slider-track" id="sliderTrack">{slider_slides}</div>{"<button class=\"slider-btn slider-prev\" onclick=\"prevSlide()\">❮</button><button class=\"slider-btn slider-next\" onclick=\"nextSlide()\">❯</button>" if len(images) > 1 else ""}</div>{"<div class=\"slider-dots\">" + slider_dots + "</div>" if len(images) > 1 else ""}'
-
-  content = (
-      '<div class="card" style="max-width: 500px; margin: auto; border: 1px solid var(--accent);">'
-      + '<h2 class="rgb-text" style="text-align: center;">⚡ MỞ TÚI MÙ: ' + str(product.get('name', '')) + '</h2>'
-      + slider_html
-      + '<p style="color: var(--text-secondary); text-align: center; margin-top: 10px;">' + str(product.get('desc', '')) + '</p>'
-      + '<p class="price" style="text-align: center;">Giá: ' + f"{product.get('price', 0):,}" + 'đ</p>'
-      + '<p style="color: var(--text-secondary); text-align: center;">Kho còn: <b style="color: white;">' + str(len(product.get('game_accs', []))) + '</b> tài khoản</p>'
-      + '<div style="margin: 20px 0;"><label style="font-size: 13px; color: var(--text-secondary);">Mã giảm giá:</label><input type="text" id="coupon_code" placeholder="Mã (nếu có)"><button type="button" onclick="applyCoupon(' + str(product.get('price', 0)) + ')" class="btn rgb-btn" style="margin-top: 8px;">Áp dụng mã</button><p id="coupon_msg" style="font-size: 13px; margin-top: 8px; text-align: center;"></p></div>'
-      + '<h3 id="final_price_display" style="margin: 15px 0; text-align: center; color: var(--success);">Tổng thanh toán: ' + f"{product.get('price', 0):,}" + 'đ</h3>'
-      + '<button onclick="xeTui(' + str(product['id']) + ')" class="btn rgb-btn" style="font-size: 16px; padding: 14px;">🔥 XÉ TÚI NGAY</button>'
-      + '<div style="text-align: center; margin-top: 15px;"><a href="/" style="color: var(--text-secondary); font-size: 13px;">← Trang chủ</a></div>'
-      + '</div>'
-      + '<script>'
-      + 'let slideIndex = 0;'
-      + 'function showSlide(index) { const track = document.getElementById("sliderTrack"); const slides = document.querySelectorAll(".slider-slide"); const dots = document.querySelectorAll(".dot"); if (slides.length === 0) return; if (index >= slides.length) slideIndex = 0; if (index < 0) slideIndex = slides.length - 1; track.style.transform = `translateX(-${slideIndex * 100}%)`; dots.forEach((dot, i) => { dot.classList.toggle("active", i === slideIndex); }); }'
-      + 'function nextSlide() { slideIndex++; showSlide(slideIndex); }'
-      + 'function prevSlide() { slideIndex--; showSlide(slideIndex); }'
-      + 'function currentSlide(n) { slideIndex = n; showSlide(slideIndex); }'
-      + 'function applyCoupon(basePrice) { let code = document.getElementById("coupon_code").value; fetch("/api/check-coupon", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({code: code})}).then(res => res.json()).then(data => { let msg = document.getElementById("coupon_msg"); if(data.success) { let final = Math.max(0, basePrice - data.discount); msg.style.color = "var(--success)"; msg.innerText = "Giảm " + data.discount.toLocaleString() + "đ"; document.getElementById("final_price_display").innerText = "Tổng thanh toán: " + final.toLocaleString() + "đ"; } else { msg.style.color = "var(--primary)"; msg.innerText = data.message; } }); }'
-      + 'function xeTui(productId) { let code = document.getElementById("coupon_code").value; fetch("/api/buy-random/" + productId, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({coupon_code: code})}).then(res => res.json()).then(data => { if(data.success) { alert("🎉 Thành công! Acc:\\n" + data.account_info); window.location.href = "/lich-su"; } else { alert(data.message); } }); }'
-      + '</script>'
-  )
-  return render_template_string(BASE_HTML, content=content, users=users)
 
 @app.route('/buy/<int:product_id>')
 def buy(product_id):
   if 'username' not in session:
     flash('Vui lòng đăng nhập!')
     return redirect(url_for('login'))
-  product = next((p for p in products if p['id'] == product_id), None)
-  if not product:
-    flash('Không tìm thấy sản phẩm!')
-    return redirect(url_for('index'))
+  
+  try:
+    product = next((p for p in products if p['id'] == product_id), None)
+    if not product:
+      flash('Không tìm thấy sản phẩm!')
+      return redirect(url_for('index'))
 
-  images = product.get('images', [])
-  if not isinstance(images, list) or len(images) == 0 or not images[0]:
-    images = ['https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png']
+    images = product.get('images', [])
+    if not isinstance(images, list) or len(images) == 0 or not images[0]:
+      images = ['https://i.ibb.co/Z1Yck7SH/7475196962448704520-avatar-png.png']
 
-  slider_slides = ''
-  slider_dots = ''
-  for i, img in enumerate(images):
-    slider_slides += f'<div class="slider-slide"><img src="{img}" alt="Img"></div>'
-    active_cls = ' active' if i == 0 else ''
-    slider_dots += f'<span class="dot{active_cls}" onclick="currentSlide({i})"></span>'
+    slider_slides = ''
+    slider_dots = ''
+    for i, img in enumerate(images):
+      slider_slides += f'<div class="slider-slide"><img src="{img}" alt="Img"></div>'
+      active_cls = ' active' if i == 0 else ''
+      slider_dots += f'<span class="dot{active_cls}" onclick="currentSlide({i})"></span>'
 
-  slider_html = f'<div class="slider-container"><div class="slider-track" id="sliderTrack">{slider_slides}</div>{"<button class=\"slider-btn slider-prev\" onclick=\"prevSlide()\">❮</button><button class=\"slider-btn slider-next\" onclick=\"nextSlide()\">❯</button>" if len(images) > 1 else ""}</div>{"<div class=\"slider-dots\">" + slider_dots + "</div>" if len(images) > 1 else ""}'
+    slider_html = f'<div class="slider-container"><div class="slider-track" id="sliderTrack">{slider_slides}</div>{"<button class=\"slider-btn slider-prev\" onclick=\"prevSlide()\">❮</button><button class=\"slider-btn slider-next\" onclick=\"nextSlide()\">❯</button>" if len(images) > 1 else ""}</div>{"<div class=\"slider-dots\">" + slider_dots + "</div>" if len(images) > 1 else ""}'
 
-  content = f"""
-    <div class="card" style="max-width: 500px; margin: auto; border: 1px solid var(--primary);">
-        <h2 class="rgb-text" style="text-align: center;">CHI TIẾT SẢN PHẨM</h2>
-        {slider_html}
-        <div class="product-title" style="font-size: 16px; margin-top: 10px;">{product.get('name', '')}</div>
-        <p style="color: var(--text-secondary); font-size: 13px;">{product.get('desc', '')}</p>
-        <p class="price">Giá: {product.get('price', 0):,}đ</p>
-        <p style="color: var(--text-secondary); font-size: 13px;">Kho còn: <b style="color: white;">{len(product.get('game_accs', []))}</b> tài khoản</p>
-        
-        <div style="margin: 15px 0;">
-            <label style="font-size: 13px; color: var(--text-secondary);">Mã giảm giá:</label>
-            <input type="text" id="coupon_code" placeholder="Mã (nếu có)">
-            <button type="button" onclick="applyCoupon({product.get('price', 0)})" class="btn rgb-btn" style="margin-top: 8px;">Áp dụng mã</button>
-            <p id="coupon_msg" style="font-size: 13px; margin-top: 8px; text-align: center;"></p>
-        </div>
-        
-        <h3 id="final_price_display" style="margin: 15px 0; text-align: center; color: var(--success);">Tổng thanh toán: {product.get('price', 0):,}đ</h3>
-        
-        <button onclick="confirmBuy({product['id']})" class="btn rgb-btn" style="font-size: 16px; padding: 14px;">🛒 MUA NGAY</button>
-        <div style="text-align: center; margin-top: 15px;"><a href="/" style="color: var(--text-secondary); font-size: 13px;">← Trang chủ</a></div>
-    </div>
-    <script>
-    let slideIndex = 0;
-    function showSlide(index) {{ const track = document.getElementById("sliderTrack"); const slides = document.querySelectorAll(".slider-slide"); const dots = document.querySelectorAll(".dot"); if (slides.length === 0) return; if (index >= slides.length) slideIndex = 0; if (index < 0) slideIndex = slides.length - 1; track.style.transform = `translateX(-${slideIndex * 100}%)`; dots.forEach((dot, i) => {{ dot.classList.toggle("active", i === slideIndex); }}); }}
-    function nextSlide() {{ slideIndex++; showSlide(slideIndex); }}
-    function prevSlide() {{ slideIndex--; showSlide(slideIndex); }}
-    function currentSlide(n) {{ slideIndex = n; showSlide(slideIndex); }}
-    function applyCoupon(basePrice) {{ let code = document.getElementById('coupon_code').value; fetch('/api/check-coupon', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({code: code})}).then(res => res.json()).then(data => {{ let msg = document.getElementById('coupon_msg'); if(data.success) {{ let final = Math.max(0, basePrice - data.discount); msg.style.color = 'var(--success)'; msg.innerText = "Giảm " + data.discount.toLocaleString() + "đ"; document.getElementById('final_price_display').innerText = "Tổng thanh toán: " + final.toLocaleString() + "đ"; }} else {{ msg.style.color = 'var(--primary)'; msg.innerText = data.message; }} }}); }}
-    function confirmBuy(productId) {{ let code = document.getElementById('coupon_code').value; fetch('/api/buy-product/' + productId, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({coupon_code: code})}).then(res => res.json()).then(data => {{ if(data.success) {{ alert("🎉 Mua thành công! Thông tin:\\n" + data.account_info); window.location.href = '/lich-su'; }} else {{ alert(data.message); }} }}); }}
-    </script>
+    content = f"""
+      <div class="card" style="max-width: 500px; margin: auto; border: 1px solid var(--primary);">
+          <h2 class="rgb-text" style="text-align: center;">CHI TIẾT SẢN PHẨM</h2>
+          {slider_html}
+          <div class="product-title" style="font-size: 16px; margin-top: 10px;">{product.get('name', '')}</div>
+          <p style="color: var(--text-secondary); font-size: 13px;">{product.get('desc', '')}</p>
+          <p class="price">Giá: {product.get('price', 0):,}đ</p>
+          <p style="color: var(--text-secondary); font-size: 13px;">Kho còn: <b style="color: white;">{len(product.get('game_accs', []))}</b> tài khoản</p>
+          
+          <div style="margin: 15px 0;">
+              <label style="font-size: 13px; color: var(--text-secondary);">Mã giảm giá:</label>
+              <input type="text" id="coupon_code" placeholder="Mã (nếu có)">
+              <button type="button" onclick="applyCoupon({product.get('price', 0)})" class="btn rgb-btn" style="margin-top: 8px;">Áp dụng mã</button>
+              <p id="coupon_msg" style="font-size: 13px; margin-top: 8px; text-align: center;"></p>
+          </div>
+          
+          <h3 id="final_price_display" style="margin: 15px 0; text-align: center; color: var(--success);">Tổng thanh toán: {product.get('price', 0):,}đ</h3>
+          
+          <button onclick="confirmBuy({product['id']})" class="btn rgb-btn" style="font-size: 16px; padding: 14px;">🛒 MUA NGAY</button>
+          <div style="text-align: center; margin-top: 15px;"><a href="/" style="color: var(--text-secondary); font-size: 13px;">← Trang chủ</a></div>
+      </div>
+      <script>
+      let slideIndex = 0;
+      function showSlide(index) {{ const track = document.getElementById("sliderTrack"); const slides = document.querySelectorAll(".slider-slide"); const dots = document.querySelectorAll(".dot"); if (slides.length === 0) return; if (index >= slides.length) slideIndex = 0; if (index < 0) slideIndex = slides.length - 1; track.style.transform = `translateX(-${slideIndex * 100}%)`; dots.forEach((dot, i) => {{ dot.classList.toggle("active", i === slideIndex); }}); }}
+      function nextSlide() {{ slideIndex++; showSlide(slideIndex); }}
+      function prevSlide() {{ slideIndex--; showSlide(slideIndex); }}
+      function currentSlide(n) {{ slideIndex = n; showSlide(slideIndex); }}
+      function applyCoupon(basePrice) {{ let code = document.getElementById('coupon_code').value; fetch('/api/check-coupon', {{method: 'POST', headers: {{'Content-Type': 'application/json'}}, body: JSON.stringify({{code: code}})}}).then(res => res.json()).then(data => {{ let msg = document.getElementById('coupon_msg'); if(data.success) {{ let final = Math.max(0, basePrice - data.discount); msg.style.color = 'var(--success)'; msg.innerText = "Giảm " + data.discount.toLocaleString() + "đ"; document.getElementById('final_price_display').innerText = "Tổng thanh toán: " + final.toLocaleString() + "đ"; }} else {{ msg.style.color = 'var(--primary)'; msg.innerText = data.message; }} }}); }}
+      function confirmBuy(productId) {{ let code = document.getElementById('coupon_code').value; fetch('/api/buy-product/' + productId, {{method: 'POST', headers: {{'Content-Type': 'application/json'}}, body: JSON.stringify({{coupon_code: code}})}}).then(res => res.json()).then(data => {{ if(data.success) {{ alert("🎉 Mua thành công! Thông tin:\\n" + data.account_info); window.location.href = '/lich-su'; }} else {{ alert(data.message); }} }}); }}
+      </script>
     """
-  return render_template_string(BASE_HTML, content=content, users=users)
+    return render_template_string(BASE_HTML, content=content, users=users)
+  except Exception as e:
+    print(f"Lỗi buy: {e}")
+    flash("Đã xảy ra lỗi khi tải trang mua hàng!")
+    return redirect(url_for('index'))
 
 @app.route('/api/buy-product/<int:product_id>', methods=['POST'])
 def api_buy_product(product_id):
@@ -775,7 +703,6 @@ def admin():
     desc = request.form['desc']
     game_acc = request.form['game_acc'].strip()
 
-    # --- XỬ LÝ NHẬN ẢNH TỪ BỘ NHỚ ĐIỆN THOẠI ---
     images_list = []
     uploaded_files = request.files.getlist('image_files')
     for file in uploaded_files:
@@ -804,7 +731,7 @@ def admin():
           'images': images_list,
           'game_accs': [game_acc] if game_acc else [],
       })
-      flash('Đã thêm sản phẩm mới thành công với ảnh từ thiết bị!')
+      flash('Đã thêm sản phẩm mới thành công!')
     return redirect(url_for('admin'))
 
   if request.method == 'POST' and 'add_cay_thue' in request.form:
@@ -877,77 +804,4 @@ def admin():
   chat_users = sorted(list(set([m['user'] for m in messages_db])))
   chat_admin_html = ''.join([f'<div class="card" style="background: #12131c; margin-bottom: 12px;"><p><b>Khách: <span style="color: #70a1ff;">{cu}</span></b></p><div style="background: #181a25; padding: 10px; border-radius: 8px; max-height: 100px; overflow-y: auto; font-size: 13px; margin-bottom: 10px;">' + ''.join([f"<div><b>{m['sender']}:</b> {m['message']}</div>" for m in messages_db if m['user'] == cu]) + f'</div><form method="POST"><input type="hidden" name="target_user" value="{cu}"><input type="text" name="reply_text" placeholder="Trả lời..." required style="margin: 0 0 8px 0;"><button type="submit" name="reply_msg" class="btn rgb-btn" style="padding: 6px; font-size: 12px;">GỬI</button></form></div>' for cu in chat_users])
 
-  cards_html = ''.join([f'<div class="card"><p><b>User:</b> {c["user"]} | <b>{c["type"]}</b> | <span style="color: var(--accent);">{c["amount"]:,}đ</span></p><p><b>Info:</b> {c["info"]}</p><p><b>Trạng thái:</b> <span style="color: var(--success);">{c["status"]}</span></p>' + (f'<div style="display: flex; gap: 8px; margin-top: 8px;"><form action="/admin/duyet-the/{c["id"]}" method="POST" style="margin:0;"><button type="submit" class="btn rgb-btn" style="background: #2ed573; padding: 6px; font-size: 12px;">✔️ DUYỆT</button></form><form action="/admin/huy-the/{c["id"]}" method="POST" style="margin:0;"><button type="submit" class="btn rgb-btn" style="background: #ff4757; padding: 6px; font-size: 12px;">❌ HỦY</button></form></div>' if c['status'] == 'Đang chờ Admin duyệt' else '') + '</div>' for c in cards_queue]) if cards_queue else '<p style="color: var(--text-secondary); font-size: 13px;">Không có thẻ cào.</p>'
-
-  checked_attr = 'checked' if cay_thue_status['is_ready'] else ''
-
-  admin_content = (
-      '<h2 class="rgb-text">⚙️ TRANG QUẢN TRỊ ADMIN</h2>'
-      
-      '<div class="card" style="border: 1px solid var(--accent);">'
-      '<h3 class="rgb-text" style="margin-top: 0;">📒 Sổ Tay Ghi Chú Cày Cuốc</h3>'
-      '<form method="POST">'
-      '<input type="text" name="private_account" placeholder="username | password" required>'
-      '<textarea name="private_note" placeholder="Ghi chú tiến độ..." rows="2" required></textarea>'
-      '<button type="submit" name="add_private_acc" class="btn rgb-btn" style="margin-top: 10px;">LƯU SỔ TAY</button>'
-      '</form>'
-      '<div style="background: #12131c; padding: 12px; border-radius: 8px; margin-top: 15px; max-height: 200px; overflow-y: auto;">' + private_accs_html + '</div>'
-      '</div>'
-
-      '<div class="card" style="border: 1px solid var(--success);">'
-      '<h3 class="rgb-text" style="margin-top: 0;">⚡ Trạng Thái Cày Thuê</h3>'
-      '<form method="POST">'
-      '<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">'
-      f'<input type="checkbox" name="is_ready" {checked_attr} style="width: 20px; height: 20px;">'
-      '<label style="font-size: 14px; font-weight: 600; margin: 0;">Sẵn sàng nhận đơn</label></div>'
-      f'<input type="text" name="current_task" value="{cay_thue_status["current_task"]}" placeholder="Thông báo trạng thái...">'
-      '<button type="submit" name="update_cay_thue_status" class="btn rgb-btn" style="margin-top: 10px;">CẬP NHẬT</button>'
-      '</form></div>'
-
-      '<div class="card" style="border: 1px solid var(--primary);">'
-      '<h3 class="rgb-text" style="margin-top: 0;">⚔️ Thêm Gói Cày Thuê</h3>'
-      '<form method="POST">'
-      '<input type="text" name="ct_name" placeholder="Tên gói cày..." required>'
-      '<input type="number" name="ct_price" placeholder="Giá tiền (VNĐ)" required>'
-      '<input type="text" name="ct_desc" placeholder="Mô tả..." required>'
-      '<button type="submit" name="add_cay_thue" class="btn rgb-btn" style="margin-top: 15px;">THÊM GÓI CÀY</button>'
-      '</form></div>'
-
-      '<div class="card" style="border: 1px solid var(--primary);">'
-      '<h3 class="rgb-text" style="margin-top: 0;">📦 Thêm Sản Phẩm Mới (Chọn Ảnh Từ Điện Thoại)</h3>'
-      '<form method="POST" enctype="multipart/form-data">'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Tên sản phẩm:</label>'
-      '<input type="text" name="name" placeholder="VD: Acc V4..." required>'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Phân loại:</label>'
-      '<select name="category"><option value="tuichon">Acc Tự Chọn</option><option value="random">Acc Random / Túi Mù</option></select>'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Giá tiền (VNĐ):</label>'
-      '<input type="number" name="price" placeholder="VD: 30000" required>'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Chọn ảnh từ bộ nhớ thiết bị (Có thể chọn nhiều ảnh):</label>'
-      '<input type="file" name="image_files" accept="image/*" multiple style="background: #12131c; padding: 10px; border: 1px dashed var(--primary); border-radius: 8px; cursor: pointer; color: white; margin: 10px 0;">'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Mô tả ngắn:</label>'
-      '<input type="text" name="desc" placeholder="Mô tả..." required>'
-      '<label style="font-size: 13px; color: var(--text-secondary);">Tài khoản game:</label>'
-      '<input type="text" name="game_acc" placeholder="username | password">'
-      '<button type="submit" name="add_product" class="btn rgb-btn" style="margin-top: 15px;">THÊM VÀO KHO</button>'
-      '</form></div>'
-
-      '<div class="card" style="border: 1px solid var(--accent);"><h3 class="rgb-text" style="margin-top: 0;">🎟️ Mã Giảm Giá</h3><form method="POST" style="margin-bottom: 15px;"><input type="text" name="coupon_code" placeholder="Mã (VD: GIAM5K)" required><input type="number" name="discount_amount" placeholder="Số tiền giảm (VNĐ)" required><input type="number" name="expires_in_days" placeholder="Số ngày hạn" required><input type="number" name="max_uses" placeholder="Giới hạn lượt dùng" required><button type="submit" name="add_coupon" class="btn rgb-btn" style="margin-top: 8px;">TẠO MÃ</button></form><div style="background: #12131c; padding: 12px; border-radius: 8px;">' + (coupons_html if coupons_html else '<p>Trống.</p>') + '</div></div>'
-      '<div class="card" style="border: 1px solid var(--accent);"><h3 class="rgb-text" style="margin-top: 0;">💰 Cộng Tiền User</h3><form method="POST"><input type="text" name="target_username" placeholder="Tên user..." required><input type="number" name="bonus_amount" placeholder="Số tiền..." required><button type="submit" name="bonus_user" class="btn rgb-btn" style="margin-top: 15px;">CỘNG TIỀN</button></form></div>'
-      '<div class="card" style="border: 1px solid #70a1ff;"><h3 class="rgb-text" style="margin-top: 0;">💬 Tin Nhắn Khách Hàng</h3>' + (chat_admin_html if chat_admin_html else '<p>Trống.</p>') + '</div>'
-      '<div class="card" style="border: 1px solid var(--success);"><h3 class="rgb-text" style="margin-top: 0;">📋 Quản Lý Thẻ Cào</h3>' + cards_html + '</div>'
-  )
-  return render_template_string(BASE_HTML, content=admin_content, users=users)
-
-@app.route('/admin/coupon/toggle/<int:coupon_id>', methods=['POST'])
-def toggle_coupon(coupon_id):
-  if 'username' not in session or session.get('role') != 'admin':
-    return redirect(url_for('index'))
-  for c in coupons_db:
-    if c['id'] == coupon_id:
-      c['is_active'] = not c['is_active']
-      flash('Đã đổi trạng thái mã!')
-      break
-  return redirect(url_for('admin'))
-
-if __name__ == '__main__':
-  app.run(host='0.0.0.0', port=5000)
+  cards_html = ''.join([f'<div class="card"><p><b>User:</b> {c["user"]} | <b>{c["type"]}</b> | <span style="color
